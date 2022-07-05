@@ -21,8 +21,8 @@ class Postgres {
             .catch((err) => console.error("connection error", err.stack));
     }
 
-    async view() {
-        let result = await this.pool.query("SELECT * FROM view_usuarios");
+    view() {
+        let result = this.pool.query("SELECT * FROM view_modulos");
         return result;
     }
 }

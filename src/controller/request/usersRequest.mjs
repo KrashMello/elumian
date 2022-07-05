@@ -1,6 +1,6 @@
 import { RequestValidator } from "#Class/validator";
 
-const userRule = {
+const rule = {
     username: {
         alpha: {},
         length: { min: 5, max: 15 },
@@ -11,14 +11,10 @@ const userRule = {
     },
 };
 
-const userRuleMessage = {
+const message = {
     alpha: "las letras no coinciden",
     length: "debe meter mas numeros ",
     alphanumeric: "debe haber solo letras y numeros",
 };
 
-export const userRequestValidate = new RequestValidator(
-    "en-US",
-    userRule,
-    userRuleMessage
-);
+export const userRequestValidate = new RequestValidator("en-US", rule, message);

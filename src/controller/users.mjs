@@ -1,5 +1,6 @@
 import { Users } from "#Models/users";
 import { userRequestValidate } from "#Request/usersRequest";
+import DB from "#Class/database";
 
 const user = new Users();
 
@@ -30,7 +31,7 @@ user.created(async (_req, response) => {
     let validate = userRequestValidate.getResult(_req.query);
     if (validate.status === "ok") {
         let ip = _req.header("x-forwarded-for") || _req.ip;
-        DB.view().then((res) => response.json(res.rows));
+        await DB.view().then((res) => response.json(res.rows));
     } else if (validate.status === "error") {
         response.json(validate);
     }
