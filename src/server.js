@@ -7,8 +7,8 @@ import DB from "#Class/database";
 const app = express();
 
 routes(app);
-
-DB.Connect();
+let db = new DB();
+db.Connect();
 
 app.listen(process.env.SERVER_PORT || 3000, () => {
     console.log(
