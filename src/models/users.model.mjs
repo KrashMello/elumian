@@ -7,6 +7,7 @@ export default class Users extends Model {
   constructor() {
     super();
     this.DB = new dbpg();
+    this.middelwareExepction = ["get"];
   }
   //method for search a user in the data base
   findOne(username) {
@@ -29,6 +30,6 @@ export default class Users extends Model {
   }
   //extra method
   showDetails(_callback) {
-    this.app.get("/showDetails", _callback);
+    this.routes("/", "showDetails", "GET", _callback);
   }
 }

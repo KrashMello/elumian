@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-verifyToken = (req, res, next) => {
+export default verifyToken = (req, res, next) => {
   let token = req.headers["x-access-token"];
   if (!token) {
     return res.status(403).send({
@@ -70,10 +70,3 @@ isModeratorOrAdmin = (req, res, next) => {
     });
   });
 };
-const authJwt = {
-  verifyToken: verifyToken,
-  isAdmin: isAdmin,
-  isModerator: isModerator,
-  isModeratorOrAdmin: isModeratorOrAdmin,
-};
-module.exports = authJwt;
