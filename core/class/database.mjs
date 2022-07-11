@@ -1,35 +1,51 @@
 import pg from "pg";
 
-const config = {
+class Postgres {
+  #config = {
     host: process.env.DB_HOST || "localhost",
     port: process.env.DB_PORT || 5432,
     database: process.env.DB_DATABASE || "postges",
     user: process.env.DB_USERNAME || "postgre",
     password: process.env.DB_PASSWORD || "",
-};
+  };
 
-class Postgres {
-    constructor() {
-        this.Pool = pg.Pool;
-        this.pool = new this.Pool(config);
-    }
+  constructor() {
+    this.Pool = pg.Pool;
+    this.pool = new this.Pool(this.#config);
+  }
 
-    Connect() {
-        this.pool
-            .connect()
-            .then(() => console.log("connected"))
-            .catch((err) => console.error("connection error", err.stack));
-    }
+  Connect() {
+    this.pool
+      .connect()
+      .then(() => console.log("connected"))
+      .catch((err) => console.error("connection error", err.stack));
+  }
 
-    view() {
-        let result = this.pool.query("SELECT * FROM view_modulos");
-        return result;
+  select(columns = "*", table_name = "", conditions = "", limit = -1) {
+    if (columns !== "*" && columns === Array) {
+      let columns = columns
+        .map((value) => {
+          return '"' + value + '"';
+        })
+        .toString();
     }
+    if (table_name !== "") {
+      let query = "SELECT " + columns + " FROM " + table_name;
+      if (conditions !== "") query += " WHERE " + conditions;
+      if (limit > -1) query += " LIMIT " + limit;
+      let result = this.pool.query("select * from (" + query + ") as sc");
+      return result;
+    } else {
+      let query = "SELECT " + columns;
+      let result = this.pool.query("select * from (" + query + ") as sc");
+      return result;
+    }
+  }
 }
 
 class Mysql {
-    constructor() {}
+  constructor() {}
 }
 
-const db = process.env.DB_CONNECTION === "pgsql" ? new Postgres() : new Mysql();
+const db = process.env.DB_CONNECTION === "pgsql" ? Postgres : Mysql;
 export default db;
