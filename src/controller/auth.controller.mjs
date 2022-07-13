@@ -15,14 +15,11 @@ auth.singIn(async (req, response) => {
     let userData;
     // search the existen of user
 
-    userData = await user
-      .findOne(req.query.username)
-      .then((res) => {
-        return res;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    userData = await user.findOne(req.query.username).then((res) => {
+      return res;
+    });
+    if (userData === undefined)
+      return response.status(401).json({ message: "User not found" });
     // comparing password
     let passwordIsValid = bcrypt.compareSync(
       req.query.password,
