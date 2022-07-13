@@ -10,11 +10,14 @@ export default class Users extends Model {
     this.middelwareExepction = ["get"];
   }
   //method for search a user in the data base
-  findOne(username) {
-    let searchUsername = null;
-    this.DB.select("username", "view_users", "username = '" + username + "'", 1)
+  async findOne(username) {
+    let searchUsername = await this.DB.select(
+      "*",
+      "view_users",
+      "username = '" + username + "'"
+    )
       .then((response) => {
-        searchUsername = response.rows[0];
+        return response.rows[0];
       })
       .catch((error) => {
         console.log(error);

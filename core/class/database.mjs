@@ -17,7 +17,7 @@ class Postgres {
   Connect() {
     this.pool
       .connect()
-      .then(() => console.log("connected"))
+      .then(() => console.log("connected to the database"))
       .catch((err) => console.error("connection error", err.stack));
   }
 
@@ -29,17 +29,17 @@ class Postgres {
         })
         .toString();
     }
+    let result = null;
     if (table_name !== "") {
       let query = "SELECT " + columns + " FROM " + table_name;
       if (conditions !== "") query += " WHERE " + conditions;
       if (limit > -1) query += " LIMIT " + limit;
-      let result = this.pool.query("select * from (" + query + ") as sc");
-      return result;
+      result = this.pool.query("select * from (" + query + ") as sc");
     } else {
       let query = "SELECT " + columns;
-      let result = this.pool.query("select * from (" + query + ") as sc");
-      return result;
+      result = this.pool.query("select * from (" + query + ") as sc");
     }
+    return result;
   }
 }
 

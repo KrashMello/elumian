@@ -1,7 +1,5 @@
 import Model from "#Class/model";
 
-import dbpg from "#Class/database";
-
 export default class Auth extends Model {
   //the constructor
   constructor() {
@@ -10,6 +8,6 @@ export default class Auth extends Model {
   }
   //extra method
   singIn(_callback) {
-    this.routes("/", "singIn", "POST", _callback);
+    this.routes("/singIn", "singIn", "POST", _callback);
   }
 }

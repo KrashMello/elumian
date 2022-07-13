@@ -1,6 +1,7 @@
 import Users from "#Models/users";
 import { userRequestValidate } from "#Request/users";
 import dbpg from "#Class/database";
+import bcrypt from "bcrypt";
 
 const DB = new dbpg();
 const user = new Users();
@@ -11,7 +12,7 @@ const user = new Users();
  *
  */
 user.get((_req, res) => {
-  res.send("getter all user");
+  res.json(bcrypt.hashSync("1234", 8));
 });
 
 /**
