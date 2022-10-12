@@ -10,7 +10,7 @@ const auth = new Auth();
 
 auth.singIn(async (req, response) => {
   let validate = userRequestValidate.getResult(req.query);
-  if (validate.status === "ok") {
+  if (validate.status === "ok" && req.query.token) {
     let ip = req.header("x-forwarded-for") || req.ip;
     let userData;
     // search the existen of user
@@ -18,6 +18,8 @@ auth.singIn(async (req, response) => {
     userData = await user.findOne(req.query.username).then((res) => {
       return res;
     });
+    delete userData.delete;
+    console.log(userData);
     if (userData === undefined)
       return response.status(401).json({ message: "User not found" });
     // comparing password
@@ -31,11 +33,10 @@ auth.singIn(async (req, response) => {
         accessToken: null,
         message: "Invalid Password!",
       });
-    } else {
-      return response.status(200).json("todo correcto");
     }
+    return response.status(200).json("todo correcto");
   } else if (validate.status === "error") {
-    response.json(validate);
+    return response.status(401).json(validate);
   }
 });
 
