@@ -1,24 +1,27 @@
+import { NextFunction, Response, Request } from "express";
 import jwt from "jsonwebtoken";
-function verifyToken(req, res, next) {
-  let token = req.headers["x-access-token"];
-  if (!token) {
-    return res.status(403).send({
-      message: "No token provided!",
-    });
-  }
-  jwt.verify(token, process.env.JWT_TOKEN, (err, decoded) => {
-    if (err) {
-      return res.status(401).send({
-        message: "Unauthorized!",
+import { RequestJWT } from "./types";
+const JWT_TOKEN: string = process.env.JWT_TOKEN
+  ? process.env.JWT_TOKEN
+  : "token jwt";
+function verifyToken(req: Request, res: Response, next: NextFunction) {
+  try {
+    const token = req.header("x-access-token")?.replace("Bearer ", "");
+    // let token = req.headers["x-access-token"];
+    if (!token) {
+      return res.status(403).send({
+        message: "No token provided!",
       });
     }
-    /**
-     * lo que pondremos aca seran los permisos y demas cositas
-     * se devolveran en json  esto de abajo se debe eliminar
-     */
-    req.userId = decoded.id;
+    const decoded = jwt.verify(token, JWT_TOKEN);
+    (req as RequestJWT).userId = decoded;
     next();
-  });
+  } catch (err) {
+    return res.status(401).send({
+      message: "Unauthorized!",
+    });
+  }
+  return null;
 }
 export default verifyToken;
 // isAdmin = (req, res, next) => {
