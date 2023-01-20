@@ -4,7 +4,7 @@ export class Model {
   private DB = new DB(this.tableName);
 
   async findOne(code: string) {
-    let result;
+    let result: object = {};
     await this.DB.select()
       .where(`code = '${code}'::character varying`)
       .limit(1)
