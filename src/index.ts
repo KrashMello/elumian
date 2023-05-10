@@ -1,3 +1,22 @@
+//create nodejs server with express typescript server EM6?
+// const express = require('express');
+// const app = express();
+// const http = require('http').createServer(app);
+// const io = require('socket.io')(http);
+
+// const PORT = process.env.PORT || 3000;
+
+// app.use(express.static('public'));
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
+// app.use(cookieParser());
+// app.use(express.static('public'));
+
+// app.get('/', (req, res) => {
+//   res.sendFile('index.html');
+//   res.end();
+//   console.log('GET /');
+// }
 import express, { Request, Response } from "express";
 import { controllers } from "./routes/index";
 import { IRouter } from "@Controller/types";
