@@ -10,14 +10,11 @@ export class DB {
           database: process.env.DB_DATABASE || "postges",
           user: process.env.DB_USERNAME || "postgre",
           password: process.env.DB_PASSWORD || "",
-          ssl: {
-            rejectUnauthorized: false,
-          },
         }
       : {
           connectionString: process.env.DB_EXTERNAL_CONNECTION,
           ssl: {
-            rejectUnauthorized: false,
+            rejectUnauthorized: process.env.DB_SSL,
           },
         };
   private pool = new pg.Pool(this.config);
@@ -107,7 +104,8 @@ export class DB {
       throw new Error(
         "no se puede ejecutar este comando por que no existe una consulta"
       );
-
-    return this.pool.query(this.query);
+    let query = this.query;
+    this.query = "";
+    return this.pool.query(query);
   }
 }

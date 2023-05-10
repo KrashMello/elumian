@@ -1,5 +1,5 @@
 import { NextFunction, Response, Request } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { RequestJWT } from "./types";
 const JWT_TOKEN: string = process.env.JWT_TOKEN
   ? process.env.JWT_TOKEN
@@ -17,9 +17,19 @@ function verifyToken(req: Request, res: Response, next: NextFunction) {
     (req as RequestJWT).userId = decoded;
     next();
   } catch (err) {
-    return res.status(401).send({
-      message: "Unauthorized!",
-    });
+    if (err instanceof TokenExpiredError) {
+      console.log("JWT Expired Error:", err.message);
+      return res.status(401).send({
+        message: "Unauthorized!",
+      });
+    }
+
+    if (err instanceof JsonWebTokenError) {
+      console.log("JWT Expired Error:", err.message);
+      return res.status(401).send({
+        message: "Unauthorized!",
+      });
+    }
   }
   return null;
 }
