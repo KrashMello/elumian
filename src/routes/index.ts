@@ -1,2 +1,2 @@
-import { Test } from "@src/controllers/test/test.controller";
-export const controllers = [Test];
+import { TaskController } from '@src/controllers/task/task.controller'
+export const controllers = [TaskController]
