@@ -84,3 +84,9 @@ export class Eluncoder {
     return decrypt
   }
 }
+// let eln = new Eluncoder()
+// let time = Math.floor(Math.random() * 10) + 1
+// console.log(time)
+// let encrypted = eln.hardEncrypter({ id: 1, name: 'asd' }, time)
+// console.log(encrypted)
+// console.log(eln.hardDecrypt(encrypted))
