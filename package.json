@@ -8,6 +8,7 @@
     "tsc": "tsc",
     "build": "rm -rf ./dist && rm -f tsconfig.tsbuildinfo && npx tsc && tsc-alias -p tsconfig.json",
     "start": "node dist/src/index.js",
+    "migrate": "ts-node src/migration/index.ts",
     "dev": "ts-node-dev -r tsconfig-paths/register src/index.ts",
     "lint": "ts-standard"
   },

@@ -1,33 +1,42 @@
-interface schemaTable {
-  [key: string]: object
-}
+import { schemaTables } from './types'
+import { DB as db } from '@DB/index'
 
 class Schema {
-  constructor() {}
-  public create(schema_name: string, tables: schemaTable) {
-    let tableName: string[] = Object.keys(tables) as string[]
-    let tablesName: string[] = Object.keys(tables) as string[]
-    let valuesColumns: string[] = tablesName.map((key) => {
+  private DB: any
+  constructor() {
+    this.DB = new db()
+  }
+  public create(schema_name: string, tables: schemaTables) {
+    let tablesName: Array<string> = Object.keys(tables) as string[]
+    let valuesColumns: Array<string> = tablesName.map((key) => {
       return `CREATE TABLE IF NOT EXISTS "${schema_name}"."${key}" (
-      ${Object.keys(tables[key])
-        .map((columns) => {
-          return `"${columns}" ${tables[key][columns]
-            .toString()
-            .replace(/,/g, ' ')}\\`
-        })
-        .toString()
-        .replace(/,/g, '\n')}
+      ${Object.keys(tables[key] as { [key: string]: Array<string> })
+          .map((columns) => {
+            let column: Array<string> = tables[key]![columns] as Array<string>
+            return `"${columns}" ${column.toString().replace(/,/g, ' ')}\\`
+          })
+          .toString()
+          .replace(/,/g, '\n')}
       "created_at" timestamp default 'now()'\\
       "updated_at" timestamp default 'now()'
       );`
     })
-    // FIX: last regex
-    let query = `create schema if not EXISTS "${schema_name}";\n${valuesColumns
+    let query = `create schema if not EXISTS "${schema_name}";
+    ${valuesColumns
+        .toString()
+        .replace(/,/g, "")
+        .replace(/(\\)|(,\s)/g, ",")}`.replace(/(\s{2,})/g, "");
+    this.DB.queryExec(query)
+  }
+  public drop(schema_name: string, tables: Array<string>) {
+    this.DB.queryExec(tables
+      .map((tableName) => {
+        return `DROP TABLE IF EXISTS "${schema_name}"."${tableName}" CASCADE;`;
+      })
       .toString()
-      .replace(/,/g, '\n')
-      .replace(/(\\)|(,\s)/g, ',')
-      .replace(/(\(\s{1})|(;\s{1})|('\s{1})/g, '')}`
-    return query
+      .replace(/,/g, "")
+      .replace(/(;\s{1,})/g, "x")
+    )
   }
 }
 
@@ -47,7 +56,7 @@ const options = {
   timeStamp: 'timestamp',
 }
 
-export default {
+export {
   Schema,
   options,
 }
