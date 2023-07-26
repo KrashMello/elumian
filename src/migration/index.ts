@@ -1,15 +1,9 @@
-import { Schema, options } from "@DB/schema";
+import { Migration } from '@DB/migration'
+import publicSchema from './public.schema'
+import taskSchema from './task.schema'
 
-let { smallInt, pk, increment } = options
-let schema = new Schema()
+let schemas = [publicSchema, taskSchema]
 
-let tables = {
-  blog: {
-    id: [smallInt, pk, increment]
-  },
-  user: {
-    id: [smallInt, pk, increment]
-  }
-}
+let migration = new Migration(schemas)
 
-schema.create('public', tables)
+migration.start()
