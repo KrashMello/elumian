@@ -3,7 +3,8 @@ import publicSchema from './public.schema'
 import taskSchema from './task.schema'
 
 let schemas = [publicSchema, taskSchema]
+console.log(process.env.npm_config_typem)
 
-let migration = new Migration(schemas)
+let type = process.env.npm_config_typem || 'up'
 
-migration.start()
+new Migration(type, schemas)

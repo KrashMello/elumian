@@ -3,6 +3,7 @@ import { schemaTables } from '@DB/types'
 
 let { smallInt, pk, unique, varchar, bigInt, text, increment } = options
 let schema = new Schema()
+let schema_name = 'task'
 
 let tables: schemaTables = {
   task: {
@@ -19,5 +20,9 @@ let tables: schemaTables = {
     name: [varchar(60)],
   },
 }
+let tablesDrop: Array<string> = Object.keys(tables)
 
-export default schema.create('task', tables)
+export default {
+  up: schema.create(schema_name, tables),
+  down: schema.drop(schema_name, tablesDrop),
+}

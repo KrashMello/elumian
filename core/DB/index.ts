@@ -7,17 +7,23 @@ class PGSQL {
   private config: object =
     process.env.DB_URL === ''
       ? {
-        host: process.env.DB_HOST || 'localhost',
-        port: process.env.DB_PORT || 5432,
-        database: process.env.DB_DATABASE || 'postges',
-        user: process.env.DB_USERNAME || 'postgre',
-        password: process.env.DB_PASSWORD || '',
-        ssl: false,
-      }
+          host: process.env.DB_HOST || 'localhost',
+          port: process.env.DB_PORT || 5432,
+          database: process.env.DB_DATABASE || 'postges',
+          user: process.env.DB_USERNAME || 'postgre',
+          password: process.env.DB_PASSWORD || '',
+          max: 20,
+          idleTimeoutMillis: 1000,
+          connectionTimeoutMillis: 2000,
+          ssl: false,
+        }
       : {
-        connectionString: process.env.DB_URL,
-        ssl: false,
-      }
+          connectionString: process.env.DB_URL,
+          max: 20,
+          idleTimeoutMillis: 1000,
+          connectionTimeoutMillis: 2000,
+          ssl: false,
+        }
   private pool = new pg.Pool(this.config)
 
   private DATE_OID = 1082
@@ -105,21 +111,21 @@ class PGSQL {
       throw new Error(
         'no se puede ejecutar este comando por que no existe una consulta'
       )
-    return this.pool.query(query)
 
+    let result = this.pool.query(query)
+    return result
   }
-
 
   exec() {
     if (!(typeof this.query === 'string') && this.query === null)
       throw new Error(
         'no se puede ejecutar este comando por que no existe una consulta'
       )
-    let query = this.query
-    this.query = ''
-    return this.pool.query(query)
-  }
 
+    let result = this.pool.query(this.query)
+    this.query = ''
+    return result
+  }
 }
 
 class MONGODB {
@@ -244,5 +250,5 @@ export let DB =
   process.env.DB_CONNECTION === 'pgsql'
     ? PGSQL
     : process.env.DB_CONNECTION === 'mongodb'
-      ? MONGODB
-      : PGSQL
+    ? MONGODB
+    : PGSQL

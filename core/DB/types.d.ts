@@ -39,8 +39,17 @@ export interface schemaTables {
   }
 }
 
-export interface schemaCreate {
+export interface schemaUp {
   schema: string
   tables: string
   ref: string
+}
+
+export interface schemaDown {
+  schema: string
+  tables: string
+}
+export interface schemas {
+  up: schemaUp
+  down: schemaDown
 }

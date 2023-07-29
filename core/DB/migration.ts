@@ -1,22 +1,54 @@
 import { DB as db } from '@DB/index'
-import { schemaCreate } from './types'
+import { schemas } from './types'
 export class Migration {
   private DB: any
-  private migrations = {
+  private migrationsUp = {
     schemas: '',
     tables: '',
     ref: '',
   }
-  constructor(schemas: Array<schemaCreate>) {
+  private migrationsDown = {
+    schemas: '',
+    tables: '',
+    ref: '',
+  }
+  constructor(type: string, schemas: Array<schemas>) {
     this.DB = new db()
     schemas.map((schema) => {
-      this.migrations.schemas += schema.schema
-      this.migrations.tables += schema.tables
-      this.migrations.ref += schema.ref
+      this.migrationsUp.schemas += schema.up.schema
+      this.migrationsUp.tables += schema.up.tables
+      this.migrationsUp.ref += schema.up.ref
+      this.migrationsDown.schemas += schema.down.schema
+      this.migrationsDown.tables += schema.down.tables
     })
+
+    this.start(type)
   }
-  start() {
-    this.DB.queryExec(this.migrations.schemas)
-    this.DB.queryExec(this.migrations.tables)
+  public up() {
+    try {
+      console.log('Migration Start')
+      this.DB.queryExec(this.migrationsUp.schemas)
+      this.DB.queryExec(this.migrationsUp.tables)
+      console.log('Migration Done')
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  public down() {
+    try {
+      console.log('Migration Start')
+      this.DB.queryExec(this.migrationsDown.tables).then((_res: any) => {
+        this.DB.queryExec(this.migrationsDown.schemas)
+      })
+      console.log('Migration Done')
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  start(type: string) {
+    if (type === 'up') this.up()
+    else if (type === 'down') this.down()
+    else console.log('invalid type')
   }
 }
