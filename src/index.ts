@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express'
 import os from 'os'
 import { controllers } from './routes/index'
-import { IRouter } from '@Controller/types'
+import { IRouter } from '@Controller/type'
 import 'dotenv/config'
 import verifyToken from '@Middelware/index'
 

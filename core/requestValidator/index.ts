@@ -9,7 +9,7 @@ import {
   IsNumericOptions,
   IsEmailOptions,
   isBooleansOptions,
-} from './types'
+} from './type'
 
 export class RequestValidator {
   private locale: Locale = 'en-US'
@@ -39,7 +39,7 @@ export class RequestValidator {
         )
 
         return this.findValidator(temKey, temValues, queryValues[key])
-      } else return [{ status: 1, message: 'parametro enviado no es valido' }]
+      } else return [{ status: 1, message: 'Invalid param' }]
     })
     let response = queryKeys
       .map((v, i) => {
@@ -81,7 +81,7 @@ export class RequestValidator {
                   rules[key] as IsAlphaOptions
                 )
                   ? 'success'
-                  : this.message.alpha || 'el campo solo debe contener letras',
+                  : this.message.alpha || 'The param only need letter',
               }
             else response = { status: 0, message: 'success' }
             break
@@ -102,7 +102,7 @@ export class RequestValidator {
                 )
                   ? 'success'
                   : this.message.alpha ||
-                    'el campo solo debe contener letras y -',
+                    'The param only need letter and this special simbol -',
               }
             else response = { status: 0, message: 'success' }
 
@@ -126,7 +126,7 @@ export class RequestValidator {
                 )
                   ? 'success'
                   : this.message.length ||
-                    `el campo debe tener al menos ${min} y maximo ${max} caracteres`,
+                    `the param need a length of ${min} to ${max} character`,
               }
             } else response = { status: 0, message: 'success' }
             break
@@ -148,7 +148,7 @@ export class RequestValidator {
                 )
                   ? 'success'
                   : this.message.alphanumeric ||
-                    'el campo solo debe contener letras y numeros',
+                    'the param only need [A-Za-Z0-9]',
               }
             else response = { status: 0, message: 'success' }
             break
@@ -169,7 +169,7 @@ export class RequestValidator {
                 )
                   ? 'success'
                   : this.message.alphanumeric ||
-                    'el campo solo debe contener letras y numeros',
+                    'The param only need [A-Za-Z0-9] and especial character -',
               }
             else response = { status: 0, message: 'success' }
             break
@@ -185,7 +185,7 @@ export class RequestValidator {
                 status: !str ? 1 : 0,
                 message: str
                   ? 'notNull'
-                  : this.message.notNull || 'el campo es obligatorio',
+                  : this.message.notNull || 'this param is necesary',
               }
             break
           case 'numeric':
@@ -202,7 +202,7 @@ export class RequestValidator {
                 rules[key] as IsNumericOptions
               )
                 ? 'success'
-                : this.message.numeric || 'el campo debe contener solo numeros',
+                : this.message.numeric || 'The param just can be numeric',
             }
             break
           case 'email':
@@ -219,7 +219,7 @@ export class RequestValidator {
               )
                 ? 'success'
                 : this.message.email ||
-                  'el campo debe contener un correo electronico ejemplo@prueba.com',
+                  'the params need be a email example: ejemplo@example.com',
             }
             break
           case 'boolean':
@@ -235,7 +235,7 @@ export class RequestValidator {
                 rules[key] as isBooleansOptions
               )
                 ? 'success'
-                : this.message.boolean || 'el campo debe ser un valor booleano',
+                : this.message.boolean || 'the param just can be true/false',
             }
             break
           case 'isArray':
@@ -243,11 +243,11 @@ export class RequestValidator {
               status: Array.isArray(str as string[]) ? 0 : 1,
               message: Array.isArray(str as string[])
                 ? 'success'
-                : this.message.isArray || 'el campo debe ser un arreglo',
+                : this.message.isArray || 'the param just need be a array',
             }
             break
           default:
-            response = { status: 1, message: 'no existe' }
+            response = { status: 1, message: 'Dont Exist' }
             break
         }
       else {

@@ -1,23 +1,27 @@
 import { Schema, options } from '@DB/schema'
-import { schemaTables } from '@DB/types'
+import { schemaTables } from '@DB/type'
 
-let { smallInt, pk, unique, varchar, bigInt, text, increment } = options
+let { smallInt, pk, unique, varchar, notNull, bigInt, text, increment, ref } =
+  options
 let schema = new Schema()
 let schema_name = 'task'
 
 let tables: schemaTables = {
-  task: {
-    id: [smallInt, pk, increment],
-    name: [varchar(15), unique],
+  tasks: {
+    id: [bigInt, pk, increment, notNull],
+    code: [varchar(15), unique],
+    name: [varchar(255), notNull],
+    description: [text, notNull],
   },
-  blog: {
-    id: [bigInt, pk, increment],
-    name: [varchar(60)],
-    description: [text],
+  tags: {
+    id: [smallInt, pk, increment, notNull],
+    code: [varchar(15), unique, notNull],
+    name: [varchar(255), notNull],
   },
-  status: {
-    id: [bigInt, pk, increment],
-    name: [varchar(60)],
+  tagsPerTask: {
+    id: [bigInt, pk, increment, notNull],
+    tag_code: [varchar(15), ref('>', `${schema_name}.tags.code`)],
+    task_code: [varchar(15), ref('>', `${schema_name}.tasks.code`)],
   },
 }
 let tablesDrop: Array<string> = Object.keys(tables)

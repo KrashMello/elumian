@@ -42,6 +42,12 @@
       "@Controller/*": [
         "core/controller/*"
       ],
+      "@Encoder/*": [
+        "core/eluncoder/*"
+      ],
+      "@Cache/*": [
+        "core/cache/*"
+      ],
       "@Middelware/*": [
         "core/middelware/*"
       ],

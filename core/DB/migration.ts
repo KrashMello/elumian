@@ -1,5 +1,5 @@
 import { DB as db } from '@DB/index'
-import { schemas } from './types'
+import { schemas } from './type'
 export class Migration {
   private DB: any
   private migrationsUp = {
@@ -12,7 +12,7 @@ export class Migration {
     tables: '',
     ref: '',
   }
-  constructor(type: string, schemas: Array<schemas>) {
+  constructor(type: 'up' | 'down', schemas: Array<schemas>) {
     this.DB = new db()
     schemas.map((schema) => {
       this.migrationsUp.schemas += schema.up.schema
@@ -27,8 +27,11 @@ export class Migration {
   public up() {
     try {
       console.log('Migration Start')
-      this.DB.queryExec(this.migrationsUp.schemas)
-      this.DB.queryExec(this.migrationsUp.tables)
+      this.DB.queryExec(this.migrationsUp.schemas).then((_res: any) => {
+        this.DB.queryExec(this.migrationsUp.tables).then((_res: any) => {
+          this.DB.queryExec(this.migrationsUp.ref)
+        })
+      })
       console.log('Migration Done')
     } catch (err) {
       console.log(err)

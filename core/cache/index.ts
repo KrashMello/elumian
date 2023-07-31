@@ -1,32 +1,42 @@
-private let usuariosConectados={}
-// Agregar usuario al caché
-export function sign(
-    payload: string | Buffer | object,
-    secretOrPrivateKey: Secret,
-): string;
-  export function sing(data:object) {
-    // Encriptar datos del usuario
-    let datosEncriptados = datosUsuario
+import { Eluncoder } from '@Encoder/index'
+import { v4 as uuidv4 } from 'uuid'
 
-    usuariosConectados[] = datosEncriptados
+let cacheList: cacheList = {}
+let encoder = new Eluncoder()
+let expireTime: number
 
-    // Establecer temporizador para eliminar usuario del caché
-    setTimeout(() => {
-      delete this.usuariosConectados[datosEncriptados.id]
-    }, 10000) // Tiempo en milisegundos antes de que se elimine el usuario (10 segundos en este caso)
-  }
-
-  // Obtener usuario del caché
-  obtenerUsuario(idUsuario) {
-    if (this.usuariosConectados[idUsuario])
-      return this.usuariosConectados[idUsuario]
-    else return false
-  }
-
-  obtenerTodosLosUsuarios() {
-    return this.usuariosConectados
+export function setConfig(expireT: number) {
+  expireTime = expireT * 1000
 }
-  
+
+export function singCacheData(key: string, data: object) {
+  let time = Math.floor(Math.random() * 10) + 1
+  let encriptedData: cacheData = {
+    id: uuidv4(),
+    data: encoder.hardEncrypter(data, time),
+  }
+
+  cacheList[key] = []
+  cacheList[key]?.push(encriptedData)
+
+  setTimeout(() => {
+    cacheList[key]?.map((v, i) => {
+      if (v.id === encriptedData.id) delete cacheList[i]
+    })
+  }, expireTime)
+}
+
+export function getCacheDataById(key: string, id: string): cacheData | string {
+  let filterById = cacheList[key]?.filter((v) => v.id === id)[0]?.data
+  if (filterById) return filterById
+  else return `dont exists data in cache`
+}
+
+export function length(key: string) {
+  return cacheList[key]?.length
+}
+
+/* 
 cache = new Cache()
 cache.agregarUsuario({ id: 1, name: 'asd' })
 setTimeout(() => {
@@ -35,3 +45,4 @@ setTimeout(() => {
 setTimeout(() => {
   console.log(cache.obtenerUsuario(1))
 }, 10001)
+*/

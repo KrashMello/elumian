@@ -5,13 +5,7 @@ export abstract class Model {
   constructor() {
     this.DB = new db(this.tableName)
   }
-  public async findAll() {
-    let { rows } = await this.DB.select().exec()
-    return rows
-  }
-  public async findOne(id: string) {
-    let { rows } = await this.DB.select().where(`"id" = '${id}'::bigint`).exec()
 
-    return rows[0]
-  }
+  public async findAll() {}
+  public async findOne(_id: string) {}
 }

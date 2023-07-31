@@ -64,7 +64,7 @@ export class Eluncoder {
     decrypted = Buffer.concat([decrypted, decipher.final()])
     return decrypted.toString()
   }
-  hardEncrypter(data: object, time: number) {
+  hardEncrypter(data: object, time: number): string {
     let encryptText = this.encrypted(data)
     for (let i = 0; i < time; i++) {
       encryptText = this.encryptedBase64(encryptText)

@@ -35,15 +35,14 @@ class PGSQL {
   }
 
   table(name: string) {
-    if (!(typeof name === 'string'))
-      throw new Error('el tipo del parametro de la tabla no es valido')
+    if (!(typeof name === 'string')) throw new Error('Invalid argument type')
     this.tableName = name
     return this
   }
 
   select(fields: string | string[] = '*') {
     if (!(typeof fields === 'string') && !Array.isArray(fields))
-      throw new Error('parametros del select no son validos')
+      throw new Error('invalid argument type to select query')
     const _fields = typeof fields === 'string' ? [fields] : fields
     this.query = `SELECT ${_fields.join(', ')} from ${this.tableName}`
     return this
@@ -51,7 +50,7 @@ class PGSQL {
 
   where(fields: string | string[] = `id = 1`) {
     if (!(typeof fields === 'string') && !Array.isArray(fields))
-      throw new Error('parametros del where no son validos')
+      throw new Error('Invalid argument type to where query')
     const _fields = typeof fields === 'string' ? [fields] : fields
 
     this.query += ` where ${_fields.join(' AND ')}`
@@ -60,7 +59,7 @@ class PGSQL {
 
   limit(field: number) {
     if (!(typeof field === 'number'))
-      throw new Error('parametros del limit no son validos')
+      throw new Error('Invalid argument to limit query')
 
     this.query += ` limit ${field.toString()}`
     return this
@@ -68,7 +67,7 @@ class PGSQL {
 
   offset(field: number) {
     if (!(typeof field === 'number'))
-      throw new Error('parametros del offset no son validos')
+      throw new Error('Invalid argument to offset query')
 
     this.query += ` offset ${field.toString()}`
     return this
@@ -82,14 +81,14 @@ class PGSQL {
       !(typeof fields === 'string') &&
       !Array.isArray(fields)
     )
-      throw new Error('parametros del call no son validos')
-    if (this.query !== '') throw new Error('formula no valida para ejecutar')
+      throw new Error('Invalid argument to Call query')
+    if (this.query !== '') throw new Error('Dont have a query')
     const _fields = typeof fields === 'string' ? [fields] : fields
     this.query = `CALL "${procedure}"(${_fields.join(', ')})`
     return this
   }
 
-  view(fields: string | string[], view: string) {
+  view(fields: string | string[] = '*', view: string) {
     if (
       !(typeof fields === 'string') &&
       !Array.isArray(fields) &&
@@ -98,9 +97,7 @@ class PGSQL {
       view === null &&
       view === ''
     )
-      throw new Error(
-        'los tipos de parametros ingrezados en view no son validos'
-      )
+      throw new Error('Invalid argument to a view query')
     const _fields = typeof fields === 'string' ? [fields] : fields
     this.query = `SELECT ${_fields.join(', ')} FROM ${view} `
     return this
@@ -108,9 +105,7 @@ class PGSQL {
 
   queryExec(query: string) {
     if (!(typeof query === 'string') && query === null)
-      throw new Error(
-        'no se puede ejecutar este comando por que no existe una consulta'
-      )
+      throw new Error('Dont have a query')
 
     let result = this.pool.query(query)
     return result
@@ -118,9 +113,7 @@ class PGSQL {
 
   exec() {
     if (!(typeof this.query === 'string') && this.query === null)
-      throw new Error(
-        'no se puede ejecutar este comando por que no existe una consulta'
-      )
+      throw new Error('Dont have a query')
 
     let result = this.pool.query(this.query)
     this.query = ''

@@ -1,39 +1,39 @@
-import { NextFunction, Response, Request } from "express";
-import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
-import { RequestJWT } from "./types";
+import { NextFunction, Response, Request } from 'express'
+import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
+import { RequestJWT } from './type'
 const JWT_TOKEN: string = process.env.JWT_TOKEN
   ? process.env.JWT_TOKEN
-  : "token jwt";
+  : 'token jwt'
 function verifyToken(req: Request, res: Response, next: NextFunction) {
   try {
-    const token = req.header("x-access-token")?.replace("Bearer ", "");
+    const token = req.header('x-access-token')?.replace('Bearer ', '')
     // let token = req.headers["x-access-token"];
     if (!token) {
       return res.status(403).send({
-        message: "No token provided!",
-      });
+        message: 'No token provided!',
+      })
     }
-    const decoded = jwt.verify(token, JWT_TOKEN);
-    (req as RequestJWT).userId = decoded;
-    next();
+    const decoded = jwt.verify(token, JWT_TOKEN)
+    ;(req as RequestJWT).userId = decoded
+    next()
   } catch (err) {
     if (err instanceof TokenExpiredError) {
-      console.log("JWT Expired Error:", err.message);
+      console.log('JWT Expired Error:', err.message)
       return res.status(401).send({
-        message: "Unauthorized!",
-      });
+        message: 'Unauthorized!',
+      })
     }
 
     if (err instanceof JsonWebTokenError) {
-      console.log("JWT Expired Error:", err.message);
+      console.log('JWT Expired Error:', err.message)
       return res.status(401).send({
-        message: "Unauthorized!",
-      });
+        message: 'Unauthorized!',
+      })
     }
   }
-  return null;
+  return null
 }
-export default verifyToken;
+export default verifyToken
 // isAdmin = (req, res, next) => {
 //   User.findByPk(req.userId).then((user) => {
 //     user.getRoles().then((roles) => {

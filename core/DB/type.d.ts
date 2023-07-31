@@ -4,10 +4,15 @@ type NotNullable<T> = Diff<T, null | undefined>
 
 export type retrunVarchar = `varchar(${number})`
 
-export type varchar = (v: number) => retrunVarchar
+export type tablesRef = `${string}.${string}.${string}`
+export type typeRef = '>' | '<' | '-'
+export type returnRef =
+  | `ALTER TABLE "<schemaRef>"."<tableRef>" ADD FOREIGN KEY ("<columnRef>") REFERENCES "${string}"."${string}" ("${string}");`
+  | `ALTER TABLE "${string}"."${string}"  ADD FOREIGN KEY ("${string}") REFERENCES "<schemaRef>"."<tableRef>" ("<columnRef>");`
+  | ``
 
 export interface options {
-  varchar: varchar
+  varchar: (v: number) => retrunVarchar
   smallInt: 'SMALLINT'
   bigInt: 'BIGINT'
   text: 'TEXT'
@@ -18,6 +23,7 @@ export interface options {
   boolean: 'BOOLEAN'
   bool: 'BOOL'
   timeStamp: 'TIMESTAMP'
+  ref: (k: typeRef, i: tablesRef) => returnRef
 }
 
 export type columnsPropiety =
@@ -32,6 +38,7 @@ export type columnsPropiety =
   | 'TEXT'
   | 'SMALLINT'
   | retrunVarchar
+  | returnRef
 
 export interface schemaTables {
   [key: string]: {
