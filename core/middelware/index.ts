@@ -1,37 +1,26 @@
 import { NextFunction, Response, Request } from 'express'
-import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
-import { RequestJWT } from './type'
-const JWT_TOKEN: string = process.env.JWT_TOKEN
-  ? process.env.JWT_TOKEN
-  : 'token jwt'
-function verifyToken(req: Request, res: Response, next: NextFunction) {
-  try {
-    const token = req.header('x-access-token')?.replace('Bearer ', '')
-    // let token = req.headers["x-access-token"];
-    if (!token) {
-      return res.status(403).send({
-        message: 'No token provided!',
-      })
-    }
-    const decoded = jwt.verify(token, JWT_TOKEN)
-    ;(req as RequestJWT).userId = decoded
-    next()
-  } catch (err) {
-    if (err instanceof TokenExpiredError) {
-      console.log('JWT Expired Error:', err.message)
-      return res.status(401).send({
-        message: 'Unauthorized!',
-      })
-    }
+import { verifyId } from '@Cache/index'
 
-    if (err instanceof JsonWebTokenError) {
-      console.log('JWT Expired Error:', err.message)
-      return res.status(401).send({
-        message: 'Unauthorized!',
-      })
-    }
+function verifyToken(req: Request, res: Response, next: NextFunction) {
+  const id = req.header('x-access-id')
+
+  if (!id) {
+    return res.status(403).send({
+      message: 'No token provided!',
+    })
   }
-  return null
+
+  if (verifyId('Auth', id)) next()
+  else
+    return res.status(401).json({
+      status: 1,
+      message: 'Unauthorized!',
+    })
+
+  return res.status(401).json({
+    status: 1,
+    message: 'Unauthorized!',
+  })
 }
 export default verifyToken
 // isAdmin = (req, res, next) => {

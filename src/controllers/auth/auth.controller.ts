@@ -1,15 +1,17 @@
-import { Controller, Get, Post } from '@Controller/decorators'
+import { Controller, Post } from '@Controller/decorators'
+import { AuthModel } from '@src/models/Auth.model'
 import { Request, Response } from 'express'
-import { cacheList } from '@Cache/index'
-@Controller('/api/Auth')
+@Controller('/Auth')
 export class AuthController {
-  @Get('/', false)
-  async get(_req: Request, res: Response) {
-    return res.json(cacheList)
+  private Auth = new AuthModel()
+
+  @Post('/signIn', false)
+  async signIn(req: Request, res: Response) {
+    this.Auth.signIn(req.body, res)
   }
-  @Post('/', false)
-  async create(_req: Request, res: Response) {
-    console.log(_req.params)
-    return res.json({})
+
+  @Post('/signUp', false)
+  async create(req: Request, res: Response) {
+    this.Auth.signUp(req.body, res)
   }
 }
