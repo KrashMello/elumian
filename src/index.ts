@@ -29,7 +29,9 @@ controllers.forEach((controller) => {
       })
 
     info.push({
-      api: `${method.toLocaleUpperCase()} ${prefix + path}`,
+      api: `${method.toLocaleUpperCase()} http://${
+        os.networkInterfaces()['enp2s0']![0]?.address as string
+      }:${process.env.SERVER_PORT}${prefix + path}`,
       handler: `${controller.name}.${String(handlerName)}`,
       withMiddelware,
     })
@@ -37,9 +39,10 @@ controllers.forEach((controller) => {
 })
 
 console.table(info)
-
 app.listen(process.env.SERVER_PORT, () => {
   console.log(
-    `server active in port: http://${os.hostname()}:${process.env.SERVER_PORT}`
+    `server active in port: http://${
+      os.networkInterfaces()['enp2s0']![0]?.address as string
+    }:${process.env.SERVER_PORT}`
   )
 })
