@@ -43,10 +43,10 @@
         "core/controller/*"
       ],
       "@Encoder/*": [
-        "core/eluncoder/*"
+        "core/elumcoder/*"
       ],
       "@Cache/*": [
-        "core/cache/*"
+        "core/elumcache/*"
       ],
       "@Middelware/*": [
         "core/middelware/*"
