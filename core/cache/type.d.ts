@@ -1,8 +1,8 @@
-interface cacheData {
+export interface cacheData {
   id: string
   data: string
 }
 
-interface cacheList {
+export interface cacheLists {
   [key: string]: Array<cacheData>
 }
