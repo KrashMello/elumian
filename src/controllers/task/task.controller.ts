@@ -1,7 +1,6 @@
 import { Controller, Get, Post } from '@Controller/decorators'
 import { Request, Response } from 'express'
 import { TaskModel } from '@src/models/task.model'
-import { taskCreateValidator } from './request.validatorRequest'
 @Controller('/api/tasks')
 export class TaskController {
   private task = new TaskModel()
@@ -20,31 +19,7 @@ export class TaskController {
   }
 
   @Post('/', false)
-  async create(req: Request, res: Response) {
-    let result: { status: number; message: string } = {
-      status: 1,
-      message: 'error',
-    }
-    let validate = taskCreateValidator.getResult(req.body.params)
-
-    if (Object.values(validate).length === 0) {
-      let { name, description } = req.body.params
-      await this.task
-        .create([
-          `'${name}'::character varying`,
-          `'${description}'::character varying`,
-        ])
-        .then(() => {
-          result = { status: 0, message: 'tarea agregada exitosamente' }
-        })
-        .catch((error: any) => {
-          console.log(error)
-          result = { status: 1, message: error }
-        })
-    } else {
-      result = { status: 1, message: validate }
-    }
-
-    return res.status(result.status === 1 ? 401 : 200).json(result)
+  async create(_req: Request, res: Response) {
+    return res.send('agregar tarea')
   }
 }
