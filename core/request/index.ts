@@ -1,262 +1,144 @@
+import _ from 'lodash'
 import validator from 'validator'
-import { isAlpha, isAlphanumericSimbols, isAlphaSimbols } from './service'
 import {
-  Message,
-  IsLengthOptions,
-  IsAlphaOptions,
   Locale,
-  ResponseValidate,
-  IsNumericOptions,
-  IsEmailOptions,
-  isBooleansOptions,
+  Message,
+  dataCompareValueRequest,
+  returnCompareValue,
 } from './type'
+import { isAlpha, isAlphaSimbols, isAlphanumericSimbols } from './service'
 
-export class RequestValidator {
-  private locale: Locale = 'en-US'
-  private rules: object
+// let optionsToValidate = {
+//   username: 'required|max:15|min:8|alpha|array',
+//   password: 'required|max:50|min:8|alphaNumeric',
+// }
+
+export class Request {
+  private lang: Locale = 'es-ES'
+  private optionsToValidate: { [key: string]: string }
   private message: Message
-
-  constructor(locale: Locale, rules: object, message: object = {}) {
-    this.locale = locale
-    this.rules = rules
+  constructor(
+    optionsToValidate: { [key: string]: string },
+    message: Message = {}
+  ) {
+    this.optionsToValidate = optionsToValidate
     this.message = message
   }
 
-  public getResult(query: object) {
-    let rulesKeys = Object.keys(this.rules)
-    let queryKeys = Object.keys(query)
-    let rulesValues = Object.values(this.rules)
-    let queryValues = Object.values(query)
-    let temKey: string[] = []
-    let temValues: string[] = []
-    let result = queryKeys.map((value, key) => {
-      if (rulesKeys.filter((v) => v === value).length > 0) {
-        temKey = Object.keys(
-          rulesValues[rulesKeys.findIndex((v) => v === value)]
-        )
-        temValues = Object.values(
-          rulesValues[rulesKeys.findIndex((v) => v === value)]
-        )
-
-        return this.findValidator(temKey, temValues, queryValues[key])
-      } else return [{ status: 1, message: 'Invalid param' }]
-    })
-    let response = queryKeys
-      .map((v, i) => {
-        return [v, result[i]]
-      })
-      .filter((v) => {
-        let r: object[] = v[1] as object[]
-        // console.log(r);
-        if (r.length > 0) return v
-        else return null
-      })
-    return Object.fromEntries(response)
+  public validate(data: dataCompareValueRequest): returnCompareValue {
+    return this.compareValue(data, this.optionsToValidate, this.message)
   }
-  private findValidator(
-    type: string[],
-    rules: string[],
-    str: string | boolean | [] | number | null
-  ) {
-    // console.log({ type, rules, str });
-    let result = []
-    result = type.map((value, key) => {
-      // console.log(value);
-      let response: ResponseValidate
-      if (typeof value === 'string')
-        switch (value) {
-          case 'alpha':
-            if (str)
-              response = {
-                status: isAlpha(
-                  str as string,
-                  this.locale,
-                  rules[key] as IsAlphaOptions
-                )
-                  ? 0
-                  : 1,
-                message: isAlpha(
-                  str as string,
-                  this.locale,
-                  rules[key] as IsAlphaOptions
-                )
-                  ? 'success'
-                  : this.message.alpha || 'The param only need letter',
-              }
-            else response = { status: 0, message: 'success' }
-            break
-          case 'alphaSimbols':
-            if (str)
-              response = {
-                status: isAlphaSimbols(
-                  str as string,
-                  this.locale,
-                  rules[key] as IsAlphaOptions
-                )
-                  ? 0
-                  : 1,
-                message: isAlphaSimbols(
-                  str as string,
-                  this.locale,
-                  rules[key] as IsAlphaOptions
-                )
-                  ? 'success'
-                  : this.message.alpha ||
-                    'The param only need letter and this special simbol -',
-              }
-            else response = { status: 0, message: 'success' }
 
-            break
+  private compareValue(
+    data: dataCompareValueRequest,
+    optionsToValidate: { [key: string]: string },
+    message: Message = {}
+  ): returnCompareValue {
+    let dataKey = Object.keys(data)
+    let requestKey = Object.keys(optionsToValidate)
+    if (!_.isEqual(dataKey, requestKey))
+      return `campos unicamente necesarios: ${requestKey.toString()}`
 
-          case 'length':
-            if (str) {
-              const { max, min }: IsLengthOptions = rules[
-                key
-              ] as IsLengthOptions
-              response = {
-                status: validator.isLength(
-                  str as string,
-                  rules[key] as IsLengthOptions
-                )
-                  ? 0
-                  : 1,
-                message: validator.isLength(
-                  str as string,
-                  rules[key] as IsLengthOptions
-                )
-                  ? 'success'
-                  : this.message.length ||
-                    `the param need a length of ${min} to ${max} character`,
-              }
-            } else response = { status: 0, message: 'success' }
-            break
+    let errors: { [key: string]: Array<string> } = {}
 
-          case 'alphanumeric':
-            if (str)
-              response = {
-                status: validator.isAlphanumeric(
-                  str as string,
-                  this.locale,
-                  rules[key] as IsAlphaOptions
-                )
-                  ? 0
-                  : 1,
-                message: validator.isAlphanumeric(
-                  str as string,
-                  this.locale,
-                  rules[key] as IsAlphaOptions
-                )
-                  ? 'success'
-                  : this.message.alphanumeric ||
-                    'the param only need [A-Za-Z0-9]',
-              }
-            else response = { status: 0, message: 'success' }
-            break
-          case 'alphanumericSimbols':
-            if (str)
-              response = {
-                status: isAlphanumericSimbols(
-                  str as string,
-                  this.locale,
-                  rules[key] as IsAlphaOptions
-                )
-                  ? 0
-                  : 1,
-                message: isAlphanumericSimbols(
-                  str as string,
-                  this.locale,
-                  rules[key] as IsAlphaOptions
-                )
-                  ? 'success'
-                  : this.message.alphanumeric ||
-                    'The param only need [A-Za-Z0-9] and especial character -',
-              }
-            else response = { status: 0, message: 'success' }
-            break
+    requestKey.map((key) => {
+      let options = optionsToValidate[key]?.split('|') as string[]
+      let optionsResult: Array<string> = []
 
-          case 'notNull':
-            if (typeof str === 'boolean')
-              response = {
-                status: 0,
-                message: 'success',
-              }
-            else
-              response = {
-                status: !str ? 1 : 0,
-                message: str
-                  ? 'notNull'
-                  : this.message.notNull || 'this param is necesary',
-              }
-            break
-          case 'numeric':
-            str = String(str)
-            response = {
-              status: validator.isNumeric(
-                str as string,
-                rules[key] as IsNumericOptions
+      optionsResult = options
+        .map((option) => {
+          let result: string | null = null
+          let min_max_length: number = 0
+          if (option.includes('max') || option.includes('min')) {
+            let auxOption = option.split(':')
+            option = auxOption[0] as string
+            min_max_length = Number(auxOption[1])
+          }
+          switch (option) {
+            case 'alpha':
+              if (
+                typeof data[key] === 'string' &&
+                !isAlpha(data[key] as string, this.lang)
               )
-                ? 0
-                : 1,
-              message: validator.isNumeric(
-                str as string,
-                rules[key] as IsNumericOptions
+                result = message.alpha || 'el campo solo debe tener letras!'
+              break
+            case 'alphaSimbols':
+              if (
+                typeof data[key] === 'string' &&
+                !isAlphaSimbols(data[key] as string, this.lang)
               )
-                ? 'success'
-                : this.message.numeric || 'The param just can be numeric',
-            }
-            break
-          case 'email':
-            response = {
-              status: validator.isEmail(
-                str as string,
-                rules[key] as IsEmailOptions
+                result =
+                  message.alphaSimbols ||
+                  'el campo solo debe contener letras y /_'
+              break
+            case 'alphaNumeric':
+              if (
+                typeof data[key] === 'string' &&
+                !validator.isAlphanumeric(data[key] as string)
               )
-                ? 0
-                : 1,
-              message: validator.isEmail(
-                str as string,
-                rules[key] as IsEmailOptions
+                result =
+                  message.alphaNumeric ||
+                  `el campo solo debe tener letras y numeros`
+              break
+            case 'alphaNumericSimbols':
+              if (
+                (typeof data[key] === 'string' && !data[key]) ||
+                !isAlphanumericSimbols(data[key] as string)
               )
-                ? 'success'
-                : this.message.email ||
-                  'the params need be a email example: ejemplo@example.com',
-            }
-            break
-          case 'boolean':
-            response = {
-              status: validator.isBoolean(
-                str?.toString() as string,
-                rules[key] as isBooleansOptions
+                result =
+                  message.alphaNumericSimbols ||
+                  'el campo debe contener solo letras, numeros y /_'
+              break
+            case 'required':
+              if (!data[key])
+                result = message.required || 'el campo es requerido'
+              break
+            case 'max':
+              if (
+                typeof data[key] === 'string' &&
+                (!data[key] || (data[key]?.length as number) > min_max_length)
               )
-                ? 0
-                : 1,
-              message: validator.isBoolean(
-                str?.toString() as string,
-                rules[key] as isBooleansOptions
+                result =
+                  message.max ||
+                  `el campo no debe tener mas de ${min_max_length} caracteres`
+              break
+            case 'min':
+              if (
+                typeof data[key] === 'string' &&
+                (!data[key] || (data[key]?.length as number) < min_max_length)
               )
-                ? 'success'
-                : this.message.boolean || 'the param just can be true/false',
-            }
-            break
-          case 'isArray':
-            response = {
-              status: Array.isArray(str as string[]) ? 0 : 1,
-              message: Array.isArray(str as string[])
-                ? 'success'
-                : this.message.isArray || 'the param just need be a array',
-            }
-            break
-          default:
-            response = { status: 1, message: 'Dont Exist' }
-            break
-        }
-      else {
-        response = { status: 1, message: 'error the typeof no is sting' }
-        console.log('error the typeof no is sting')
-      }
-      // console.log(response);
-      return response
+                result =
+                  message.min ||
+                  `el campo no debe tener menos de ${min_max_length} caracteres`
+              break
+            case 'email':
+              if (
+                typeof data[key] === 'string' &&
+                (!data[key] || !validator.isEmail(data[key] as string))
+              )
+                result =
+                  message.email ||
+                  'el campo debe ser un correo electronico ejemplo: example@myweb.com'
+              break
+            case 'boolean':
+              if (typeof data[key] !== 'boolean')
+                result = message.boolean || 'el campo debe ser booleano'
+              break
+            case 'array':
+              if (
+                typeof data[key] !== 'string' &&
+                (!data[key] || !Array.isArray(data[key]))
+              )
+                result = message.array || 'el campo debe ser un arreglo'
+              break
+            default:
+              result
+          }
+          return result
+        })
+        .filter((v) => v) as Array<string>
+      if (optionsResult.length > 0) errors = { ...errors, [key]: optionsResult }
     })
-    return result.filter((v) => v.status === 1)
+    return Object.values(errors).length === 0 ? true : errors
   }
 }

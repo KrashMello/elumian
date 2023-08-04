@@ -1,16 +1,16 @@
 import { IsAlphanumericSimbolsOptions, IsAlphaOptions, Locale } from './type'
 
 const alpha = {
-  'en-US': /^[A-Z\-\s/_]+$/i,
+  'es-ES': /^[A-Za-z\-\s/_]+$/i,
 }
 const alphanumeric = {
-  'en-US': /^[0-9A-Z\-\s/_]+$/i,
+  'es-ES': /^[0-9A-Za-z\-\s/_]+$/i,
 }
 
 export function isAlphaSimbols(
   _str: string,
-  locale: Locale,
-  options: IsAlphaOptions
+  locale: Locale = 'es-ES',
+  options: IsAlphaOptions = {}
 ) {
   var str = _str
   var ignore = options.ignore
@@ -31,15 +31,15 @@ export function isAlphaSimbols(
     }
   }
   if (locale in alpha) {
-    return alpha['en-US'].test(str)
+    return alpha['es-ES'].test(str)
   }
 
   throw new Error("Invalid locale '".concat(locale, "'"))
 }
 export function isAlphanumericSimbols(
   _str: string,
-  locale: Locale,
-  options: IsAlphanumericSimbolsOptions
+  locale: Locale = 'es-ES',
+  options: IsAlphanumericSimbolsOptions = {}
 ) {
   var str = _str
   var ignore = options.ignore
@@ -61,7 +61,7 @@ export function isAlphanumericSimbols(
   }
 
   if (locale in alphanumeric) {
-    return alphanumeric['en-US'].test(str)
+    return alphanumeric['es-ES'].test(str)
   }
 
   throw new Error("Invalid locale '".concat(locale, "'"))
@@ -69,7 +69,7 @@ export function isAlphanumericSimbols(
 
 export function isAlpha(
   _str: string,
-  locale: Locale = 'en-US',
+  locale: Locale = 'es-ES',
   options: IsAlphaOptions = {}
 ) {
   let str = _str
@@ -92,7 +92,7 @@ export function isAlpha(
   }
 
   if (locale in alpha) {
-    return alpha['en-US'].test(str)
+    return alpha['es-ES'].test(str)
   }
   throw new Error(`Invalid locale '${locale}'`)
 }

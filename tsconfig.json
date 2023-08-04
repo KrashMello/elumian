@@ -51,8 +51,8 @@
       "@Middelware/*": [
         "core/middelware/*"
       ],
-      "@RequestValidator/*": [
-        "core/requestValidator/*"
+      "@Request/*": [
+        "core/request/*"
       ]
     },
     /* Specify a set of entries that re-map imports to additional lookup locations. */
