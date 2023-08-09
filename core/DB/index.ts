@@ -4,14 +4,14 @@ import 'dotenv/config'
 class PGSQL {
   private tableName: string = 'user'
   private query: string = ''
-  private config: object =
+  private readonly config: object =
     process.env.DB_URL === ''
       ? {
-          host: process.env.DB_HOST || 'localhost',
-          port: process.env.DB_PORT || 5432,
-          database: process.env.DB_DATABASE || 'postges',
-          user: process.env.DB_USERNAME || 'postgre',
-          password: process.env.DB_PASSWORD || '',
+          host: process.env.DB_HOST ?? 'localhost',
+          port: process.env.DB_PORT ?? 5432,
+          database: process.env.DB_DATABASE ?? 'postges',
+          user: process.env.DB_USERNAME ?? 'postgre',
+          password: process.env.DB_PASSWORD ?? '',
           max: 20,
           idleTimeoutMillis: 1000,
           connectionTimeoutMillis: 2000,
@@ -24,55 +24,61 @@ class PGSQL {
           connectionTimeoutMillis: 2000,
           ssl: false,
         }
-  private pool = new pg.Pool(this.config)
 
-  private DATE_OID = 1082
-  private parseDate = (value: any) => value
+  private readonly pool = new pg.Pool(this.config)
+
+  private readonly DATE_OID = 1082
+  private readonly parseDate = (value: any): any => value
 
   constructor(tableName: string = 'user') {
     this.tableName = tableName
     pg.types.setTypeParser(this.DATE_OID, this.parseDate)
   }
 
-  table(name: string) {
+  table(name: string): this {
     if (!(typeof name === 'string')) throw new Error('Invalid argument type')
     this.tableName = name
     return this
   }
 
-  select(fields: string | string[] = '*') {
-    if (!(typeof fields === 'string') && !Array.isArray(fields))
+  select(fields: string | string[] = '*'): this {
+    if (!(typeof fields === 'string') && !Array.isArray(fields)) {
       throw new Error('invalid argument type to select query')
+    }
     const _fields = typeof fields === 'string' ? [fields] : fields
     this.query = `SELECT ${_fields.join(', ')} from ${this.tableName}`
     return this
   }
 
-  where(fields: string | string[] = `id = 1`) {
-    if (!(typeof fields === 'string') && !Array.isArray(fields))
+  where(fields: string | string[] = 'id = 1'): this {
+    if (!(typeof fields === 'string') && !Array.isArray(fields)) {
       throw new Error('Invalid argument type to where query')
+    }
     const _fields = typeof fields === 'string' ? [fields] : fields
 
     this.query += ` where ${_fields.join(' AND ')}`
     return this
   }
 
-  limit(field: number) {
-    if (!(typeof field === 'number'))
+  limit(field: number): this {
+    if (!(typeof field === 'number')) {
       throw new Error('Invalid argument to limit query')
+    }
 
     this.query += ` limit ${field.toString()}`
     return this
   }
 
-  offset(field: number) {
-    if (!(typeof field === 'number'))
+  offset(field: number): this {
+    if (!(typeof field === 'number')) {
       throw new Error('Invalid argument to offset query')
+    }
 
     this.query += ` offset ${field.toString()}`
     return this
   }
-  call(procedure: string, fields: string | string[] = '1') {
+
+  call(procedure: string, fields: string | string[] = '1'): this {
     if (
       !(typeof procedure === 'string') &&
       procedure === null &&
@@ -80,15 +86,16 @@ class PGSQL {
       procedure === '' &&
       !(typeof fields === 'string') &&
       !Array.isArray(fields)
-    )
+    ) {
       throw new Error('Invalid argument to Call query')
+    }
     if (this.query !== '') throw new Error('Dont have a query')
     const _fields = typeof fields === 'string' ? [fields] : fields
     this.query = `CALL "${procedure}"(${_fields.join(', ')})`
     return this
   }
 
-  view(fields: string | string[] = '*', view: string) {
+  view(fields: string | string[] = '*', view: string): this {
     if (
       !(typeof fields === 'string') &&
       !Array.isArray(fields) &&
@@ -96,39 +103,43 @@ class PGSQL {
       view === undefined &&
       view === null &&
       view === ''
-    )
+    ) {
       throw new Error('Invalid argument to a view query')
+    }
     const _fields = typeof fields === 'string' ? [fields] : fields
     this.query = `SELECT ${_fields.join(', ')} FROM ${view} `
     return this
   }
 
-  queryExec(query: string) {
-    if (!(typeof query === 'string') && query === null)
+  async queryExec(query: string): Promise<any> {
+    if (!(typeof query === 'string') && query === null) {
       throw new Error('Dont have a query')
+    }
 
-    let result = this.pool.query(query)
-    return result
+    const result = this.pool.query(query)
+    return await result
   }
 
-  exec() {
-    if (!(typeof this.query === 'string') && this.query === null)
+  async exec(): Promise<any> {
+    if (!(typeof this.query === 'string') && this.query === null) {
       throw new Error('Dont have a query')
+    }
 
-    let result = this.pool.query(this.query)
+    const result = this.pool.query(this.query)
     this.query = ''
-    return result
+    return await result
   }
 }
 
 class MONGODB {
-  private client = new MongoClient(process.env.DB_URL ?? 'localhost')
-  private DB_DATABASE = process.env.DB_DATABASE ?? 'test'
-  private tableName: string = 'task'
+  private readonly client = new MongoClient(process.env.DB_URL ?? 'localhost')
+  private readonly DB_DATABASE = process.env.DB_DATABASE ?? 'test'
+  private readonly tableName: string = 'task'
   constructor(tableName: string = 'test') {
     this.tableName = tableName
   }
-  public async findOne(query: object, options: object = {}) {
+
+  public async findOne(query: object, options: object = {}): Promise<any> {
     try {
       const database = this.client.db(this.DB_DATABASE)
       const collections = database.collection(this.tableName)
@@ -140,12 +151,13 @@ class MONGODB {
       await this.client.close()
     }
   }
-  public async find(query: object, options: object = {}) {
+
+  public async find(query: object, options: object = {}): Promise<any> {
     try {
       const database = this.client.db(this.DB_DATABASE)
       const collections = database.collection(this.tableName)
 
-      const collection = await collections.find(query, options)
+      const collection = collections.find(query, options)
       if ((await collections.countDocuments(query)) === 0) {
         return 'No documents found!'
       }
@@ -156,19 +168,21 @@ class MONGODB {
     }
   }
 
-  public async insertOne(doc: object) {
+  public async insertOne(doc: object): Promise<any> {
     try {
       const database = this.client.db(this.DB_DATABASE)
       const collections = database.collection(this.tableName)
       // create a document to insert
       const collection = await collections.insertOne(doc)
 
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       return `A document was inserted with the _id: ${collection.insertedId}`
     } finally {
       await this.client.close()
     }
   }
-  public async insertMany(docs: object[]) {
+
+  public async insertMany(docs: object[]): Promise<any> {
     try {
       const database = this.client.db(this.DB_DATABASE)
       const collections = database.collection(this.tableName)
@@ -179,7 +193,12 @@ class MONGODB {
       await this.client.close()
     }
   }
-  public async updateOne(filter: object, doc: object[], options: object = {}) {
+
+  public async updateOne(
+    filter: object,
+    doc: object[],
+    options: object = {}
+  ): Promise<any> {
     try {
       const database = this.client.db(this.DB_DATABASE)
       const collections = database.collection(this.tableName)
@@ -190,7 +209,12 @@ class MONGODB {
       await this.client.close()
     }
   }
-  public async updateMany(filter: object, doc: object[], options: object = {}) {
+
+  public async updateMany(
+    filter: object,
+    doc: object[],
+    options: object = {}
+  ): Promise<any> {
     try {
       const database = this.client.db(this.DB_DATABASE)
       const collections = database.collection(this.tableName)
@@ -201,18 +225,25 @@ class MONGODB {
       await this.client.close()
     }
   }
-  public async replaceOne(filter: object, doc: object[], options: object = {}) {
+
+  public async replaceOne(
+    filter: object,
+    doc: object[],
+    options: object = {}
+  ): Promise<any> {
     try {
       const database = this.client.db(this.DB_DATABASE)
       const collections = database.collection(this.tableName)
       // preplace a document to insert
       const collection = await collections.replaceOne(filter, doc, options)
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       return `Modified ${collection.modifiedCount} document(s)`
     } finally {
       await this.client.close()
     }
   }
-  public async deleteOne(doc: object) {
+
+  public async deleteOne(doc: object): Promise<any> {
     try {
       const database = this.client.db(this.DB_DATABASE)
       const collections = database.collection(this.tableName)
@@ -227,7 +258,8 @@ class MONGODB {
       await this.client.close()
     }
   }
-  public async deleteMany(doc: object) {
+
+  public async deleteMany(doc: object): Promise<any> {
     try {
       const database = this.client.db(this.DB_DATABASE)
       const collections = database.collection(this.tableName)
@@ -239,7 +271,7 @@ class MONGODB {
     }
   }
 }
-export let DB =
+export const DB =
   process.env.DB_CONNECTION === 'pgsql'
     ? PGSQL
     : process.env.DB_CONNECTION === 'mongodb'

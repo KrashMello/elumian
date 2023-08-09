@@ -12,12 +12,9 @@ interface Message {
   email?: string
 }
 
-export type dataCompareValueRequest = { [key: string]: any }
+export type dataCompareValueRequest = Record<string, any>
 
-export type returnCompareValue =
-  | true
-  | string
-  | { [key: string]: Array<string> }
+export type returnCompareValue = true | string | Record<string, string[]>
 
 export interface IsAlphaSimbolsOptions {
   ignore?: string

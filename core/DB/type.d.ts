@@ -9,7 +9,7 @@ export type typeRef = '>' | '<' | '-'
 export type returnRef =
   | `ALTER TABLE "<schemaRef>"."<tableRef>" ADD FOREIGN KEY ("<columnRef>") REFERENCES "${string}"."${string}" ("${string}");`
   | `ALTER TABLE "${string}"."${string}"  ADD FOREIGN KEY ("${string}") REFERENCES "<schemaRef>"."<tableRef>" ("<columnRef>");`
-  | ``
+  | ''
 
 export interface options {
   varchar: (v: number) => retrunVarchar
@@ -40,11 +40,7 @@ export type columnsPropiety =
   | retrunVarchar
   | returnRef
 
-export interface schemaTables {
-  [key: string]: {
-    [key: string]: columnsPropiety[]
-  }
-}
+export type schemaTables = Record<string, Record<string, columnsPropiety[]>>
 
 export interface schemaUp {
   schema: string

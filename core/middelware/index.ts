@@ -1,25 +1,26 @@
-import { NextFunction, Response, Request } from 'express'
+import { type NextFunction, type Response, type Request } from 'express'
 import { verifyId } from '@Cache/index'
 
-function verifyToken(req: Request, res: Response, next: NextFunction) {
+function verifyToken (req: Request, res: Response, next: NextFunction): any {
   const id = req.header('x-access-id')
 
-  if (!id) {
+  if (id == null) {
     return res.status(403).send({
-      message: 'No token provided!',
+      message: 'No token provided!'
     })
   }
 
   if (verifyId('Auth', id)) next()
-  else
+  else {
     return res.status(401).json({
       status: 1,
-      message: 'Unauthorized!',
+      message: 'Unauthorized!'
     })
+  }
 
   return res.status(401).json({
     status: 1,
-    message: 'Unauthorized!',
+    message: 'Unauthorized!'
   })
 }
 export default verifyToken

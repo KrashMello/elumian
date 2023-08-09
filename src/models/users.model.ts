@@ -4,11 +4,11 @@ export class UserModel extends Model {
   tableName = 'users'
   userCache = new Cache(1)
 
-  constructor() {
+  constructor () {
     super()
   }
 
-  create(data: string[]) {
+  create (data: string[]) {
     return this.DB.call('createUser', data.toString()).exec()
   }
 }

@@ -1,30 +1,31 @@
-import { DB as db } from '@DB/index'
-import { schemas } from './type'
+import { DB as DBA } from '@DB/index'
+import { type schemas } from './type'
 export class Migration {
-  private DB: any
-  private migrationsUp = {
+  private readonly DB: any
+  private readonly migrationsUp = {
     schemas: '',
     tables: '',
     ref: '',
   }
-  private migrationsDown = {
+
+  private readonly migrationsDown = {
     schemas: '',
     tables: '',
     ref: '',
   }
-  constructor(type: 'up' | 'down', schemas: Array<schemas>) {
-    this.DB = new db()
-    schemas.map((schema) => {
+
+  constructor(schemas: schemas[]) {
+    this.DB = new DBA()
+    schemas.forEach((schema) => {
       this.migrationsUp.schemas += schema.up.schema
       this.migrationsUp.tables += schema.up.tables
       this.migrationsUp.ref += schema.up.ref
       this.migrationsDown.schemas += schema.down.schema
       this.migrationsDown.tables += schema.down.tables
     })
-
-    this.start(type)
   }
-  public up() {
+
+  public up(): void {
     try {
       console.log('Migration Start')
       this.DB.queryExec(this.migrationsUp.schemas).then((_res: any) => {
@@ -38,7 +39,7 @@ export class Migration {
     }
   }
 
-  public down() {
+  public down(): void {
     try {
       console.log('Migration Start')
       this.DB.queryExec(this.migrationsDown.tables).then((_res: any) => {
@@ -49,7 +50,8 @@ export class Migration {
       console.log(err)
     }
   }
-  start(type: string) {
+
+  start(type: 'up' | 'down'): void {
     if (type === 'up') this.up()
     else if (type === 'down') this.down()
     else console.log('invalid type')

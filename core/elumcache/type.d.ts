@@ -4,6 +4,4 @@ export interface cacheData {
   expireTime: Date
 }
 
-export interface cacheLists {
-  [key: string]: Array<cacheData>
-}
+export type cacheLists = Record<string, cacheData[]>

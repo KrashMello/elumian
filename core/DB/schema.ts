@@ -1,12 +1,13 @@
 import {
-  schemaTables,
-  options as optionsType,
-  retrunVarchar,
-  schemaUp,
-  schemaDown,
-  returnRef,
-  typeRef,
-  tablesRef,
+  type schemaTables,
+  type options as optionsType,
+  type retrunVarchar,
+  type schemaUp,
+  type schemaDown,
+  type returnRef,
+  type typeRef,
+  type tablesRef,
+  type columnsPropiety
 } from './type'
 
 const options: optionsType = {
@@ -24,7 +25,11 @@ const options: optionsType = {
   bool: 'BOOL',
   timeStamp: 'TIMESTAMP',
   ref: (type: typeRef, tables: tablesRef): returnRef => {
-    let [schema, table, column] = tables.split('.')
+    const [schema, table, column] = tables.split('.') as [
+      string,
+      string,
+      string
+    ]
 
     switch (type) {
       case '>':
@@ -36,32 +41,35 @@ const options: optionsType = {
       default:
         return ''
     }
-  },
+  }
 }
 
 class Schema {
-  constructor() {}
-  public create(schema_name: string, tables: schemaTables): schemaUp {
-    let tablesName: Array<string> = Object.keys(tables) as string[]
-    let ref: Array<string> = []
-    let valuesColumns: Array<string> = tablesName.map((key) => {
-      return `CREATE TABLE IF NOT EXISTS "${schema_name}"."${key}" (
-      ${Object.keys(tables[key] as { [key: string]: Array<string> })
+  public create (schemaName: string, tables: schemaTables): schemaUp {
+    const tablesName: string[] = Object.keys(tables)
+    const ref: string[] = []
+    const valuesColumns: string[] = tablesName.map((key) => {
+      return `CREATE TABLE IF NOT EXISTS "${schemaName}"."${key}" (
+      ${Object.keys(tables[key] as Record<string, columnsPropiety[]>)
         .map((columns) => {
-          let column: Array<string> = tables[key]![columns] as string[]
+          const table: Record<string, columnsPropiety[]> = tables[
+            key
+          ] as Record<string, columnsPropiety[]>
+          let column: columnsPropiety[] = table[columns] as columnsPropiety[]
 
-          if (column.filter((v) => v.includes('ALTER TABLE ')).toString())
-            ref.push(
+          if (column.filter((v) => v.includes('ALTER TABLE ')).length > 0) {
+ref.push(
               column
                 .filter((v) => v.includes('ALTER TABLE '))
                 .map((v) => {
                   return v
-                    .replace(/<schemaRef>/g, schema_name)
+                    .replace(/<schemaRef>/g, schemaName)
                     .replace(/<tableRef>/g, key)
                     .replace(/<columnRef>/g, columns)
                 })
                 .toString()
             )
+}
           column = column.filter((v) => !v.includes('ALTER TABLE'))
           return `"${columns}" ${column.toString().replace(/,/g, ' ')}\\`
         })
@@ -71,28 +79,29 @@ class Schema {
       "updated_at" timestamp default 'now()'
       );`
     })
-    let query = {
-      schema: `CREATE SCHEMA IF NOT EXISTS "${schema_name}";`,
+    const query = {
+      schema: `CREATE SCHEMA IF NOT EXISTS "${schemaName}";`,
       tables: `${valuesColumns
         .toString()
         .replace(/,/g, '')
         .replace(/(\\)|(,\s)/g, ',')}`.replace(/(\s{2,})/g, ''),
-      ref: ref.toString().replace(/,/g, ''),
+      ref: ref.toString().replace(/,/g, '')
     }
     return query
   }
-  public drop(schema_name: string, tables: Array<string>): schemaDown {
+
+  public drop (schemaName: string, tables: string[]): schemaDown {
     return {
       schema: `${
-        schema_name !== 'public' ? 'DROP SCHEMA "' + schema_name + '"' : ''
+        schemaName !== 'public' ? 'DROP SCHEMA "' + schemaName + '"' : ''
       }`,
       tables: tables
         .map((tableName) => {
-          return `DROP TABLE IF EXISTS "${schema_name}"."${tableName}" CASCADE;`
+          return `DROP TABLE IF EXISTS "${schemaName}"."${tableName}" CASCADE;`
         })
         .toString()
         .replace(/,/g, '')
-        .replace(/(\\)|(,\s)/g, ','),
+        .replace(/(\\)|(,\s)/g, ',')
     }
   }
 }

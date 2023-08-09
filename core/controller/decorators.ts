@@ -1,11 +1,9 @@
-import { IRouter } from './type'
+import { type IRouter } from './type'
 import 'reflect-metadata'
 
 export const Controller = (prefix: string): ClassDecorator => {
   return (target) => {
     Reflect.defineMetadata('prefix', prefix, target)
-
-    //
     if (!Reflect.hasMetadata('routes', target)) {
       Reflect.defineMetadata('routes', [], target)
     }
@@ -28,22 +26,23 @@ export const Get = (
     if (
       routes.filter((r) => r.handlerName === (propertyKey as string)).length ===
       0
-    )
+    ) {
       routes.push({
         method: 'get',
         path,
         withMiddelware,
-        handlerName: propertyKey as string,
+        handlerName: propertyKey as string
       })
-    else
+    } else {
       routes[
         routes.findIndex((i) => i.handlerName === (propertyKey as string))
       ] = {
         method: 'get',
         path,
         withMiddelware,
-        handlerName: propertyKey as string,
+        handlerName: propertyKey as string
       }
+    }
     Reflect.defineMetadata('routes', routes, target.constructor)
   }
 }
@@ -64,22 +63,23 @@ export const Post = (
     if (
       routes.filter((r) => r.handlerName === (propertyKey as string)).length ===
       0
-    )
+    ) {
       routes.push({
         method: 'post',
         path,
         withMiddelware,
-        handlerName: propertyKey as string,
+        handlerName: propertyKey as string
       })
-    else
+    } else {
       routes[
         routes.findIndex((i) => i.handlerName === (propertyKey as string))
       ] = {
         method: 'post',
         path,
         withMiddelware,
-        handlerName: propertyKey as string,
+        handlerName: propertyKey as string
       }
+    }
 
     Reflect.defineMetadata('routes', routes, target.constructor)
   }
@@ -102,22 +102,23 @@ export const Put = (
     if (
       routes.filter((r) => r.handlerName === (propertyKey as string)).length ===
       0
-    )
+    ) {
       routes.push({
         method: 'put',
         path,
         withMiddelware,
-        handlerName: propertyKey as string,
+        handlerName: propertyKey as string
       })
-    else
+    } else {
       routes[
         routes.findIndex((i) => i.handlerName === (propertyKey as string))
       ] = {
         method: 'put',
         path,
         withMiddelware,
-        handlerName: propertyKey as string,
+        handlerName: propertyKey as string
       }
+    }
 
     Reflect.defineMetadata('routes', routes, target.constructor)
   }

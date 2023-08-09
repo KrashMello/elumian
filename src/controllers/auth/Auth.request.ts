@@ -1,8 +1,8 @@
 import { Request } from '@Request/index'
 
-let signInOptions = {
+const signInOptions = {
   username: 'required|max:20|min:5|alpha',
-  password: 'required|max:20|min:7|alphaSimbols',
+  password: 'required|max:20|min:7|alphaSimbols'
 }
 
-export let signInRequest = new Request(signInOptions)
+export const signInRequest = new Request(signInOptions)

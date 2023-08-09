@@ -1,21 +1,25 @@
-import { IsAlphanumericSimbolsOptions, IsAlphaOptions, Locale } from './type'
+import {
+  type IsAlphanumericSimbolsOptions,
+  type IsAlphaOptions,
+  type Locale
+} from './type'
 
 const alpha = {
-  'es-ES': /^[A-Za-z\-\s/_]+$/i,
+  'es-ES': /^[A-Za-z\-\s/_]+$/i
 }
 const alphanumeric = {
-  'es-ES': /^[0-9A-Za-z\-\s/_]+$/i,
+  'es-ES': /^[0-9A-Za-z\-\s/_]+$/i
 }
 
-export function isAlphaSimbols(
+export function isAlphaSimbols (
   _str: string,
   locale: Locale = 'es-ES',
   options: IsAlphaOptions = {}
-) {
-  var str = _str
-  var ignore = options.ignore
+): any {
+  let str = _str
+  const ignore = options.ignore
 
-  if (ignore) {
+  if (ignore instanceof RegExp || typeof ignore === 'string') {
     if (ignore instanceof RegExp) {
       str = str.replace(ignore, '')
     } else if (typeof ignore === 'string') {
@@ -36,15 +40,15 @@ export function isAlphaSimbols(
 
   throw new Error("Invalid locale '".concat(locale, "'"))
 }
-export function isAlphanumericSimbols(
+export function isAlphanumericSimbols (
   _str: string,
   locale: Locale = 'es-ES',
   options: IsAlphanumericSimbolsOptions = {}
-) {
-  var str = _str
-  var ignore = options.ignore
+): any {
+  let str = _str
+  const ignore = options.ignore
 
-  if (ignore) {
+  if (ignore instanceof RegExp || typeof ignore === 'string') {
     if (ignore instanceof RegExp) {
       str = str.replace(ignore, '')
     } else if (typeof ignore === 'string') {
@@ -67,15 +71,15 @@ export function isAlphanumericSimbols(
   throw new Error("Invalid locale '".concat(locale, "'"))
 }
 
-export function isAlpha(
+export function isAlpha (
   _str: string,
   locale: Locale = 'es-ES',
   options: IsAlphaOptions = {}
-) {
+): any {
   let str = _str
   const { ignore } = options
 
-  if (ignore) {
+  if (ignore instanceof RegExp || typeof ignore === 'string') {
     if (ignore instanceof RegExp) {
       str = str.replace(ignore, '')
     } else if (typeof ignore === 'string') {
