@@ -1,15 +1,18 @@
 import express from 'express'
 import os from 'os'
 import 'dotenv/config'
-import routes from './routes'
+import { router } from '@router/index'
+import { controllers } from './routes'
 
 const app = express()
 app.use(express.json())
 
-routes
-
+router(controllers)
+const hostname = os.hostname()
 app.listen(process.env.SERVER_PORT, () => {
   console.log(
-    `server active in port: http://${os.hostname}:${process.env.SERVER_PORT}`
+    `server active in port: http://${hostname}:${process.env.SERVER_PORT as string}`
   )
 })
+
+
