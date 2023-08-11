@@ -7,17 +7,13 @@ import {
   type returnCompareValue
 } from './type'
 import { isAlpha, isAlphaSimbols, isAlphanumericSimbols } from './service'
+import { type Response, type Request, type NextFunction } from 'express'
 
-// let optionsToValidate = {
-//   username: 'required|max:15|min:8|alpha|array',
-//   password: 'required|max:50|min:8|alphaNumeric',
-// }
-
-export class Request {
+export class RequestClass {
   private readonly lang: Locale = 'es-ES'
   private readonly optionsToValidate: Record<string, string>
   private readonly message: Message
-  constructor (
+  constructor(
     optionsToValidate: Record<string, string>,
     message: Message = {}
   ) {
@@ -25,11 +21,18 @@ export class Request {
     this.message = message
   }
 
-  public validate (data: dataCompareValueRequest): returnCompareValue {
-    return this.compareValue(data, this.optionsToValidate, this.message)
+  public validate(): any {
+    return (req: Request, res: Response, next: NextFunction) => {
+      const validate = this.compareValue(req.body, this.optionsToValidate, this.message)
+      if (validate !== true) {
+        res.status(401).json(validate)
+        return;
+      }
+      next()
+    }
   }
 
-  private compareValue (
+  private compareValue(
     data: dataCompareValueRequest,
     optionsToValidate: Record<string, string>,
     message: Message = {}
@@ -91,13 +94,12 @@ export class Request {
               }
               break
             case 'required':
-              if (data[key] != null) { result = message.required ?? 'el campo es requerido' }
+              if (typeof data[key] === "undefined") { result = message.required ?? 'el campo es requerido' }
               break
             case 'max':
               if (
                 typeof data[key] === 'string' &&
-                (data[key] != null ||
-                  (data[key]?.length as number) > MinMaxLength)
+                (data[key]?.length as number) > MinMaxLength
               ) {
                 result =
                   message.max ??
@@ -107,8 +109,7 @@ export class Request {
             case 'min':
               if (
                 typeof data[key] === 'string' &&
-                (data[key] != null ||
-                  (data[key]?.length as number) < MinMaxLength)
+                (data[key]?.length as number) < MinMaxLength
               ) {
                 result =
                   message.min ??
@@ -118,7 +119,7 @@ export class Request {
             case 'email':
               if (
                 typeof data[key] === 'string' &&
-                (data[key] != null || !validator.isEmail(data[key] as string))
+                !validator.isEmail(data[key] as string)
               ) {
                 result =
                   message.email ??
@@ -130,8 +131,7 @@ export class Request {
               break
             case 'array':
               if (
-                typeof data[key] !== 'string' &&
-                (data[key] != null || !Array.isArray(data[key]))
+                !Array.isArray(data[key])
               ) { result = message.array ?? 'el campo debe ser un arreglo' }
               break
           }

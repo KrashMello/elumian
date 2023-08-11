@@ -7,7 +7,7 @@ import { controllers } from './routes'
 const app = express()
 app.use(express.json())
 
-router(controllers)
+router(controllers, app)
 const hostname = os.hostname()
 app.listen(process.env.SERVER_PORT, () => {
   console.log(

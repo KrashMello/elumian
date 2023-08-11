@@ -23,39 +23,36 @@
     // "moduleDetection": "auto",                        /* Control what method is used to detect module-format JS files. */
     /* Modules */
     "module": "commonjs", /* Specify what module code is generated. */
-    // "rootDir": "./", /* Specify the root folder within your source files. */
+    //"rootDir": "./", /* Specify the root folder within your source files. */
     "moduleResolution": "node", /* Specify how TypeScript looks up a file from a given module specifier. */
     "baseUrl": ".",
     "paths": {
-      "*": [
-        "node_modules/*"
-      ],
       "@src/*": [
-        "src/*"
+        "example/*"
       ],
       "@DB/*": [
-        "core/DB/*"
+        "src/elumDB/*"
       ],
       "@Model/*": [
-        "core/elumModels/*"
+        "src/elumModels/*"
       ],
       "@Controller/*": [
-        "core/controller/*"
+        "src/elumController/*"
       ],
       "@Encoder/*": [
-        "core/elumcoder/*"
+        "src/elumCoder/*"
       ],
       "@Cache/*": [
-        "core/elumcache/*"
+        "src/elumCache/*"
       ],
       "@Middelware/*": [
-        "core/middelware/*"
+        "src/middelware/*"
       ],
       "@Request/*": [
-        "core/request/*"
+        "src/elumRequest/*"
       ],
       "@router/*": [
-        "core/elumRouter/*"
+        "src/elumRouter/*"
       ]
     },
     /* Specify a set of entries that re-map imports to additional lookup locations. */
@@ -127,7 +124,8 @@
   "exclude": [
     "node_modules",
     "dist",
-    "tests"
+    "test"
+    // "example"
   ],
   "ts-node": {
     "require": [
