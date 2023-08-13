@@ -14,5 +14,3 @@ app.listen(process.env.SERVER_PORT, () => {
     `server active in port: http://${hostname}:${process.env.SERVER_PORT as string}`
   )
 })
-
-

@@ -1,6 +1,6 @@
 import { type Request, type Response } from 'express'
 
-export type Methods = 'get' | 'post' | 'delete' | 'options' | 'put'
+export type Methods = 'get' | 'post' | 'delete' | 'path' | 'options' | 'put'
 export interface IRouter {
   method: Methods
   path: string

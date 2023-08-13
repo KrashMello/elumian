@@ -1,8 +1,8 @@
 import { Migration } from '@DB/migration'
-import publicSchema from './public.schema'
+// import publicSchema from './public.schema'
 import taskSchema from './task.schema'
 
-const schemas = [publicSchema, taskSchema]
+const schemas = [taskSchema]
 
 const type: 'up' | 'down' =
   (process.env.npm_config_type as 'up' | 'down') ?? 'up'

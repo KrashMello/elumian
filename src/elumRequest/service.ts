@@ -5,16 +5,16 @@ import {
 } from './type'
 
 const alpha = {
-  'es-ES': /^[A-Za-z\-\s/_]+$/i
+  'es-ES': /^[a-zA-Z-.\s&,_#/]+$/i
 }
 const alphanumeric = {
-  'es-ES': /^[0-9A-Za-z\-\s/_]+$/i
+  'es-ES': /^[a-z0-9A-Z-.\s&,_#/]+$/i
 }
 
-export function isAlphaSimbols (
+export function isAlphaSimbols(
   _str: string,
   locale: Locale = 'es-ES',
-  options: IsAlphaOptions = {}
+  options: IsAlphaOptions = { ignore: '' }
 ): any {
   let str = _str
   const ignore = options.ignore
@@ -40,7 +40,7 @@ export function isAlphaSimbols (
 
   throw new Error("Invalid locale '".concat(locale, "'"))
 }
-export function isAlphanumericSimbols (
+export function isAlphaNumericSimbols(
   _str: string,
   locale: Locale = 'es-ES',
   options: IsAlphanumericSimbolsOptions = {}
@@ -71,7 +71,7 @@ export function isAlphanumericSimbols (
   throw new Error("Invalid locale '".concat(locale, "'"))
 }
 
-export function isAlpha (
+export function isAlpha(
   _str: string,
   locale: Locale = 'es-ES',
   options: IsAlphaOptions = {}

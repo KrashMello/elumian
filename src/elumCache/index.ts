@@ -12,13 +12,13 @@ const secondsToMidnight = (n: Date): number => {
 
 export const cacheList: cacheLists = { Auth: [] }
 const encoder = new Eluncoder()
-let expireTime: number = 5 * 1000 * 60
+let expireTime: number = 1 * 1000 * 60 * 60
 
-export function setConfig (expireT: number): void {
-  expireTime = expireT * 1000 * 60
+export function setConfig(expireT: number): void {
+  expireTime = expireT * 1000 * 60 * 60
 }
 
-export function singCacheData (key: string, data: object): cacheData {
+export function singCacheData(key: string, data: object): cacheData {
   const time = Math.floor(Math.random() * 10) + 1
   const encriptedData: cacheData = {
     id: uuidv4(),
@@ -45,13 +45,13 @@ export function singCacheData (key: string, data: object): cacheData {
   return encriptedData
 }
 
-export function getCacheDataById (key: string, id: string): cacheData | string {
+export function getCacheDataById(key: string, id: string): cacheData | string {
   const filterById = cacheList[key]?.filter((v: cacheData) => v.id === id)[0]
     ?.data
   if (filterById != null) return filterById
   else return 'dont exists data in cache'
 }
 
-export function verifyId (key: string, id: string): boolean {
-  if (cacheList[key]?.filter((v: cacheData) => v.id === id)[0] != null) { return true } else return false
+export function verifyId(key: string, id: string): boolean {
+  if (cacheList[key]?.filter((v: cacheData) => v.id === id)[0] != null) return true; else return false
 }

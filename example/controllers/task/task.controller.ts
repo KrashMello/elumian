@@ -1,25 +1,31 @@
-import { Controller, Get, Post } from '@Controller/decorators'
-import { Request, Response } from 'express'
+import { Controller, Post, Get, Put, RequestValidator, Delete } from '@Controller/decorators'
+import { type Request, type Response } from 'express'
 import { TaskModel } from '@src/models/task.model'
-@Controller('/api/tasks')
+import { createTaskRequest, findDataRequest, updateTaskRequest } from './task.request'
+@Controller('/Task')
 export class TaskController {
-  private readonly task = new TaskModel()
-
+  private readonly Task = new TaskModel()
   @Get('/', false)
-  async get(_req: Request, res: Response) {
-    const result = await this.task.findAll()
-    return res.json(result)
+  @RequestValidator(findDataRequest)
+  find(req: Request, res: Response): any {
+    const data: { code: string, name: string, description: string } = req.query as { code: string, name: string, description: string }
+    this.Task.find(data, res)
   }
 
-  @Get('/:id', false)
-  async getOne(req: Request, res: Response) {
-    const { id } = req.params
-    if (id) res.json(await this.task.findOne(id))
-    else res.send('id no existe')
+  @Post('/', false)
+  @RequestValidator(createTaskRequest)
+  async create(req: Request, res: Response): Promise<any> {
+    this.Task.create(req.body, res)
   }
 
-  @Post({ path: '/', withMiddelware: false })
-  async create(_req: Request, res: Response) {
-    return res.send('agregar tarea')
+  @Put('/:code', false)
+  @RequestValidator(updateTaskRequest)
+  async update(req: Request, res: Response): Promise<any> {
+    this.Task.update({ ...req.body, code: req.params.code }, res)
+  }
+
+  @Delete('/:code', false)
+  async delete(req: Request, res: Response): Promise<any> {
+    this.Task.delete({ code: req.params.code as string }, res)
   }
 }

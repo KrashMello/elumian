@@ -23,6 +23,8 @@ export const Get = (
 
     // Get the routes stored so far, extend it by the new route and re-set the metadata.
     const routes: IRouter[] = Reflect.getMetadata('routes', target.constructor)
+    const index = routes.findIndex((i) => i.handlerName === (propertyKey as string))
+
     if (
       routes.filter((r) => r.handlerName === (propertyKey as string)).length ===
       0
@@ -34,9 +36,8 @@ export const Get = (
         handlerName: propertyKey as string,
       })
     } else {
-      routes[
-        routes.findIndex((i) => i.handlerName === (propertyKey as string))
-      ] = {
+      routes[index] = {
+        ...routes[index],
         method: 'get',
         path,
         withMiddelware,
@@ -124,6 +125,86 @@ export const Put = (
   }
 }
 
+export const Path = (
+  path: string,
+  withMiddelware: boolean = true
+): MethodDecorator => {
+  // `target` equals our class, `propertyKey` equals our decorated method name
+  return (target, propertyKey) => {
+    // In case this is the first route to be registered the `routes` metadata is likely to be undefined at this point.
+    // To prevent any further validation simply set it to an empty array here.
+    if (!Reflect.hasMetadata('routes', target.constructor)) {
+      Reflect.defineMetadata('routes', [], target.constructor)
+    }
+
+    // Get the routes stored so far, extend it by the new route and re-set the metadata.
+    const routes: IRouter[] = Reflect.getMetadata('routes', target.constructor)
+    const index = routes.findIndex((i) => i.handlerName === (propertyKey as string))
+
+    if (
+      routes.filter((r) => r.handlerName === (propertyKey as string)).length ===
+      0
+    ) {
+      routes.push({
+        method: 'path',
+        path,
+        withMiddelware,
+        handlerName: propertyKey as string,
+      })
+    } else {
+      routes[index] = {
+        ...routes[index],
+        method: 'path',
+        path,
+        withMiddelware,
+        handlerName: propertyKey as string,
+      }
+    }
+
+    Reflect.defineMetadata('routes', routes, target.constructor)
+  }
+}
+
+export const Delete = (
+  path: string,
+  withMiddelware: boolean = true
+): MethodDecorator => {
+  // `target` equals our class, `propertyKey` equals our decorated method name
+  return (target, propertyKey) => {
+    // In case this is the first route to be registered the `routes` metadata is likely to be undefined at this point.
+    // To prevent any further validation simply set it to an empty array here.
+    if (!Reflect.hasMetadata('routes', target.constructor)) {
+      Reflect.defineMetadata('routes', [], target.constructor)
+    }
+
+    // Get the routes stored so far, extend it by the new route and re-set the metadata.
+    const routes: IRouter[] = Reflect.getMetadata('routes', target.constructor)
+    const index = routes.findIndex((i) => i.handlerName === (propertyKey as string))
+
+    if (
+      routes.filter((r) => r.handlerName === (propertyKey as string)).length ===
+      0
+    ) {
+      routes.push({
+        method: 'delete',
+        path,
+        withMiddelware,
+        handlerName: propertyKey as string,
+      })
+    } else {
+      routes[index] = {
+        ...routes[index],
+        method: 'delete',
+        path,
+        withMiddelware,
+        handlerName: propertyKey as string,
+      }
+    }
+
+    Reflect.defineMetadata('routes', routes, target.constructor)
+  }
+}
+
 export const RequestValidator = (requestValidator: any): MethodDecorator => {
   // `target` equals our class, `propertyKey` equals our decorated method name
   return (target, propertyKey) => {
@@ -149,7 +230,7 @@ export const RequestValidator = (requestValidator: any): MethodDecorator => {
       })
     } else {
       routes[index] = {
-          method: 'get',
+        method: 'get',
         path: '',
         withMiddelware: true,
         handlerName: propertyKey as string,

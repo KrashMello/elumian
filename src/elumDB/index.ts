@@ -2,35 +2,37 @@ import { MongoClient } from 'mongodb'
 import pg from 'pg'
 import 'dotenv/config'
 class PGSQL {
-  private tableName: string = 'user'
+  private readonly schemaName: string
+  private tableName: string
   private query: string = ''
   private readonly config: object =
     process.env.DB_URL === ''
       ? {
-          host: process.env.DB_HOST ?? 'localhost',
-          port: process.env.DB_PORT ?? 5432,
-          database: process.env.DB_DATABASE ?? 'postges',
-          user: process.env.DB_USERNAME ?? 'postgre',
-          password: process.env.DB_PASSWORD ?? '',
-          max: 20,
-          idleTimeoutMillis: 1000,
-          connectionTimeoutMillis: 2000,
-          ssl: false,
-        }
+        host: process.env.DB_HOST ?? 'localhost',
+        port: process.env.DB_PORT ?? 5432,
+        database: process.env.DB_DATABASE ?? 'postges',
+        user: process.env.DB_USERNAME ?? 'postgre',
+        password: process.env.DB_PASSWORD ?? '',
+        max: 20,
+        idleTimeoutMillis: 1000,
+        connectionTimeoutMillis: 2000,
+        ssl: false,
+      }
       : {
-          connectionString: process.env.DB_URL,
-          max: 20,
-          idleTimeoutMillis: 1000,
-          connectionTimeoutMillis: 2000,
-          ssl: false,
-        }
+        connectionString: process.env.DB_URL,
+        max: 20,
+        idleTimeoutMillis: 1000,
+        connectionTimeoutMillis: 2000,
+        ssl: false,
+      }
 
   private readonly pool = new pg.Pool(this.config)
 
   private readonly DATE_OID = 1082
   private readonly parseDate = (value: any): any => value
 
-  constructor(tableName: string = 'user') {
+  constructor(schemaName: string = 'public', tableName: string = 'user') {
+    this.schemaName = schemaName
     this.tableName = tableName
     pg.types.setTypeParser(this.DATE_OID, this.parseDate)
   }
@@ -46,17 +48,17 @@ class PGSQL {
       throw new Error('invalid argument type to select query')
     }
     const _fields = typeof fields === 'string' ? [fields] : fields
-    this.query = `SELECT ${_fields.join(', ')} from ${this.tableName}`
+    this.query = `SELECT ${_fields.join(', ')} from "${this.schemaName}"."${this.tableName}"`
     return this
   }
 
-  where(fields: string | string[] = 'id = 1'): this {
+  where(fields: string | string[] = 'id = 1', option: "AND" | "OR" = "AND"): this {
     if (!(typeof fields === 'string') && !Array.isArray(fields)) {
       throw new Error('Invalid argument type to where query')
     }
     const _fields = typeof fields === 'string' ? [fields] : fields
 
-    this.query += ` where ${_fields.join(' AND ')}`
+    this.query += ` where ${_fields.join(' ' + option + ' ')}`
     return this
   }
 
@@ -91,7 +93,7 @@ class PGSQL {
     }
     if (this.query !== '') throw new Error('Dont have a query')
     const _fields = typeof fields === 'string' ? [fields] : fields
-    this.query = `CALL "${procedure}"(${_fields.join(', ')})`
+    this.query = `CALL "${this.schemaName}"."${procedure}"(${_fields.join(', ')})`
     return this
   }
 
@@ -107,7 +109,7 @@ class PGSQL {
       throw new Error('Invalid argument to a view query')
     }
     const _fields = typeof fields === 'string' ? [fields] : fields
-    this.query = `SELECT ${_fields.join(', ')} FROM ${view} `
+    this.query = `SELECT ${_fields.join(', ')} FROM ${this.schemaName}.${view} `
     return this
   }
 
@@ -275,5 +277,5 @@ export const DB =
   process.env.DB_CONNECTION === 'pgsql'
     ? PGSQL
     : process.env.DB_CONNECTION === 'mongodb'
-    ? MONGODB
-    : PGSQL
+      ? MONGODB
+      : PGSQL

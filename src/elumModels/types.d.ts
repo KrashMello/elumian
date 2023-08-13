@@ -3,8 +3,3 @@ export interface queryBuilder {
   select: function
   where: function
 }
-
-export interface ModelInterfaceClass {
-  tableName: string
-  DB: any
-}

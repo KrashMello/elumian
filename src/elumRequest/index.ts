@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import validator from 'validator'
 import {
   type Locale,
@@ -6,7 +5,7 @@ import {
   type dataCompareValueRequest,
   type returnCompareValue
 } from './type'
-import { isAlpha, isAlphaSimbols, isAlphanumericSimbols } from './service'
+import { isAlpha, isAlphaSimbols, isAlphaNumericSimbols } from './service'
 import { type Response, type Request, type NextFunction } from 'express'
 
 export class RequestClass {
@@ -21,9 +20,14 @@ export class RequestClass {
     this.message = message
   }
 
-  public validate(): any {
+  public validate(get: boolean = false): any {
     return (req: Request, res: Response, next: NextFunction) => {
-      const validate = this.compareValue(req.body, this.optionsToValidate, this.message)
+      let validate: returnCompareValue
+      if (get)
+        validate = this.compareValue(req.query, this.optionsToValidate, this.message)
+      else {
+        validate = this.compareValue(req.body, this.optionsToValidate, this.message)
+      }
       if (validate !== true) {
         res.status(401).json(validate)
         return;
@@ -39,7 +43,14 @@ export class RequestClass {
   ): returnCompareValue {
     const dataKey = Object.keys(data)
     const requestKey = Object.keys(optionsToValidate)
-    if (!_.isEqual(dataKey, requestKey)) { return `campos unicamente necesarios: ${requestKey.toString()}` }
+    let uncoinsident = 0
+    dataKey.forEach(value => {
+      if (!requestKey.includes(value))
+        uncoinsident++
+    })
+
+    if (uncoinsident > 0)
+      return `campos unicamente necesarios: ${requestKey.toString()}`
 
     let errors: Record<string, string[]> = {}
 
@@ -60,13 +71,15 @@ export class RequestClass {
             case 'alpha':
               if (
                 typeof data[key] === 'string' &&
-                isAlpha(data[key] as string, this.lang) === false
+                // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+                (isAlpha(data[key] as string, this.lang) === false && data[key])
               ) { result = message.alpha ?? 'el campo solo debe tener letras!' }
               break
             case 'alphaSimbols':
               if (
                 typeof data[key] === 'string' &&
-                isAlphaSimbols(data[key] as string, this.lang) === false
+                // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+                (isAlphaSimbols(data[key] as string, this.lang) === false && data[key])
               ) {
                 result =
                   message.alphaSimbols ??
@@ -76,7 +89,8 @@ export class RequestClass {
             case 'alphaNumeric':
               if (
                 typeof data[key] === 'string' &&
-                !validator.isAlphanumeric(data[key] as string)
+                // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+                (!validator.isAlphanumeric(data[key] as string) && data[key])
               ) {
                 result =
                   message.alphaNumeric ??
@@ -85,16 +99,18 @@ export class RequestClass {
               break
             case 'alphaNumericSimbols':
               if (
-                (typeof data[key] === 'string' && data[key] != null) ||
-                isAlphanumericSimbols(data[key] as string) === false
+                typeof data[key] !== 'string' ||
+                // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+                (isAlphaNumericSimbols(data[key] as string) === false && data[key])
               ) {
                 result =
                   message.alphaNumericSimbols ??
-                  'el campo debe contener solo letras, numeros y /_'
+                  'el campo debe contener solo letras, numeros y -._#,/'
               }
               break
             case 'required':
-              if (typeof data[key] === "undefined") { result = message.required ?? 'el campo es requerido' }
+              // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+              if (!data[key]) { result = message.required ?? 'el campo es requerido' }
               break
             case 'max':
               if (
