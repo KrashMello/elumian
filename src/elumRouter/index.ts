@@ -1,4 +1,4 @@
-import { type IRouter } from '@Controller/type'
+import { type SRouter, type IRouter } from '@Controller/type'
 import verifyToken from '@Middelware/index'
 import { type NextFunction, type Request, type Response } from 'express'
 import os from 'os'
@@ -6,8 +6,11 @@ import os from 'os'
 
 const info: Array<{ api: string, handler: string, withMiddelware: boolean }> =
   []
+const infoSocket: Array<{ method: string, path: string, handlerName: string }> = []
 
-export function router(controllers: any, app: any, Middelware: (req: Request, res: Response, next: NextFunction) => Response = verifyToken): any {
+const socketRouter: Array<{ method: string, path: string, functionSocket: any }> = []
+
+export function router(controllers: any, app: any, io: any, Middelware: (req: Request, res: Response, next: NextFunction) => Response = verifyToken): any {
 
   controllers.forEach((Controller: any) => {
     const instance = new Controller()
@@ -15,15 +18,16 @@ export function router(controllers: any, app: any, Middelware: (req: Request, re
     const prefix = Reflect.getMetadata('prefix', Controller)
 
     const routes: IRouter[] = Reflect.getMetadata('routes', Controller)
+    const routesSocket: SRouter[] = Reflect.getMetadata('routesSocket', Controller)
 
     routes.forEach(({ method, path, withMiddelware, handlerName, requestValidator }) => {
 
-      if (typeof requestValidator === "undefined" && withMiddelware === false) {
+      if (typeof requestValidator === "undefined" && !withMiddelware) {
         app[method](prefix.concat('', path), (req: Request, res: Response) => {
           instance[handlerName](req, res)
         })
       }
-      if (typeof requestValidator !== "undefined" && withMiddelware === true) {
+      if (typeof requestValidator !== "undefined" && withMiddelware) {
         app[method](
           prefix.concat('', path),
           Middelware,
@@ -53,16 +57,32 @@ export function router(controllers: any, app: any, Middelware: (req: Request, re
       }
       const hostname = os.hostname()
       info.push({
-        api: `${method.toLocaleUpperCase() as string} http://${hostname}:${process.env.SERVER_PORT as string
+        api: `${method.toLocaleUpperCase()} http://${hostname}:${process.env.SERVER_PORT as string
           }${prefix.concat('', path) as string}`,
         handler: `${Controller.name as string}.${String(handlerName)}`,
         withMiddelware
       })
     })
+
+    routesSocket.forEach(({ method, pathName, handlerName }) => {
+      socketRouter.push({ method, path: prefix.concat(':', pathName), functionSocket: instance[handlerName]() })
+      infoSocket.push({ method, path: prefix.concat(':', pathName), handlerName: `${Controller.name as string}.${String(handlerName)}` })
+    })
+
   })
   app.use((_req: Request, res: Response) => {
-    res.status(404).send(
-      "<h1>Page not found on the server</h1>")
+    res.status(404).json({ message: "ruta no encontrada!" })
+  })
+  io.on("connection", (socket: any) => {
+    console.log(`id is connect: ${socket.id as string}`)
+    socketRouter.forEach(({ method, path, functionSocket }) => {
+      if (method === 'on')
+        socket.on(path, functionSocket)
+      else if (method === 'emit')
+        io.to(socket.id).emit(path, functionSocket)
+
+    })
   })
   console.table(info)
+  if (infoSocket.length > 0) console.table(infoSocket)
 }

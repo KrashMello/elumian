@@ -1,14 +1,61 @@
-import { type IRouter } from './type'
+import { type SRouter, type IRouter } from './type'
 import 'reflect-metadata'
 
 export const Controller = (prefix: string): ClassDecorator => {
   return (target) => {
     Reflect.defineMetadata('prefix', prefix, target)
-    if (!Reflect.hasMetadata('routes', target)) {
-      Reflect.defineMetadata('routes', [], target)
-    }
+
+
   }
 }
+
+export const socketOn = (pathName: string): MethodDecorator => {
+  return (target, propertyKey) => {
+    if (!Reflect.hasMetadata('routesSocket', target.constructor)) {
+      Reflect.defineMetadata('routesSocket', [], target.constructor)
+    }
+    const routes: SRouter[] = Reflect.getMetadata('routesSocket', target.constructor)
+    const index = routes.findIndex((i) => i.handlerName === propertyKey as string)
+
+    if (routes.filter((r) => r.handlerName === propertyKey as string).length === 0)
+      routes.push({
+        method: 'on',
+        pathName,
+        handlerName: propertyKey as string
+      })
+    else
+      routes[index] = {
+        method: 'on',
+        pathName,
+        handlerName: propertyKey as string
+      }
+  }
+}
+
+export const socketEmit = (pathName: string): MethodDecorator => {
+  return (target, propertyKey) => {
+    if (!Reflect.hasMetadata('routesSocket', target.constructor)) {
+      Reflect.defineMetadata('routesSocket', [], target.constructor)
+    }
+    const routes: SRouter[] = Reflect.getMetadata('routesSocket', target.constructor)
+    const index = routes.findIndex((i) => i.handlerName === propertyKey as string)
+
+    if (routes.filter((r) => r.handlerName === propertyKey as string).length === 0)
+      routes.push({
+        method: 'emit',
+        pathName,
+        handlerName: propertyKey as string
+      })
+    else
+      routes[index] = {
+        method: 'emit',
+        pathName,
+        handlerName: propertyKey as string
+      }
+  }
+
+}
+
 export const Get = (
   path: string,
   withMiddelware: boolean = true
@@ -20,7 +67,6 @@ export const Get = (
     if (!Reflect.hasMetadata('routes', target.constructor)) {
       Reflect.defineMetadata('routes', [], target.constructor)
     }
-
     // Get the routes stored so far, extend it by the new route and re-set the metadata.
     const routes: IRouter[] = Reflect.getMetadata('routes', target.constructor)
     const index = routes.findIndex((i) => i.handlerName === (propertyKey as string))
