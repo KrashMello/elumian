@@ -23,9 +23,12 @@ export class TaskModel extends Model {
     })
   }
 
-  findWhitSocket(): any {
-
-    return this.DB.view("*", `"allTasks"`).exec()
+  findWhitSocket(io: any, socket: any): any {
+    setInterval(() => {
+      this.DB.view("*", `"allTasks"`).exec().then((resp: any) => {
+        io.to(socket.id).emit("/Task:get", resp.rows)
+      })
+    }, 1000);
   }
 
 
