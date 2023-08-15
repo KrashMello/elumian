@@ -65,7 +65,7 @@ export function router(controllers: any, app: any, io: any, Middelware: (req: Re
     })
 
     routesSocket.forEach(({ method, pathName, handlerName }) => {
-      socketRouter.push({ method, path: prefix.concat(':', pathName), functionSocket: instance[handlerName]() })
+      socketRouter.push({ method, path: prefix.concat(':', pathName), functionSocket: (io: any, socket: any) => { instance[handlerName](io, socket) } })
       infoSocket.push({ method, path: prefix.concat(':', pathName), handlerName: `${Controller.name as string}.${String(handlerName)}` })
     })
 
@@ -76,10 +76,8 @@ export function router(controllers: any, app: any, io: any, Middelware: (req: Re
   io.on("connection", (socket: any) => {
     console.log(`id is connect: ${socket.id as string}`)
     socketRouter.forEach(({ method, path, functionSocket }) => {
-      if (method === 'on')
-        socket.on(path, functionSocket)
-      else if (method === 'emit')
-        io.to(socket.id).emit(path, functionSocket)
+      console.log(method, path)
+      functionSocket(io, socket)
 
     })
   })

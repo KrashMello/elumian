@@ -11,7 +11,7 @@ export class TaskModel extends Model {
 
   find(data: { code: string, name: string, description: string }, resp: Response): any {
     const { code, name, description } = data
-    return this.DB.view("*", `"allTasks"`).where([
+    this.DB.view("*", `"allTasks"`).where([
       `"code"::text like '%${code}%'`,
       `"name" like '%${name}%'`,
       `"description" like '%${description}%'`
@@ -22,6 +22,12 @@ export class TaskModel extends Model {
       return resp.status(401).json({ message: "ah ocurrido un error" })
     })
   }
+
+  findWhitSocket(): any {
+
+    return this.DB.view("*", `"allTasks"`).exec()
+  }
+
 
   create(data: { name: string, description: string }, resp: Response): any {
     this.DB.call('createtask', `'${data.name}'::varchar, '${data.description}'::text`).exec().then((_res: any) => {

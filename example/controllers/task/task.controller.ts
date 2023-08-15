@@ -30,7 +30,9 @@ export class TaskController {
   }
 
   @socketEmit("get")
-  getsocket(): any {
-    return "hola"
+  async getsocket(io: any, socket: any): Promise<any> {
+    await this.Task.findWhitSocket().then((resp: any) => {
+      io.to(socket.id).emit("/Task:get", resp.rows)
+    })
   }
 }
