@@ -15,7 +15,7 @@ const io = new Server(httpServer)
 router(controllers, app, io)
 const hostname = os.hostname()
 
-httpServer.listen(process.env.SERVER_PORT, () => {
+httpServer.listen(process.env.PORT, () => {
   console.log(
     `server active in port: http://${hostname}:${process.env.SERVER_PORT as string}`
   )
