@@ -49,9 +49,54 @@ export const options: optionsType = {
 export class Schema {
   public create(schemaName: string, tables: schemaTables, procedures: schemaProcedure = null, functions: schemaFunctions = null): schemaUp {
     const tablesName: string[] = Object.keys(tables)
+    let procedureName: string[]
     const ref: string[] = []
-    const proceduresArrays: string[] = []
+    let proceduresArrays: string[] = []
+    if (procedures != null) {
+      procedureName = Object.keys(procedures)
+      proceduresArrays = procedureName.map((v) => {
+        let parametersKeyIn: string[] = []
+        let parametersKeyOut: string[] = []
+        let parametersKey
+        const fieldsIn = procedures[v]?.fields.in
+        const fieldsOut = procedures[v]?.fields.out
+
+        if (fieldsIn != null)
+          parametersKeyIn = Object.keys(fieldsIn)
+        if (fieldsOut != null)
+          parametersKeyOut = Object.keys(fieldsOut)
+        let declareKey
+        parametersKey = parametersKeyIn.map((z) => {
+          return `${z}#23${fieldsIn[z].replace(/\s/g, "#23")}`
+        })
+        parametersKey = [...parametersKey, ...parametersKeyOut.map((z) => {
+          return `${z}#23${fieldsIn[z].replace(/\s/g, "#23")}`
+        })
+        ]
+        if (declareKey != null) {
+          declareKey = Object.keys(procedures[v].declare)
+
+          declareKey = declareKey.map((z) => {
+            return z + "#23" + procedures[v].declare[z].replace(/\s/g, "#23") + ";"
+          })
+        }
+        const result = `
+  create#23or#23replace#23procedure#23"${v}"(${parametersKey})
+  #23language#23plpgsql
+#23as#23$$#23
+#23declare#23
+  ${declareKey ? declareKey : ''}
+  #23begin#23
+  ${procedures[v].comantBlock.replace(/(\s)\1/g, "#23").replace(/\s/g, "#23")}
+end;#23$$
+  `
+        return result.replace(/\s/g, "").replace(/(#23)/g, " ")
+      })
+
+    }
     const functionsArrays: string[] = []
+
+
     const valuesColumns: string[] = tablesName.map((key) => {
       return `CREATE TABLE IF NOT EXISTS "${schemaName}"."${key}" (
       ${Object.keys(tables[key] as Record<string, columnsPropiety[]>)
@@ -83,6 +128,8 @@ export class Schema {
       "updated_at" timestamp default 'now()'
       );`
     })
+
+
 
     const query = {
       schema: `CREATE SCHEMA IF NOT EXISTS "${schemaName}";`,
