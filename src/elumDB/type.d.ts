@@ -26,6 +26,25 @@ export interface options {
   ref: (k: typeRef, i: tablesRef) => returnRef
 }
 
+interface functionsFields {
+  fields: Record<string, string>
+  comantBlock: string
+}
+
+interface procedureFields {
+  fields: {
+    in: Record<string, string>,
+    out?: Record<string, string>
+  }
+  declare: Record<string, string>
+  comantBlock: string
+}
+export type schemaFunctions = Record<string, functionsFields> | null
+
+export type schemaProcedure =
+  Record<string, procedureFields> | null
+
+
 export type columnsPropiety =
   | 'TIMESTAMP'
   | 'BOOL'

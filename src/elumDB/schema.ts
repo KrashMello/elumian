@@ -1,13 +1,15 @@
-import {
-  type schemaTables,
-  type options as optionsType,
-  type retrunVarchar,
-  type schemaUp,
-  type schemaDown,
-  type returnRef,
-  type typeRef,
-  type tablesRef,
-  type columnsPropiety
+import type {
+  schemaTables,
+  options as optionsType,
+  retrunVarchar,
+  schemaUp,
+  schemaDown,
+  returnRef,
+  typeRef,
+  tablesRef,
+  columnsPropiety,
+  schemaFunctions,
+  schemaProcedure
 } from './type'
 
 export const options: optionsType = {
@@ -45,9 +47,11 @@ export const options: optionsType = {
 }
 
 export class Schema {
-  public create(schemaName: string, tables: schemaTables): schemaUp {
+  public create(schemaName: string, tables: schemaTables, procedures: schemaProcedure = null, functions: schemaFunctions = null): schemaUp {
     const tablesName: string[] = Object.keys(tables)
     const ref: string[] = []
+    const proceduresArrays: string[] = []
+    const functionsArrays: string[] = []
     const valuesColumns: string[] = tablesName.map((key) => {
       return `CREATE TABLE IF NOT EXISTS "${schemaName}"."${key}" (
       ${Object.keys(tables[key] as Record<string, columnsPropiety[]>)
@@ -79,6 +83,7 @@ export class Schema {
       "updated_at" timestamp default 'now()'
       );`
     })
+
     const query = {
       schema: `CREATE SCHEMA IF NOT EXISTS "${schemaName}";`,
       tables: `${valuesColumns
@@ -89,6 +94,35 @@ export class Schema {
     }
     return query
   }
+
+  /*
+   *const FA = []
+const FP = []
+
+const procedureFields = Object.keys(procedure)
+
+procedureFields.forEach((v)=>{
+  let parametersKey = Object.keys(procedure[v].fields.in)
+  let declareKey = Object.keys(procedure[v].declare)
+  parametersKey = parametersKey.map((z)=>{
+    return z + "#23" + procedure[v].fields.in[z].replace(/\s/g,"#23")
+  })
+  declareKey = declareKey.map((z)=>{
+    return z + "#23" + procedure[v].declare[z].replace(/\s/g,"#23") + ";"
+  })
+  const result = `
+  create#23or#23replace#23procedure#23"${v}"(${parametersKey})
+  #23language#23plpgsql
+#23as#23$$#23
+#23declare#23
+  ${declareKey ?? ""}
+  #23begin#23
+  ${procedure[v].comantBlock.replace(/(\s)\1/g,"#23").replace(/\s/g,"#23")}
+end;#23$$
+  `
+  FP.push(result.replace(/\s/g,"").replace(/(#23)/g," "))
+})
+   * */
 
   public drop(schemaName: string, tables: string[]): schemaDown {
     return {

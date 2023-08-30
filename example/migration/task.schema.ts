@@ -1,5 +1,5 @@
 import { Schema, options } from '@DB/schema'
-import { type schemaTables } from '@DB/type'
+import type { schemaFunctions, schemaProcedure, schemaTables } from '@DB/type'
 
 const { pk, unique, varchar, notNull, bigInt, text, increment } =
   options
@@ -14,9 +14,38 @@ const tables: schemaTables = {
     description: [text, notNull]
   },
 }
+const functions: schemaFunctions = {
+  codegen: {
+    fields: {
+      type: varchar(30)
+    },
+    comantBlock: `
+      return false;
+    `
+  }
+}
+
+const procedure: schemaProcedure = {
+  createTask: {
+    fields: {
+      in: {
+        _name: varchar(255),
+        _description: text
+      }
+    },
+    declare: {
+      _code: varchar(15)
+    },
+    comantBlock: `
+      _code := codegen('task');
+      Insert into tasks(code,"name",description) values (code,_name,_description);
+      `
+  }
+}
+
 const tablesDrop: string[] = Object.keys(tables)
 
 export default {
-  up: schema.create(schemaName, tables),
+  up: schema.create(schemaName, tables, procedure, functions),
   down: schema.drop(schemaName, tablesDrop)
 }
