@@ -27,7 +27,7 @@ const functions: schemaFunctions = {
 
 const procedure: schemaProcedure = {
   createTask: {
-    fields: {
+    parameters: {
       in: {
         _name: varchar(255),
         _description: text
@@ -40,7 +40,24 @@ const procedure: schemaProcedure = {
       _code := codegen('task');
       Insert into tasks(code,"name",description) values (code,_name,_description);
       `
+  },
+  updateTask: {
+    parameters: {
+      in: {
+        _code: varchar(15),
+        _name: varchar(255),
+        _description: text
+      }
+    },
+    comantBlock: `
+      update task.tasks
+		set  "name" = _name,
+		description = _description,
+		updated_at = now()
+	where code = _code;
+      `
   }
+
 }
 
 const tablesDrop: string[] = Object.keys(tables)
