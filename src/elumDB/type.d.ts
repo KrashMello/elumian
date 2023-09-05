@@ -32,11 +32,11 @@ interface functionsFields {
 }
 
 interface procedureFields {
-  fields: {
+  parameters: {
     in: Record<string, string>,
     out?: Record<string, string>
   }
-  declare: Record<string, string>
+  declare?: Record<string, string>
   comantBlock: string
 }
 export type schemaFunctions = Record<string, functionsFields> | null
@@ -65,6 +65,7 @@ export interface schemaUp {
   schema: string
   tables: string
   ref: string
+  procedures: string
 }
 
 export interface schemaDown {
