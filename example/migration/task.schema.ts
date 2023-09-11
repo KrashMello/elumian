@@ -16,7 +16,7 @@ const tables: schemaTables = {
 }
 const functions: schemaFunctions = {
   codegen: {
-    fields: {
+    parameters: {
       type: varchar(30)
     },
     comantBlock: `
@@ -50,7 +50,7 @@ const procedure: schemaProcedure = {
       }
     },
     comantBlock: `
-      update task.tasks
+      update "task"."tasks"
 		set  "name" = _name,
 		description = _description,
 		updated_at = now()

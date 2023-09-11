@@ -20,6 +20,7 @@
     "start": "node dist/src/index.js",
     "migrate": "ts-node example/migration/index.ts",
     "dev": "ts-node-dev -r tsconfig-paths/register example/index.ts",
+    "dev:bun": "bun -r tsconfig-paths/register example/index.ts",
     "lint": "ts-standard",
     "lint:fix": "ts-standard --fix"
   },

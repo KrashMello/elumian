@@ -47,7 +47,7 @@ export const options: optionsType = {
 }
 
 export class Schema {
-  public create(schemaName: string, tables: schemaTables, procedures: schemaProcedure = null, _functions: schemaFunctions = null): schemaUp {
+  public create(schemaName: string, tables: schemaTables, procedures: schemaProcedure = null, functions: schemaFunctions = null): schemaUp {
     const tablesName: string[] = Object.keys(tables)
     let procedureName: string[]
     const ref: string[] = []
@@ -92,8 +92,33 @@ export class Schema {
         return result.replace(/(#23)/g, " ")
       })
     }
-    // const functionsArrays: string[] = []
+    let functionsName: string[]
+    const functionsArrays: string[] = []
+    if (functions != null) {
+      functionsName = Object.keys(functions)
+      functionsArrays = functionsName.map((v) => {
+        let parametersKey: string[] = []
 
+        parametersKey = Object.keys(functions[v].parameters)
+        let declareKey
+        parametersKey = parametersKey.map((z) => {
+          return `${z}#23${functions[v].parameters[z].replace(/\s/g, "#23")}`
+        })
+        if (procedures[v].declare != null) {
+          declareKey = Object.keys(procedures[v].declare)
+          declareKey = declareKey.map((z) => {
+            return z + "#23" + procedures[v].declare[z].replace(/\s/g, "#23") + ";"
+          })
+        }
+        const result = `
+          create#23or#23replace#23function#23"${v}"(${declarekey})
+          #23language#23plpgsql
+          #23as
+          ${functions[v].comantBlock.replace(/(\s)\1/g, "#23").replace(/\s/g, "#23")}
+          `
+        return result.replace(/(#23)/g, " ")
+      })
+    }
 
     const valuesColumns: string[] = tablesName.map((key) => {
       return `CREATE TABLE IF NOT EXISTS "${schemaName}"."${key}" (

@@ -1,6 +1,5 @@
 import express from 'express'
 import os from 'os'
-import 'dotenv/config'
 import { router } from '@router/index'
 import { controllers } from './routes'
 import { createServer } from "http"
@@ -14,9 +13,8 @@ const io = new Server(httpServer)
 
 router(controllers, app, io)
 const hostname = os.hostname()
-
-httpServer.listen(process.env.PORT, () => {
+httpServer.listen(process.env.SERVER_PORT, () => {
   console.log(
-    `server active in port: http://${hostname}:${process.env.SERVER_PORT as string}`
+    `server active in port: http://${hostname}:${process.env.SERVER_PORT}`
   )
 })

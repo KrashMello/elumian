@@ -27,7 +27,7 @@ export interface options {
 }
 
 interface functionsFields {
-  fields: Record<string, string>
+  parameters: Record<string, string>
   comantBlock: string
 }
 
