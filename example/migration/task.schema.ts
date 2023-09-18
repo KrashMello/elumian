@@ -19,8 +19,9 @@ const functions: schemaFunctions = {
     parameters: {
       type: varchar(30)
     },
+    return: varchar(15),
     comantBlock: `
-      return false;
+      RETURN type;
     `
   }
 }

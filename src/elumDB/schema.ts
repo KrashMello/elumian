@@ -93,27 +93,20 @@ export class Schema {
       })
     }
     let functionsName: string[]
-    const functionsArrays: string[] = []
+    let functionsArrays: string[] = []
     if (functions != null) {
       functionsName = Object.keys(functions)
       functionsArrays = functionsName.map((v) => {
         let parametersKey: string[] = []
 
         parametersKey = Object.keys(functions[v].parameters)
-        let declareKey
         parametersKey = parametersKey.map((z) => {
           return `${z}#23${functions[v].parameters[z].replace(/\s/g, "#23")}`
         })
-        if (procedures[v].declare != null) {
-          declareKey = Object.keys(procedures[v].declare)
-          declareKey = declareKey.map((z) => {
-            return z + "#23" + procedures[v].declare[z].replace(/\s/g, "#23") + ";"
-          })
-        }
         const result = `
-          create#23or#23replace#23function#23"${v}"(${declarekey})
-          #23language#23plpgsql
-          #23as
+          create#23or#23replace#23function#23"${schemaName}"."${v}"(${parametersKey.toString()})#23
+          Returns#23${functions[v].return}#23
+          #23language#23sql#23
           ${functions[v].comantBlock.replace(/(\s)\1/g, "#23").replace(/\s/g, "#23")}
           `
         return result.replace(/(#23)/g, " ")
@@ -160,14 +153,15 @@ export class Schema {
         .replace(/,/g, '')
         .replace(/(\\)|(,\s)/g, ',')}`.replace(/(\s{2,})/g, ''),
       ref: ref.toString().replace(/,/g, ''),
-      procedures: proceduresArrays.toString().replace(/,/g, '').replace(/(#24)/g, ",")
+      procedures: proceduresArrays.toString().replace(/,/g, '').replace(/(#24)/g, ","),
+      functions: functionsArrays.toString().replace(/,/g, '').replace(/(#24)/g, ","),
     }
     return query
   }
 
   public drop(schemaName: string, tables: string[]): schemaDown {
     return {
-      schema: `${schemaName !== 'public' ? 'DROP SCHEMA "' + schemaName + '"' : ''
+      schema: `${schemaName !== 'public' ? 'DROP SCHEMA "' + schemaName + '" CASCADE;' : ''
         }`,
       tables: tables
         .map((tableName) => {

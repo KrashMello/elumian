@@ -7,6 +7,7 @@ export class Migration {
     tables: '',
     ref: '',
     procedures: '',
+    functions: ''
   }
 
   private readonly migrationsDown = {
@@ -21,6 +22,7 @@ export class Migration {
       this.migrationsUp.schemas += schema.up.schema
       this.migrationsUp.tables += schema.up.tables
       this.migrationsUp.ref += schema.up.ref
+      this.migrationsUp.functions += schema.up.functions
       this.migrationsUp.procedures += schema.up.procedures
       this.migrationsDown.schemas += schema.down.schema
       this.migrationsDown.tables += schema.down.tables
@@ -33,6 +35,7 @@ export class Migration {
       this.DB.queryExec(this.migrationsUp.schemas).then((_res: any) => {
         this.DB.queryExec(this.migrationsUp.tables).then((_res: any) => {
           this.DB.queryExec(this.migrationsUp.ref)
+          this.DB.queryExec(this.migrationsUp.functions)
           this.DB.queryExec(this.migrationsUp.procedures)
         })
       })

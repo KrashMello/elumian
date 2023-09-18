@@ -28,6 +28,7 @@ export interface options {
 
 interface functionsFields {
   parameters: Record<string, string>
+  return: string
   comantBlock: string
 }
 
@@ -66,6 +67,7 @@ export interface schemaUp {
   tables: string
   ref: string
   procedures: string
+  functions: string
 }
 
 export interface schemaDown {
