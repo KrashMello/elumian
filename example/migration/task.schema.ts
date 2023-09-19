@@ -19,9 +19,21 @@ const functions: schemaFunctions = {
     parameters: {
       type: varchar(30)
     },
+    declare: {
+      _auxcode: varchar(15),
+      _auxcount: bigInt
+    },
     return: varchar(15),
     comantBlock: `
-      RETURN type;
+      case type
+		   when 'tsk' then
+              select count(*) into _auxcount from tasks;
+              select concat('TSK-',substring('0000',length(_auxcount::character varying) + 1),_auxcount+1) into _auxcode;
+		   else
+	    	  _auxcode = 'Unspecified';
+		   end case;
+      
+      return _auxcode;
     `
   }
 }
@@ -38,7 +50,7 @@ const procedure: schemaProcedure = {
       _code: varchar(15)
     },
     comantBlock: `
-      _code := codegen('task');
+      _code := codegen('tsk');
       Insert into tasks(code,"name",description) values (code,_name,_description);
       `
   },

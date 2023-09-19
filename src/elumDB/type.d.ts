@@ -29,6 +29,7 @@ export interface options {
 interface functionsFields {
   parameters: Record<string, string>
   return: string
+  declare?: Record<string, string>
   comantBlock: string
 }
 

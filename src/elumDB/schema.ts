@@ -98,16 +98,28 @@ export class Schema {
       functionsName = Object.keys(functions)
       functionsArrays = functionsName.map((v) => {
         let parametersKey: string[] = []
-
+        let declareKey
         parametersKey = Object.keys(functions[v].parameters)
         parametersKey = parametersKey.map((z) => {
           return `${z}#23${functions[v].parameters[z].replace(/\s/g, "#23")}`
         })
+        if (functions[v].declare != null) {
+          declareKey = Object.keys(functions[v].declare)
+          declareKey = declareKey.map((z) => {
+            return z + "#23" + functions[v].declare[z].replace(/\s/g, "#23") + ";#23"
+          })
+        }
         const result = `
-          create#23or#23replace#23function#23"${schemaName}"."${v}"(${parametersKey.toString()})#23
+          create#23or#23replace#23function#23"${schemaName}"."${v}"(${parametersKey.toString().replace(/,/g, "#24")})#23
           Returns#23${functions[v].return}#23
-          #23language#23sql#23
-          ${functions[v].comantBlock.replace(/(\s)\1/g, "#23").replace(/\s/g, "#23")}
+          #23language#23plpgsql
+          #23as#23$$#23
+          #23declare#23
+          ${declareKey != null ? declareKey.toString() : ''}
+          #23begin#23
+          ${functions[v].comantBlock.replace(/(\s)\1/g, "#23").replace(/\s/g, "#23").replace(/,/g, "#24")}
+          end;#23$$;
+
           `
         return result.replace(/(#23)/g, " ")
       })
