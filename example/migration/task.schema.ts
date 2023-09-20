@@ -50,8 +50,8 @@ const procedure: schemaProcedure = {
       _code: varchar(15)
     },
     comantBlock: `
-      _code := codegen('tsk');
-      Insert into tasks(code,"name",description) values (code,_name,_description);
+      select task.codegen('tsk') into _code;
+      Insert into tasks(code,"name",description) values (_code,_name,_description);
       `
   },
   updateTask: {
