@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Put, RequestValidator, Delete, socketEmit } from '@Controller/decorators'
+import { Controller, Post, Get, Put, RequestValidator, socketEmit } from '@Controller/decorators'
 import { type Request, type Response } from 'express'
 import { TaskModel } from '@src/models/task.model'
 import { createTaskRequest, findDataRequest, updateTaskRequest } from './task.request'
@@ -24,10 +24,6 @@ export class TaskController {
     this.Task.update({ ...req.body, code: req.params.code }, res)
   }
 
-  @Delete('/:code', false)
-  async delete(req: Request, res: Response): Promise<any> {
-    this.Task.delete({ code: req.params.code as string }, res)
-  }
 
   @socketEmit("get")
   getsocket(io: any, socket: any): any {
