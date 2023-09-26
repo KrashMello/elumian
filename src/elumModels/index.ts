@@ -4,7 +4,6 @@ export abstract class Model {
   protected tableName: string = 'test'
   DB: any
   initBD(): void {
-
     this.DB = new DBA(this.schemaName, this.tableName)
   }
 }
