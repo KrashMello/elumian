@@ -7,9 +7,9 @@ export type retrunVarchar = `varchar(${number})`
 export type tablesRef = `${string}.${string}.${string}`
 export type typeRef = '>' | '<' | '-'
 export type returnRef =
-  | `ALTER TABLE "<schemaRef>"."<tableRef>" ADD FOREIGN KEY ("<columnRef>") REFERENCES "${string}"."${string}" ("${string}");`
-  | `ALTER TABLE "${string}"."${string}"  ADD FOREIGN KEY ("${string}") REFERENCES "<schemaRef>"."<tableRef>" ("<columnRef>");`
-  | ''
+  `ALTER TABLE "<schemaRef>"."<tableRef>" ADD FOREIGN KEY ("<columnRef>") REFERENCES "${string}"."${string}" ("${string}");` |
+  `ALTER TABLE "${string}"."${string}"  ADD FOREIGN KEY ("${string}") REFERENCES "<schemaRef>"."<tableRef>" ("<columnRef>");` |
+  ''
 
 export interface options {
   varchar: (v: number) => retrunVarchar
