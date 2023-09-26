@@ -64,11 +64,10 @@ export function router(controllers: any, app: any, io: any, Middelware: (req: Re
       })
     })
 
-    if (routesSocket != null)
-      routesSocket.forEach(({ method, pathName, handlerName }) => {
-        socketRouter.push({ method, path: prefix.concat(':', pathName), functionSocket: (io: any, socket: any) => { instance[handlerName](io, socket) } })
-        infoSocket.push({ method, path: prefix.concat(':', pathName), handlerName: `${Controller.name as string}.${String(handlerName)}` })
-      })
+    routesSocket.forEach(({ method, pathName, handlerName }) => {
+      socketRouter.push({ method, path: prefix.concat(':', pathName), functionSocket: (io: any, socket: any) => { instance[handlerName](io, socket) } })
+      infoSocket.push({ method, path: prefix.concat(':', pathName), handlerName: `${Controller.name as string}.${String(handlerName)}` })
+    })
 
   })
   app.use((_req: Request, res: Response) => {
