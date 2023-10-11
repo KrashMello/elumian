@@ -22,7 +22,7 @@ export const procedure: schemaProcedure = {
     },
     comantBlock: `
       select system.codegen('usr') into _code;
-      Insert into system."Users"(code, username, password, first_name, last_name, email, status_code, role_code) values (_code, _username,_password,_first_name,_last_name,_email,_status_code,_role_code);
+      Insert into system."users"(code, username, password, first_name, last_name, email, status_code, role_code) values (_code, _username,_password,_first_name,_last_name,_email,_status_code,_role_code);
       `
   },
   updateUser: {
@@ -34,7 +34,7 @@ export const procedure: schemaProcedure = {
       }
     },
     comantBlock: `
-      update "system"."Users"
+      update "system"."users" set
 		first_name = _first_name,
     last_name = _last_name,
 		updated_at = now()

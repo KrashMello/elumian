@@ -5,7 +5,7 @@ const { pk, unique, varchar, notNull, bigInt, ref, text, increment } =
   options
 
 export const tables: schemaTables = {
-  Users: {
+  users: {
     id: [bigInt, pk, increment, notNull],
     code: [varchar(15), unique],
     username: [varchar(20), notNull, unique],
