@@ -4,4 +4,3 @@ import { TaskController } from '@src/controllers/task/task.controller'
 import { UserController } from '@src/controllers/users/user.controller'
 
 export const controllers = [TaskController, UserController, AuthController]
-

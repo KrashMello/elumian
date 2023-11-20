@@ -1,4 +1,4 @@
-import { Eluncoder } from '@Encoder/index'
+import { Encoder } from '@Encoder/index'
 import { v4 as uuidv4 } from 'uuid'
 import { type cacheData, type cacheLists } from './type'
 
@@ -11,7 +11,7 @@ const secondsToMidnight = (n: Date): number => {
 }
 
 export const cacheList: cacheLists = { Auth: [] }
-const encoder = new Eluncoder()
+const encoder = new Encoder()
 let expireTime: number = 1 * 1000 * 60 * 60
 
 export function setConfig(expireT: number): void {
@@ -25,7 +25,7 @@ export function singCacheData(key: string, data: object): cacheData {
     data: encoder.hardEncrypter(data, time),
     expireTime: new Date(
       new Date().getTime() + secondsToMidnight(new Date()) * expireTime
-    )
+    ),
   }
 
   if (cacheList[key] == null) cacheList[key] = []
@@ -53,5 +53,7 @@ export function getCacheDataById(key: string, id: string): cacheData | string {
 }
 
 export function verifyId(key: string, id: string): boolean {
-  if (cacheList[key]?.filter((v: cacheData) => v.id === id)[0] != null) return true; else return false
+  if (cacheList[key]?.filter((v: cacheData) => v.id === id)[0] != null)
+    return true
+  else return false
 }

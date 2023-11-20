@@ -3,7 +3,7 @@ import {
   type Locale,
   type Message,
   type dataCompareValueRequest,
-  type returnCompareValue
+  type returnCompareValue,
 } from './type'
 import { isAlpha, isAlphaSimbols, isAlphaNumericSimbols } from './service'
 import { type Response, type Request, type NextFunction } from 'express'
@@ -24,13 +24,21 @@ export class RequestClass {
     return (req: Request, res: Response, next: NextFunction) => {
       let validate: returnCompareValue
       if (get)
-        validate = this.compareValue(req.query, this.optionsToValidate, this.message)
+        validate = this.compareValue(
+          req.query,
+          this.optionsToValidate,
+          this.message
+        )
       else {
-        validate = this.compareValue(req.body, this.optionsToValidate, this.message)
+        validate = this.compareValue(
+          req.body,
+          this.optionsToValidate,
+          this.message
+        )
       }
       if (validate !== true) {
         res.status(401).json(validate)
-        return;
+        return
       }
       next()
     }
@@ -44,9 +52,8 @@ export class RequestClass {
     const dataKey = Object.keys(data)
     const requestKey = Object.keys(optionsToValidate)
     let uncoinsident = 0
-    dataKey.forEach(value => {
-      if (!requestKey.includes(value))
-        uncoinsident++
+    dataKey.forEach((value) => {
+      if (!requestKey.includes(value)) uncoinsident++
     })
 
     if (uncoinsident > 0)
@@ -55,7 +62,7 @@ export class RequestClass {
     let errors: Record<string, string[]> = {}
 
     requestKey.forEach((key): any => {
-      const options = optionsToValidate[key]?.split('|') as string[]
+      const options = optionsToValidate[key]?.split('|')
       let optionsResult: string[] = []
 
       optionsResult = options
@@ -64,7 +71,7 @@ export class RequestClass {
           let MinMaxLength: number = 0
           if (option.includes('max') || option.includes('min')) {
             const auxOption = option.split(':')
-            option = auxOption[0] as string
+            option = auxOption[0]
             MinMaxLength = Number(auxOption[1])
           }
           switch (option) {
@@ -72,14 +79,18 @@ export class RequestClass {
               if (
                 typeof data[key] === 'string' &&
                 // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-                (isAlpha(data[key] as string, this.lang) === false && data[key])
-              ) { result = message.alpha ?? 'el campo solo debe tener letras!' }
+                isAlpha(data[key] as string, this.lang) === false &&
+                data[key]
+              ) {
+                result = message.alpha ?? 'el campo solo debe tener letras!'
+              }
               break
             case 'alphaSimbols':
               if (
                 typeof data[key] === 'string' &&
                 // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-                (isAlphaSimbols(data[key] as string, this.lang) === false && data[key])
+                isAlphaSimbols(data[key] as string, this.lang) === false &&
+                data[key]
               ) {
                 result =
                   message.alphaSimbols ??
@@ -90,7 +101,8 @@ export class RequestClass {
               if (
                 typeof data[key] === 'string' &&
                 // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-                (!validator.isAlphanumeric(data[key] as string) && data[key])
+                !validator.isAlphanumeric(data[key] as string) &&
+                data[key]
               ) {
                 result =
                   message.alphaNumeric ??
@@ -101,7 +113,8 @@ export class RequestClass {
               if (
                 typeof data[key] !== 'string' ||
                 // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-                (isAlphaNumericSimbols(data[key] as string) === false && data[key])
+                (isAlphaNumericSimbols(data[key] as string) === false &&
+                  data[key])
               ) {
                 result =
                   message.alphaNumericSimbols ??
@@ -110,7 +123,9 @@ export class RequestClass {
               break
             case 'required':
               // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-              if (!data[key]) { result = message.required ?? 'el campo es requerido' }
+              if (!data[key]) {
+                result = message.required ?? 'el campo es requerido'
+              }
               break
             case 'max':
               if (
@@ -143,17 +158,19 @@ export class RequestClass {
               }
               break
             case 'boolean':
-              if (typeof data[key] !== 'boolean') { result = message.boolean ?? 'el campo debe ser booleano' }
+              if (typeof data[key] !== 'boolean') {
+                result = message.boolean ?? 'el campo debe ser booleano'
+              }
               break
             case 'array':
-              if (
-                !Array.isArray(data[key])
-              ) { result = message.array ?? 'el campo debe ser un arreglo' }
+              if (!Array.isArray(data[key])) {
+                result = message.array ?? 'el campo debe ser un arreglo'
+              }
               break
           }
           return result
         })
-        .filter((v) => v) as string[]
+        .filter((v) => v)
       if (optionsResult.length > 0) errors = { ...errors, [key]: optionsResult }
     })
     return Object.values(errors).length === 0 ? true : errors

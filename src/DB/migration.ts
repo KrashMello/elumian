@@ -7,7 +7,7 @@ export class Migration {
     tables: '',
     ref: '',
     procedures: '',
-    functions: ''
+    functions: '',
   }
 
   private readonly migrationsDown = {
@@ -30,16 +30,34 @@ export class Migration {
   }
 
   public up(): void {
+    console.log('Migration Start')
     try {
-      console.log('Migration Start')
       // console.log({ schema: this.migrationsUp.schemas, tables: this.migrationsUp.tables, ref: this.migrationsUp.ref, functions: this.migrationsUp.functions, procedures: this.migrationsUp.procedures })
-      this.DB.queryExec(this.migrationsUp.schemas).then((_res: any) => {
-        this.DB.queryExec(this.migrationsUp.tables).then((_res: any) => {
-          this.DB.queryExec(this.migrationsUp.functions).catch((err: any) => { throw new Error(err); })
-          this.DB.queryExec(this.migrationsUp.procedures).catch((err: any) => { throw new Error(err); })
-          this.DB.queryExec(this.migrationsUp.ref).catch((err: any) => { throw new Error(err); })
-        }).catch((err: any) => { throw new Error(err); })
-      }).catch((err: any) => { throw new Error(err); })
+      this.DB.queryExec(this.migrationsUp.schemas)
+        .then((_res: any) => {
+          this.DB.queryExec(this.migrationsUp.tables)
+            .then((_res: any) => {
+              this.DB.queryExec(this.migrationsUp.functions).catch(
+                (err: any) => {
+                  throw new Error(err)
+                }
+              )
+              this.DB.queryExec(this.migrationsUp.procedures).catch(
+                (err: any) => {
+                  throw new Error(err)
+                }
+              )
+              this.DB.queryExec(this.migrationsUp.ref).catch((err: any) => {
+                throw new Error(err)
+              })
+            })
+            .catch((err: any) => {
+              throw new Error(err)
+            })
+        })
+        .catch((err: any) => {
+          throw new Error(err)
+        })
       console.log('Migration Done')
     } catch (err) {
       console.log(err)
@@ -48,8 +66,8 @@ export class Migration {
   }
 
   public down(): void {
+    console.log('Migration Start')
     try {
-      console.log('Migration Start')
       this.DB.queryExec(this.migrationsDown.tables).then((_res: any) => {
         this.DB.queryExec(this.migrationsDown.schemas)
       })

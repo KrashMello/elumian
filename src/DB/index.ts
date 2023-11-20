@@ -8,23 +8,23 @@ class PGSQL {
   private readonly config: object =
     process.env.DB_URL === ''
       ? {
-        host: process.env.DB_HOST ?? 'localhost',
-        port: process.env.DB_PORT ?? 5432,
-        database: process.env.DB_DATABASE ?? 'postges',
-        user: process.env.DB_USERNAME ?? 'postgre',
-        password: process.env.DB_PASSWORD ?? '',
-        max: 20,
-        idleTimeoutMillis: 1000,
-        connectionTimeoutMillis: 2000,
-        ssl: false,
-      }
+          host: process.env.DB_HOST ?? 'localhost',
+          port: process.env.DB_PORT ?? 5432,
+          database: process.env.DB_DATABASE ?? 'postges',
+          user: process.env.DB_USERNAME ?? 'postgre',
+          password: process.env.DB_PASSWORD ?? '',
+          max: 20,
+          idleTimeoutMillis: 1000,
+          connectionTimeoutMillis: 2000,
+          ssl: false,
+        }
       : {
-        connectionString: process.env.DB_URL,
-        max: 20,
-        idleTimeoutMillis: 1000,
-        connectionTimeoutMillis: 2000,
-        ssl: false,
-      }
+          connectionString: process.env.DB_URL,
+          max: 20,
+          idleTimeoutMillis: 1000,
+          connectionTimeoutMillis: 2000,
+          ssl: false,
+        }
 
   private readonly pool = new pg.Pool(this.config)
 
@@ -48,11 +48,16 @@ class PGSQL {
       throw new Error('invalid argument type to select query')
     }
     const _fields = typeof fields === 'string' ? [fields] : fields
-    this.query = `SELECT ${_fields.join(', ')} from "${this.schemaName}"."${this.tableName}"`
+    this.query = `SELECT ${_fields.join(', ')} from "${this.schemaName}"."${
+      this.tableName
+    }"`
     return this
   }
 
-  where(fields: string | string[] = 'id = 1', option: "AND" | "OR" = "AND"): this {
+  where(
+    fields: string | string[] = 'id = 1',
+    option: 'AND' | 'OR' = 'AND'
+  ): this {
     if (!(typeof fields === 'string') && !Array.isArray(fields)) {
       throw new Error('Invalid argument type to where query')
     }
@@ -93,7 +98,9 @@ class PGSQL {
     }
     if (this.query !== '') throw new Error('Dont have a query')
     const _fields = typeof fields === 'string' ? [fields] : fields
-    this.query = `CALL "${this.schemaName}"."${procedure}"(${_fields.join(', ')})`
+    this.query = `CALL "${this.schemaName}"."${procedure}"(${_fields.join(
+      ', '
+    )})`
     return this
   }
 
@@ -277,5 +284,5 @@ export const DB =
   process.env.DB_CONNECTION === 'pgsql'
     ? PGSQL
     : process.env.DB_CONNECTION === 'mongodb'
-      ? MONGODB
-      : PGSQL
+    ? MONGODB
+    : PGSQL

@@ -1,19 +1,22 @@
 import * as crypto from 'crypto'
 
-export class Eluncoder {
+export class Encoder {
   // Define la clave secreta
-  private readonly secretKey: string = process.env.eln_SECRET_KEY
-    ? process.env.eln_SECRET_KEY
-    : 'secretKey'
+  private readonly secretKey: string = process.env.eln_SECRET_KEY ?? 'secretKey'
 
   // Define el tipo de algoritmo
   private readonly algorithm: string = 'aes-256-cbc'
   // Convierte la clave secreta a un buffer
-  private readonly secretKeyBuffer: Buffer = Buffer.alloc(32, this.secretKey, 'utf8')
+  private readonly secretKeyBuffer: Buffer = Buffer.alloc(
+    32,
+    this.secretKey,
+    'utf8'
+  )
+
   // Crea un vector de inicialización aleatorio
   private readonly iv: Buffer = crypto.randomBytes(16)
 
-  public encrypted (data: object): string {
+  public encrypted(data: object): string {
     // Convierte el objeto a una cadena JSON
     const plainText: string = JSON.stringify(data)
     const cipher: crypto.Cipher = crypto.createCipheriv(
@@ -27,7 +30,7 @@ export class Eluncoder {
     return cipherText
   }
 
-  public encryptedBase64 (text: string): string {
+  public encryptedBase64(text: string): string {
     const cipher: crypto.Cipher = crypto.createCipheriv(
       this.algorithm,
       this.secretKeyBuffer,
@@ -39,7 +42,7 @@ export class Eluncoder {
     return encrypted.toString('base64')
   }
 
-  public decrypt (data: string) {
+  public decrypt(data: string): Record<string, any> {
     // Descifra los datos con la clave secreta y los parámetros del algoritmo
 
     const decipher: crypto.Decipher = crypto.createDecipheriv(
@@ -53,7 +56,7 @@ export class Eluncoder {
     return decryptedObject
   }
 
-  public decryptBase64 (text: string) {
+  public decryptBase64(text: string): string {
     // Descifra los datos con la clave secreta y los parámetros del algoritmo
     const encryptedText = Buffer.from(text, 'base64')
     const decipher: crypto.Decipher = crypto.createDecipheriv(
@@ -66,7 +69,7 @@ export class Eluncoder {
     return decrypted.toString()
   }
 
-  hardEncrypter (data: object, time: number): string {
+  hardEncrypter(data: object, time: number): string {
     let encryptText = this.encrypted(data)
     for (let i = 0; i < time; i++) {
       encryptText = this.encryptedBase64(encryptText)
@@ -74,15 +77,14 @@ export class Eluncoder {
     return `${time}.${encryptText}`
   }
 
-  hardDecrypt (data: string) {
+  hardDecrypt(data: string): Record<string, any> {
     let [Stime, encryptText] = data.split('.')
     encryptText = encryptText ?? ''
     const time: number = Number(Stime) ?? 1
-    let decrypt: any
     for (let i = 0; i < time; i++) {
       encryptText = this.decryptBase64(encryptText)
     }
-    decrypt = this.decrypt(encryptText)
+    const decrypt = this.decrypt(encryptText)
 
     return decrypt
   }
