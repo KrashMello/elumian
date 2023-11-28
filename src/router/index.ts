@@ -74,7 +74,7 @@ export function router(
         const hostname = os.hostname()
         info.push({
           api: `${method.toLocaleUpperCase()} http://${hostname}:${
-            process.env.SERVER_PORT
+            process.env.SERVER_PORT ?? 3000
           }${prefix.concat('', path) as string}`,
           handler: `${Controller.name as string}.${String(handlerName)}`,
           withMiddelware,

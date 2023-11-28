@@ -16,7 +16,7 @@ const server = (
   app.use(
     cors({
       origin: function (origin, callback) {
-        if (whitelist.includes(origin)) {
+        if (whitelist.includes(origin as string)) {
           callback(null, true)
         } else {
           callback(new Error('Not allowed by CORS'))
