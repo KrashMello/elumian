@@ -3,4 +3,4 @@ import server from '@server/index'
 
 const whitelist = ['http://localhost:3000']
 
-server(controllers, whitelist, process.env.SERVER_PORT)
+server(controllers, whitelist, Number(process.env.SERVER_PORT))

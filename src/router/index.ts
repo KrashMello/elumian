@@ -3,6 +3,29 @@ import verifyToken from '@Middelware/index'
 import type { NextFunction, Request, Response } from 'express'
 import os from 'os'
 
+const { networkInterfaces } = os
+const nets = networkInterfaces()
+const results = Object.create(null) // Or just '{}', an empty object
+let IPV4 = ''
+
+for (const name of Object.keys(nets)) {
+  const auxNets = nets[name]
+  if (auxNets != null)
+    for (const net of auxNets) {
+      // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+      // 'IPv4' is in Node <= 17, from 18 it's a number 4 or 6
+      const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4
+      if (net.family === familyV4Value && !net.internal) {
+        const auxResult = results[name]
+        if (auxResult == null) {
+          results[name] = []
+        }
+        IPV4 = net.address
+        results[name].push(net.address)
+      }
+    }
+}
+
 const info: Array<{ api: string; handler: string; withMiddelware: boolean }> =
   []
 const infoSocket: Array<{ method: string; path: string; handlerName: string }> =
@@ -71,9 +94,8 @@ export function router(
             }
           )
         }
-        const hostname = os.hostname()
         info.push({
-          api: `${method.toLocaleUpperCase()} http://${hostname}:${
+          api: `${method.toLocaleUpperCase()} http://${IPV4}:${
             process.env.SERVER_PORT ?? 3000
           }${prefix.concat('', path) as string}`,
           handler: `${Controller.name as string}.${String(handlerName)}`,

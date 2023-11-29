@@ -2,7 +2,7 @@
   "name": "elumian",
   "version": "1.0.0",
   "description": "Elumian is a framework for back end developers to deploy an api quickly and securely.",
-  "main": "dist/index.js",
+  "main": "dist/",
   "homepage": "https://github.com/KrashMello/elumian",
   "repository": {
     "type": "git",
@@ -11,6 +11,9 @@
   "keywords": [
     "elumian",
     "elumian-ts"
+  ],
+  "files": [
+    "/dist"
   ],
   "author": "krashMello <joelenrikesoteldo@gmail.com> (https://krashmello.netlify.app/)",
   "license": "MIT",
