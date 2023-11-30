@@ -12,6 +12,8 @@ const server = (
 ): void => {
   const app = express()
   app.use(express.json())
+
+  // Utilice el CORS para permitir que el CORS sea habilitado
   if (
     whiteList !== undefined &&
     whiteList.length > 0 &&
@@ -40,13 +42,16 @@ const server = (
 
   for (const name of Object.keys(nets)) {
     const auxNets = nets[name]
+    // Esta función añadirá todas las direcciones de las auxNets a los resultados.
     if (auxNets != null)
       for (const net of auxNets) {
         // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
         // 'IPv4' is in Node <= 17, from 18 it's a number 4 or 6
         const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4
+        // Añadir la dirección IPV4 a los resultados
         if (net.family === familyV4Value && !net.internal) {
           const auxResult = results[name]
+          // Elimine todos los resultados del mapa de resultados.
           if (auxResult == null) {
             results[name] = []
           }
@@ -64,7 +69,7 @@ const server = (
 
   httpServer.listen(port, () => {
     console.log(
-      `server active: http://${IPV4}:${port} \nserver active: http://localhost:${port}`
+      `Network: http://${IPV4}:${port} \nlocal: http://localhost:${port}`
     )
   })
 }

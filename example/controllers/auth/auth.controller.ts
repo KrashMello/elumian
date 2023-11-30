@@ -1,8 +1,4 @@
-import {
-  Controller,
-  Post,
-  RequestValidator,
-} from '../../../dist/controller/decorators'
+import { Controller, Post, RequestValidator } from '@Controller/decorators'
 import { AuthModel } from '@src/models/Auth.model'
 import { type Request, type Response } from 'express'
 import { signInRequest, signUpRequest } from './Auth.request'

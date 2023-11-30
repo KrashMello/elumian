@@ -1,8 +1,8 @@
 {
   "name": "elumian",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Elumian is a framework for back end developers to deploy an api quickly and securely.",
-  "main": "dist/",
+  "main": "lib/",
   "homepage": "https://github.com/KrashMello/elumian",
   "repository": {
     "type": "git",
@@ -12,14 +12,15 @@
     "elumian",
     "elumian-ts"
   ],
+  "types": "lib/index.d.ts",
   "files": [
-    "/dist"
+    "/lib"
   ],
   "author": "krashMello <joelenrikesoteldo@gmail.com> (https://krashmello.netlify.app/)",
   "license": "MIT",
   "scripts": {
     "tsc": "tsc",
-    "build": "rm -rf ./dist && rm -f tsconfig.tsbuildinfo && npx tsc && tsc-alias -p tsconfig.json",
+    "build": "rm -rf ./lib && rm -f tsconfig.tsbuildinfo && npx tsc && tsc-alias -p tsconfig.json",
     "start": "node dist/src/index.js",
     "migrate": "ts-node example/migration/index.ts",
     "dev": "ts-node-dev -r tsconfig-paths/register example/index.ts",
@@ -28,12 +29,6 @@
     "lint:fix": "ts-standard --fix"
   },
   "devDependencies": {
-    "@types/express": "4.17.15",
-    "@types/lodash": "^4.14.196",
-    "@types/node": "^18.11.18",
-    "@types/pg": "^8.6.6",
-    "@types/uuid": "^9.0.2",
-    "@types/validator": "^13.7.10",
     "@typescript-eslint/eslint-plugin": "^5.50.0",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.8.0",
@@ -41,29 +36,33 @@
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-n": "^15.0.0",
     "eslint-plugin-promise": "^6.0.0",
-    "lodash": "^4.17.21",
     "module-alias": "^2.2.2",
     "prettier": "2.8.2",
-    "socket.io": "^4.7.2",
     "ts-node": "^10.9.1",
     "ts-node-dev": "2.0.0",
     "ts-standard": "^12.0.2",
     "tsc-alias": "^1.8.2",
     "tsconfig-paths": "^4.1.2",
-    "tscpaths": "^0.0.9",
-    "typescript": "*",
-    "uuid": "^9.0.0",
-    "validator": "^13.7.0"
+    "tscpaths": "^0.0.9"
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.0",
+    "@types/express": "4.17.15",
+    "@types/lodash": "^4.14.196",
+    "@types/node": "^18.11.18",
+    "@types/pg": "^8.6.6",
+    "@types/validator": "^13.7.10",
     "bcrypt": "^5.1.0",
+    "lodash": "^4.17.21",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "4.18.2",
+    "socket.io": "^4.7.2",
+    "validator": "^13.7.0",
     "mongodb": "5.6",
     "pg": "^8.8.0",
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.1.13",
+    "typescript": "*"
   },
   "eslintConfig": {
     "parserOptions": {

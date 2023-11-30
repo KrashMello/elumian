@@ -1,5 +1,5 @@
 import { Encoder } from '@Encoder/index'
-import { v4 as uuidv4 } from 'uuid'
+import crypto from 'crypto'
 import { type cacheData, type cacheLists } from './type'
 
 const secondsToMidnight = (n: Date): number => {
@@ -21,7 +21,7 @@ export function setConfig(expireT: number): void {
 export function singCacheData(key: string, data: object): cacheData {
   const time = Math.floor(Math.random() * 10) + 1
   const encriptedData: cacheData = {
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     data: encoder.hardEncrypter(data, time),
     expireTime: new Date(
       new Date().getTime() + secondsToMidnight(new Date()) * expireTime

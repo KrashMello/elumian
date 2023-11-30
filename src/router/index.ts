@@ -96,7 +96,7 @@ export function router(
         }
         info.push({
           api: `${method.toLocaleUpperCase()} http://${IPV4}:${
-            process.env.SERVER_PORT ?? 3000
+            process.env.SERVER_PORT ?? 5000
           }${prefix.concat('', path) as string}`,
           handler: `${Controller.name as string}.${String(handlerName)}`,
           withMiddelware,
