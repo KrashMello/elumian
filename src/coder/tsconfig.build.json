@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.build.json",
+  "compilerOptions": {
+    "outDir": "../../lib/encoder/",
+    "rootDir": ".",
+    "paths": {}
+  },
+  "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts"],
+  "references": []
+}

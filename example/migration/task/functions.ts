@@ -1,17 +1,16 @@
-import { options } from "@DB/schema";
-import type { schemaFunctions } from "@DB/type";
+import { options } from '@elumian/db/schema'
+import type { schemaFunctions } from '@elumian/type'
 
-const { varchar, bigInt, } =
-  options
+const { varchar, bigInt } = options
 
 export const functions: schemaFunctions = {
   codegen: {
     parameters: {
-      type: varchar(30)
+      type: varchar(30),
     },
     declare: {
       _auxcode: varchar(15),
-      _auxcount: bigInt
+      _auxcount: bigInt,
     },
     return: varchar(15),
     comantBlock: `
@@ -24,6 +23,6 @@ export const functions: schemaFunctions = {
 		   end case;
       
       return _auxcode;
-    `
-  }
+    `,
+  },
 }

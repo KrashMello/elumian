@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.build.json",
+  "compilerOptions": {
+    "outDir": "../../lib/models/",
+    "rootDir": ".",
+    "paths": {
+      "@elumian/db": ["../DB"],
+      "@elumian/db/*": ["../DB/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts"],
+  "references": [
+    {
+      "path": "../DB/tsconfig.build.json"
+    }
+  ]
+}

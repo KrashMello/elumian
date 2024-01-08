@@ -12,7 +12,7 @@ import type {
   schemaProcedure,
   procedureFields,
   functionsFields,
-} from './type'
+} from '../type'
 
 export const options: optionsType = {
   varchar: (length: number = 255): retrunVarchar => {

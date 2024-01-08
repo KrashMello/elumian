@@ -85,6 +85,58 @@ class PGSQL {
     return this
   }
 
+  join(tableName: string, codeA: string, codeB: string): this {
+    if (
+      !(typeof tableName === 'string') &&
+      !(typeof codeA === 'string') &&
+      !(typeof codeB === 'string')
+    ) {
+      throw new Error('Invalid argument to join query')
+    }
+
+    this.query += ` join ${tableName} on ${codeA} = ${codeB}`
+    return this
+  }
+
+  leftJoin(tableName: string, codeA: string, codeB: string): this {
+    if (
+      !(typeof tableName === 'string') &&
+      !(typeof codeA === 'string') &&
+      !(typeof codeB === 'string')
+    ) {
+      throw new Error('Invalid argument to left join query')
+    }
+
+    this.query += `left join ${tableName} on ${codeA} = ${codeB}`
+    return this
+  }
+
+  rightJoin(tableName: string, codeA: string, codeB: string): this {
+    if (
+      !(typeof tableName === 'string') &&
+      !(typeof codeA === 'string') &&
+      !(typeof codeB === 'string')
+    ) {
+      throw new Error('Invalid argument to right join query')
+    }
+
+    this.query += `right join ${tableName} on ${codeA} = ${codeB}`
+    return this
+  }
+
+  innerJoin(tableName: string, codeA: string, codeB: string): this {
+    if (
+      !(typeof tableName === 'string') &&
+      !(typeof codeA === 'string') &&
+      !(typeof codeB === 'string')
+    ) {
+      throw new Error('Invalid argument to inner join query')
+    }
+
+    this.query += `inner join ${tableName} on ${codeA} = ${codeB}`
+    return this
+  }
+
   call(procedure: string, fields: string | string[] = '1'): this {
     if (
       !(typeof procedure === 'string') &&
@@ -125,11 +177,11 @@ class PGSQL {
       throw new Error('Dont have a query')
     }
 
-    const result = this.pool.query(query)
-    return await result
+    const result = await this.pool.query(query)
+    return result
   }
 
-  async exec(): Promise<any> {
+  async get(): Promise<any> {
     if (!(typeof this.query === 'string') && this.query === null) {
       throw new Error('Dont have a query')
     }

@@ -1,14 +1,14 @@
 import validator from 'validator'
 import {
   type Locale,
-  type Message,
   type dataCompareValueRequest,
+  type Message,
   type returnCompareValue,
-} from './type'
+} from '../type'
+
 import { isAlpha, isAlphaSimbols, isAlphaNumericSimbols } from './service'
 import { type Response, type Request, type NextFunction } from 'express'
-
-export class RequestClass {
+export class RequestValidator {
   private readonly lang: Locale = 'es-ES'
   private readonly optionsToValidate: Record<string, string>
   private readonly message: Message
@@ -37,7 +37,7 @@ export class RequestClass {
         )
       }
       if (validate !== true) {
-        res.status(401).json(validate)
+        res.status(401).json({ type: 'danger', message: validate })
         return
       }
       next()

@@ -14,7 +14,7 @@ declare class PGSQL {
     limit(field: number): this;
     offset(field: number): this;
     call(procedure: string, fields?: string | string[]): this;
-    view(fields: string | string[] | undefined, view: string): this;
+    view(fields: string | string[], view: string): this;
     queryExec(query: string): Promise<any>;
     exec(): Promise<any>;
 }

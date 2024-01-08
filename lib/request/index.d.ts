@@ -1,5 +1,5 @@
-import { type Message } from './type';
-export declare class RequestClass {
+import { type Message } from '../type';
+export declare class RequestValidator {
     private readonly lang;
     private readonly optionsToValidate;
     private readonly message;

@@ -1,14 +1,14 @@
 import {
   type IsAlphanumericSimbolsOptions,
   type IsAlphaOptions,
-  type Locale
-} from './type'
+  type Locale,
+} from '../type'
 
 const alpha = {
-  'es-ES': /^[a-zA-Z-.\s&,_#/]+$/i
+  'es-ES': /^[a-zA-Z-.\s&,_#/]+$/i,
 }
 const alphanumeric = {
-  'es-ES': /^[a-z0-9A-Z-.\s&,_#/]+$/i
+  'es-ES': /^[a-z0-9A-Z-.\s&,_#/]+$/i,
 }
 
 export function isAlphaSimbols(

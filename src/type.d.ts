@@ -296,3 +296,12 @@ export interface schemas {
   up: schemaUp
   down: schemaDown
 }
+// export interface Models {
+//   schemaName: string
+//   tableName: string
+//   attributes: Record<string, columnsPropiety[]>
+//   DB: any
+//   findAll: () => Array<Record<string, string>>
+//   count: () => number
+//   get createSchema(): { up: schemaUp; down: schemaDown }
+// }

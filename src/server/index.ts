@@ -1,6 +1,6 @@
 import express from 'express'
 import os from 'os'
-import { router } from '@router/index'
+import { router } from '@elumian/router'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import cors from 'cors'

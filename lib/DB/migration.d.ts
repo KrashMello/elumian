@@ -1,4 +1,4 @@
-import { type schemas } from './type';
+import { type schemas } from '../type';
 export declare class Migration {
     private readonly DB;
     private readonly migrationsUp;

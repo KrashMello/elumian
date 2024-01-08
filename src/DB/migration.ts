@@ -1,5 +1,5 @@
-import { DB as DBA } from '@DB/index'
-import { type schemas } from './type'
+import { DB as DBA } from '@elumian/db'
+import { type schemas } from '../type'
 export class Migration {
   private readonly DB: any
   private readonly migrationsUp = {

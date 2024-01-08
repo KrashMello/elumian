@@ -1,0 +1,22 @@
+{
+  "extends": "../tsconfig.build.json",
+  "compilerOptions": {
+    "outDir": "../../lib/router/",
+    "rootDir": ".",
+    "paths": {
+      "@elumian/controller": ["../controller"],
+      "@elumian/controller/*": ["../controller/*"],
+      "@elumian/middelware": ["../middelware"],
+      "@elumian/middelware/*": ["../middelware/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts"],
+  "references": [
+    {
+      "path": "../controller/tsconfig.build.json"
+    },
+    {
+      "path": "../middelware/tsconfig.build.json"
+    }
+  ]
+}

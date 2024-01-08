@@ -1,7 +1,8 @@
-import type { SRouter, IRouter } from '@Controller/type'
-import verifyToken from '@Middelware/index'
+import type { SRouter, IRouter } from '../type'
+import verifyToken from '@elumian/middelware'
 import type { NextFunction, Request, Response } from 'express'
 import os from 'os'
+import 'reflect-metadata'
 
 const { networkInterfaces } = os
 const nets = networkInterfaces()

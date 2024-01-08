@@ -1,4 +1,4 @@
-import { Encoder } from '@Encoder/index'
+import { Encoder } from '@elumian/encoder'
 import crypto from 'crypto'
 import { type cacheData, type cacheLists } from './type'
 

@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.build.json",
+  "compilerOptions": {
+    "outDir": "../../lib/server/",
+    "rootDir": ".",
+    "paths": {
+      "@elumian/router": ["../router/"],
+      "@elumian/router/*": ["../router/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts"],
+  "references": [
+    {
+      "path": "../router/tsconfig.build.json"
+    }
+  ]
+}

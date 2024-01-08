@@ -1,0 +1,29 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./models/tsconfig.build.json"
+    },
+    {
+      "path": "./DB/tsconfig.build.json"
+    },
+    {
+      "path": "./controller/tsconfig.build.json"
+    },
+    {
+      "path": "./router/tsconfig.build.json"
+    },
+    {
+      "path": "./request/tsconfig.build.json"
+    },
+    {
+      "path": "./server/tsconfig.build.json"
+    },
+    {
+      "path": "./middelware/tsconfig.build.json"
+    },
+    {
+      "path": "./cache/tsconfig.build.json"
+    }
+  ]
+}

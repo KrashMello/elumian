@@ -1,4 +1,4 @@
-import type { schemaTables, options as optionsType, schemaUp, schemaDown, schemaFunctions, schemaProcedure } from './type';
+import type { schemaTables, options as optionsType, schemaUp, schemaDown, schemaFunctions, schemaProcedure } from '../type';
 export declare const options: optionsType;
 export declare class Schema {
     private makeProceduresQuery;

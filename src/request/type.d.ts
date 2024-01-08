@@ -1,4 +1,4 @@
-interface Message {
+export interface Message {
   alpha?: string
   alphaSimbols?: string
   alphaNumeric?: string
@@ -175,4 +175,8 @@ export interface isBooleansOptions {
 export interface ResponseValidate {
   status: number
   message?: string
+}
+
+export interface RequestJWT extends Request {
+  userId: string | JwtPayload
 }

@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.build.json",
+  "compilerOptions": {
+    "outDir": "../../lib/cache/",
+    "rootDir": ".",
+    "paths": {
+      "@elumian/encoder": ["../coder"],
+      "@elumian/encoder/*": ["../coder/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts"],
+  "references": [
+    {
+      "path": "../coder/tsconfig.build.json"
+    }
+  ]
+}

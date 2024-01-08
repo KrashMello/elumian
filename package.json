@@ -1,8 +1,8 @@
 {
   "name": "elumian",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Elumian is a framework for back end developers to deploy an api quickly and securely.",
-  "main": "lib/",
+  "main": "lib/*",
   "homepage": "https://github.com/KrashMello/elumian",
   "repository": {
     "type": "git",
@@ -12,7 +12,7 @@
     "elumian",
     "elumian-ts"
   ],
-  "types": "lib/index.d.ts",
+  "types": "lib/type.d.ts",
   "files": [
     "/lib"
   ],
@@ -20,11 +20,12 @@
   "license": "MIT",
   "scripts": {
     "tsc": "tsc",
-    "build": "rm -rf ./lib && rm -f tsconfig.tsbuildinfo && npx tsc && tsc-alias -p tsconfig.json",
+    "build": "tsc -b -v src",
+    "build:alias": "rm -rf ./lib && rm -f tsconfig.tsbuildinfo && bunx tsc && tsc-alias -p tsconfig.json",
+    "build:watch": "tsc -b -v src --watch",
     "start": "node dist/src/index.js",
     "migrate": "ts-node example/migration/index.ts",
-    "dev": "ts-node-dev -r tsconfig-paths/register example/index.ts",
-    "dev:bun": "bun -r tsconfig-paths/register example/index.ts",
+    "dev": "bun -r tsconfig-paths/register example/index.ts",
     "lint": "ts-standard",
     "lint:fix": "ts-standard --fix"
   },
@@ -33,7 +34,7 @@
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.8.0",
     "eslint-config-standard-with-typescript": "^35.0.0",
-    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-import": "^225.2",
     "eslint-plugin-n": "^15.0.0",
     "eslint-plugin-promise": "^6.0.0",
     "module-alias": "^2.2.2",

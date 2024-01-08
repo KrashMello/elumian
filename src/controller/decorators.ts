@@ -1,4 +1,4 @@
-import { type SRouter, type IRouter } from './type'
+import { type SRouter, type IRouter } from '../type'
 import 'reflect-metadata'
 
 export const Controller = (prefix: string): ClassDecorator => {
