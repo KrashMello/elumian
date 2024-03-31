@@ -4,6 +4,8 @@
     "outDir": "../../lib/server/",
     "rootDir": ".",
     "paths": {
+      "@elumian": [".."],
+      "@elumian/*": ["../*"],
       "@elumian/router": ["../router/"],
       "@elumian/router/*": ["../router/*"]
     }

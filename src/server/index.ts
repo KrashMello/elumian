@@ -1,77 +1,81 @@
-import express from 'express'
-import os from 'os'
-import { router } from '@elumian/router'
-import { createServer } from 'http'
-import { Server } from 'socket.io'
-import cors from 'cors'
+import express from "express";
+import os from "os";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import cors from "cors";
+import { Elumian } from "../index";
+import { router } from "../router/index";
 
-const server = (
-  controllers: any[],
-  whiteList: string[] | undefined = undefined,
-  port: number = 5000
-): void => {
-  const app = express()
-  app.use(express.json())
-
+const server = (config: {
+  controllers: any[];
+  services: any[];
+  whiteList?: string[];
+  port?: number;
+}): void => {
+  const app = express();
+  app.use(express.json());
+  config.port = config.port ?? 5000;
   // Utilice el CORS para permitir que el CORS sea habilitado
   if (
-    whiteList !== undefined &&
-    whiteList.length > 0 &&
-    Array.isArray(whiteList)
+    config.whiteList &&
+    config.whiteList.length > 0 &&
+    Array.isArray(config.whiteList)
   )
     app.use(
       cors({
         origin: function (origin: string | undefined, callback) {
-          console.log(origin)
+          console.log(origin);
           if (
-            typeof origin === 'string' &&
-            whiteList.includes(origin) &&
+            typeof origin === "string" &&
+            config.whiteList.includes(origin) &&
             origin !== undefined
           ) {
-            callback(null, true)
+            callback(null, true);
           } else {
-            callback(new Error('Not allowed by CORS'))
+            callback(new Error("Not allowed by CORS"));
           }
         },
       })
-    )
-  const { networkInterfaces } = os
-  const nets = networkInterfaces()
-  const results = Object.create(null) // Or just '{}', an empty object
-  let IPV4 = ''
+    );
+  const { networkInterfaces } = os;
+  const nets = networkInterfaces();
+  const results = Object.create(null); // Or just '{}', an empty object
+  let IPV4 = "";
 
   for (const name of Object.keys(nets)) {
-    const auxNets = nets[name]
+    const auxNets = nets[name];
     // Esta función añadirá todas las direcciones de las auxNets a los resultados.
     if (auxNets != null)
       for (const net of auxNets) {
         // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
         // 'IPv4' is in Node <= 17, from 18 it's a number 4 or 6
-        const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4
+        const familyV4Value = typeof net.family === "string" ? "IPv4" : 4;
         // Añadir la dirección IPV4 a los resultados
         if (net.family === familyV4Value && !net.internal) {
-          const auxResult = results[name]
+          const auxResult = results[name];
           // Elimine todos los resultados del mapa de resultados.
           if (auxResult == null) {
-            results[name] = []
+            results[name] = [];
           }
-          IPV4 = net.address
-          results[name].push(net.address)
+          IPV4 = net.address;
+          results[name].push(net.address);
         }
       }
   }
 
-  const httpServer = createServer(app)
+  const httpServer = createServer(app);
 
-  const io = new Server(httpServer)
+  const io = new Server(httpServer);
 
-  router(controllers, app, io)
+  Elumian.services = config.services;
 
-  httpServer.listen(port, () => {
+  router(config.controllers, app, io);
+
+  httpServer.listen(config.port, () => {
     console.log(
-      `Network: http://${IPV4}:${port} \nlocal: http://localhost:${port}`
-    )
-  })
-}
+      `Network: http://${IPV4}:${config.port} \nlocal: http://localhost:${config.port}`
+    );
+  });
+};
 
-export default server
+export default server;
