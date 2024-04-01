@@ -1,0 +1,11 @@
+import "reflect-metadata";
+export declare const Controller: (prefix: string) => ClassDecorator;
+export declare const socketOn: (pathName: string) => MethodDecorator;
+export declare const socketEmit: (pathName: string) => MethodDecorator;
+export declare const Get: (path: string, withMiddelware?: boolean) => MethodDecorator;
+export declare const Post: (path: string, withMiddelware?: boolean) => MethodDecorator;
+export declare const Put: (path: string, withMiddelware?: boolean) => MethodDecorator;
+export declare const Path: (path: string, withMiddelware?: boolean) => MethodDecorator;
+export declare const Delete: (path: string, withMiddelware?: boolean) => MethodDecorator;
+export declare const RequestValidator: (requestValidator: any) => MethodDecorator;
+export declare const Services: (prefix: string) => ClassDecorator;
