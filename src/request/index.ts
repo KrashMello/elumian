@@ -24,13 +24,13 @@ export class RequestValidator {
         validate = this.compareValue(
           req.query,
           this.optionsToValidate,
-          this.message
+          this.message,
         );
       else {
         validate = this.compareValue(
           req.body,
           this.optionsToValidate,
-          this.message
+          this.message,
         );
       }
       if (validate !== true) {
@@ -44,7 +44,7 @@ export class RequestValidator {
   private compareValue(
     data: dataCompareValueRequest,
     optionsToValidate: Record<string, string>,
-    message: Message = {}
+    message: Message = {},
   ): returnCompareValue {
     const dataKey = Object.keys(data);
     const requestKey = Object.keys(optionsToValidate);
@@ -90,8 +90,7 @@ export class RequestValidator {
           case "alphaSimbols":
             if (
               typeof data[key] === "string" &&
-              isAlphaSimbols(data[key], this.lang) === false &&
-              data[key] != null
+              isAlphaSimbols(data[key], this.lang) === false
             ) {
               result =
                 message.alphaSimbols ??
@@ -101,8 +100,7 @@ export class RequestValidator {
           case "alphaNumeric":
             if (
               typeof data[key] === "string" &&
-              !validator.isAlphanumeric(data[key]) &&
-              data[key] != null
+              !validator.isAlphanumeric(data[key])
             ) {
               result =
                 message.alphaNumeric ??
