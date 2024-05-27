@@ -5,16 +5,19 @@ import { Server } from "socket.io";
 import cors from "cors";
 import { Elumian } from "../index";
 import { router } from "../router/index";
+import twig from "twig";
 
 const server = (config: {
   controllers: any[];
   services: any[];
   whiteList?: string[];
   port?: number;
+  viewsDir?: string;
 }): void => {
   const app = express();
   app.use(express.json());
   config.port = config.port ?? 5000;
+  config.viewsDir = config.viewsDir ?? "src/views";
   // Utilice el CORS para permitir que el CORS sea habilitado
   if (
     config.whiteList &&
@@ -35,8 +38,14 @@ const server = (config: {
             callback(new Error("Not allowed by CORS"));
           }
         },
-      })
+      }),
     );
+  app.set("views", config.viewsDir);
+  app.set("view engine", "twig");
+  app.set("twig options", {
+    allowAsync: true, // Allow asynchronous compiling
+    strict_variables: false,
+  });
   const { networkInterfaces } = os;
   const nets = networkInterfaces();
   const results = Object.create(null); // Or just '{}', an empty object
@@ -73,7 +82,7 @@ const server = (config: {
 
   httpServer.listen(config.port, () => {
     console.log(
-      `Network: http://${IPV4}:${config.port} \nlocal: http://localhost:${config.port}`
+      `Network: http://${IPV4}:${config.port} \nlocal: http://localhost:${config.port}`,
     );
   });
 };

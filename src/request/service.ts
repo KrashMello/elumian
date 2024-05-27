@@ -2,101 +2,101 @@ import {
   type IsAlphanumericSimbolsOptions,
   type IsAlphaOptions,
   type Locale,
-} from '../type'
+} from "../type";
 
 const alpha = {
-  'es-ES': /^[a-zA-Z-.\s&,_#/]+$/i,
-}
+  "es-ES": /^[a-zA-Z-.\s&,_#!*/]+$/i,
+};
 const alphanumeric = {
-  'es-ES': /^[a-z0-9A-Z-.\s&,_#/]+$/i,
-}
+  "es-ES": /^[a-z0-9A-Z-.\s&,_#/]+$/i,
+};
 
 export function isAlphaSimbols(
   _str: string,
-  locale: Locale = 'es-ES',
-  options: IsAlphaOptions = { ignore: '' }
+  locale: Locale = "es-ES",
+  options: IsAlphaOptions = { ignore: "" },
 ): any {
-  let str = _str
-  const ignore = options.ignore
+  let str = _str;
+  const ignore = options.ignore;
 
-  if (ignore instanceof RegExp || typeof ignore === 'string') {
+  if (ignore instanceof RegExp || typeof ignore === "string") {
     if (ignore instanceof RegExp) {
-      str = str.replace(ignore, '')
-    } else if (typeof ignore === 'string') {
+      str = str.replace(ignore, "");
+    } else if (typeof ignore === "string") {
       str = str.replace(
         new RegExp(
-          '['.concat(ignore.replace(/[[\]{}()*+?.,\\^$|#]/g, '\\$&'), ']'),
-          'g'
+          "[".concat(ignore.replace(/[[\]{}()*+?.,\\^$|#]/g, "\\$&"), "]"),
+          "g",
         ),
-        ''
-      ) // escape regex for ignore
+        "",
+      ); // escape regex for ignore
     } else {
-      throw new Error('ignore should be instance of a String or RegExp')
+      throw new Error("ignore should be instance of a String or RegExp");
     }
   }
   if (locale in alpha) {
-    return alpha['es-ES'].test(str)
+    return alpha["es-ES"].test(str);
   }
 
-  throw new Error("Invalid locale '".concat(locale, "'"))
+  throw new Error("Invalid locale '".concat(locale, "'"));
 }
 export function isAlphaNumericSimbols(
   _str: string,
-  locale: Locale = 'es-ES',
-  options: IsAlphanumericSimbolsOptions = {}
+  locale: Locale = "es-ES",
+  options: IsAlphanumericSimbolsOptions = {},
 ): any {
-  let str = _str
-  const ignore = options.ignore
+  let str = _str;
+  const ignore = options.ignore;
 
-  if (ignore instanceof RegExp || typeof ignore === 'string') {
+  if (ignore instanceof RegExp || typeof ignore === "string") {
     if (ignore instanceof RegExp) {
-      str = str.replace(ignore, '')
-    } else if (typeof ignore === 'string') {
+      str = str.replace(ignore, "");
+    } else if (typeof ignore === "string") {
       str = str.replace(
         new RegExp(
-          '['.concat(ignore.replace(/[[\]{}()*+?.,\\^$|#]/g, '\\$&'), ']'),
-          'g'
+          "[".concat(ignore.replace(/[[\]{}()*+?.,\\^$|#]/g, "\\$&"), "]"),
+          "g",
         ),
-        ''
-      ) // escape regex for ignore
+        "",
+      ); // escape regex for ignore
     } else {
-      throw new Error('ignore should be instance of a String or RegExp')
+      throw new Error("ignore should be instance of a String or RegExp");
     }
   }
 
   if (locale in alphanumeric) {
-    return alphanumeric['es-ES'].test(str)
+    return alphanumeric["es-ES"].test(str);
   }
 
-  throw new Error("Invalid locale '".concat(locale, "'"))
+  throw new Error("Invalid locale '".concat(locale, "'"));
 }
 
 export function isAlpha(
   _str: string,
-  locale: Locale = 'es-ES',
-  options: IsAlphaOptions = {}
+  locale: Locale = "es-ES",
+  options: IsAlphaOptions = {},
 ): any {
-  let str = _str
-  const { ignore } = options
+  let str = _str;
+  const { ignore } = options;
 
-  if (ignore instanceof RegExp || typeof ignore === 'string') {
+  if (ignore instanceof RegExp || typeof ignore === "string") {
     if (ignore instanceof RegExp) {
-      str = str.replace(ignore, '')
-    } else if (typeof ignore === 'string') {
+      str = str.replace(ignore, "");
+    } else if (typeof ignore === "string") {
       str = str.replace(
         new RegExp(
-          `[${ignore.replace(/[-[\]{}()*+?.,\\^$|#\\s]/g, '\\$&')}]`,
-          'g'
+          `[${ignore.replace(/[-[\]{}()*+?.,\\^$|#\\s]/g, "\\$&")}]`,
+          "g",
         ),
-        ''
-      ) // escape regex for ignore
+        "",
+      ); // escape regex for ignore
     } else {
-      throw new Error('ignore should be instance of a String or RegExp')
+      throw new Error("ignore should be instance of a String or RegExp");
     }
   }
 
   if (locale in alpha) {
-    return alpha['es-ES'].test(str)
+    return alpha["es-ES"].test(str);
   }
-  throw new Error(`Invalid locale '${locale}'`)
+  throw new Error(`Invalid locale '${locale}'`);
 }

@@ -27,8 +27,7 @@ for (const name of Object.keys(nets)) {
     }
 }
 
-const info: Array<{ api: string; handler: string; withMiddelware: boolean }> =
-  [];
+const info: Array<{ api: string; handler: string; protected: boolean }> = [];
 const infoSocket: Array<{ method: string; path: string; handlerName: string }> =
   [];
 
@@ -45,8 +44,8 @@ export function router(
   Middelware: (
     req: Request,
     res: Response,
-    next: NextFunction
-  ) => Response = verifyToken
+    next: NextFunction,
+  ) => Response = verifyToken,
 ): any {
   controllers.forEach((Controller: any) => {
     const instance = new Controller();
@@ -56,7 +55,7 @@ export function router(
     const routes: IRouter[] = Reflect.getMetadata("routes", Controller);
     const routesSocket: SRouter[] = Reflect.getMetadata(
       "routesSocket",
-      Controller
+      Controller,
     );
 
     routes.forEach(
@@ -66,7 +65,7 @@ export function router(
             prefix.concat("", path),
             (req: Request, res: Response) => {
               instance[handlerName](req, res);
-            }
+            },
           );
         }
         if (typeof requestValidator !== "undefined" && withMiddelware) {
@@ -76,7 +75,7 @@ export function router(
             requestValidator,
             (req: Request, res: Response) => {
               instance[handlerName](req, res);
-            }
+            },
           );
         } else if (typeof requestValidator !== "undefined") {
           app[method](
@@ -84,7 +83,7 @@ export function router(
             requestValidator,
             (req: Request, res: Response) => {
               instance[handlerName](req, res);
-            }
+            },
           );
         } else {
           app[method](
@@ -92,7 +91,7 @@ export function router(
             Middelware,
             (req: Request, res: Response) => {
               instance[handlerName](req, res);
-            }
+            },
           );
         }
         info.push({
@@ -100,9 +99,9 @@ export function router(
             process.env.SERVER_PORT ?? 5000
           }${prefix.concat("", path) as string}`,
           handler: `${Controller.name as string}.${String(handlerName)}`,
-          withMiddelware,
+          protected: withMiddelware,
         });
-      }
+      },
     );
 
     if (routesSocket != null)

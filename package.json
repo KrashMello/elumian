@@ -26,21 +26,24 @@
     "build:alias": "rm -rf ./lib && rm -f tsconfig.tsbuildinfo && bunx tsc && tsc-alias -p tsconfig.json",
     "build:watch": "tsc -b -v src --watch",
     "start": "node dist/src/index.js",
-    "start:example": "ts-node  -r tsconfig-paths/register example/index.ts",
+    "start:example": "ts-node-dev --rs --watch --clear -r tsconfig-paths/register example/index.ts",
     "migrate": "ts-node example/migration/index.ts",
-    "dev": "bun -r tsconfig-paths/register example/index.ts",
+    "dev": "ts-node -r example/index.ts",
+    "test": "vitest",
     "lint": "ts-standard",
     "lint:fix": "ts-standard --fix",
     "db:push": "prisma db push --schema=./example/prisma/scheme.prisma",
     "db:seed": "ts-node ./example/prisma/seed.ts"
   },
   "devDependencies": {
+    "@types/twig": "^1.12.16",
     "module-alias": "^2.2.2",
     "ts-node": "^10.9.1",
-    "ts-node-dev": "2.0.0",
+    "ts-node-dev": "^2.0.0",
+    "ts-standard": "^12.0.2",
     "tsc-alias": "^1.8.2",
     "tsconfig-paths": "4.2.0",
-    "ts-standard": "^12.0.2"
+    "vitest": "^1.6.0"
   },
   "dependencies": {
     "@prisma/client": "^5.11.0",
@@ -57,6 +60,7 @@
     "prisma": "^5.11.0",
     "reflect-metadata": "0.2.2",
     "socket.io": "^4.7.2",
+    "twig": "^1.17.1",
     "typescript": "*",
     "validator": "13.11.0"
   },

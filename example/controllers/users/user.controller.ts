@@ -19,6 +19,6 @@ export class UserController {
   @RequestValidator(findDataRequest)
   async find(_req: Request, res: Response): Promise<any> {
     const elumian = Elumian.getInstance();
-    res.json(await elumian.user.findAll());
+    res.render("index.twig", { message: "hola mundo!" });
   }
 }
