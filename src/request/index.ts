@@ -40,7 +40,68 @@ export class RequestValidator {
       next();
     };
   }
-
+  private validateValues = {
+    alpha: (value: string, message?: string): string => {
+      if (
+        typeof value === "string" &&
+        isAlpha(value, this.lang) === false &&
+        value != null
+      )
+        return message ?? "el campo solo debe tener letras!";
+    },
+    alphaSimbols: (value: string, message?: string): string => {
+      if (
+        typeof value === "string" &&
+        isAlphaSimbols(value, this.lang) === false
+      )
+        return message ?? "el campo solo debe contener letras y /_";
+    },
+    alphaNumeric: (value: string, message?: string): string => {
+      if (typeof value === "string" && !validator.isAlphanumeric(value))
+        return message ?? "el campo solo debe tener letras y numeros";
+    },
+    alphaNumericSimbols: (value: string, message?: string): string => {
+      if (
+        typeof value !== "string" &&
+        !isAlphaNumericSimbols(value) &&
+        value != null
+      )
+        return (
+          message ?? "el campo debe contener solo letras, numeros y -._#,/"
+        );
+    },
+    required: (value: any, message?: string): string => {
+      if (!value) return message ?? "el campo es requerido";
+    },
+    max: (value: string, MinMaxLength: number, message?: string): string => {
+      if (typeof value === "string" && (value?.length as number) > MinMaxLength)
+        return (
+          message ?? `el campo no debe tener mas de ${MinMaxLength} caracteres`
+        );
+    },
+    min: (value: string, MinMaxLength: number, message?: string): string => {
+      if (typeof value === "string" && (value?.length as number) < MinMaxLength)
+        return (
+          message ??
+          `el campo no debe tener menos de ${MinMaxLength} caracteres`
+        );
+    },
+    email: (value: string, message?: string): string => {
+      if (typeof value === "string" && !validator.isEmail(value as string))
+        return (
+          message ??
+          "el campo debe ser un correo electronico ejemplo: example@myweb.com"
+        );
+    },
+    boolean: (value: any, message?: string): string => {
+      if (typeof value !== "boolean")
+        return message ?? "el campo debe ser booleano";
+    },
+    array: (value: any, message?: string): string => {
+      if (!Array.isArray(value))
+        return message ?? "el campo debe ser un arreglo";
+    },
+  };
   private compareValue(
     data: dataCompareValueRequest,
     optionsToValidate: Record<string, string>,

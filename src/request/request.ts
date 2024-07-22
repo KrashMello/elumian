@@ -2,7 +2,6 @@ import { isAlpha, isAlphaSimbols, isAlphaNumericSimbols } from "./service";
 import { isAlphanumeric } from "validator";
 import { Record } from "@prisma/client/runtime/library";
 import isEmail from "validator/lib/isEmail";
-import { difference } from "lodash";
 
 const errorsTypes = {
   min: {
