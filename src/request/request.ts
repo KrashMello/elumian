@@ -5,77 +5,93 @@ import isEmail from "validator/lib/isEmail";
 
 const errorsTypes = {
   min: {
-    validate: (value, length) => {
+    validate: (value: string, length: number) => {
       return value.length >= length ? true : false;
     },
     message: "Min characters length must be ",
   },
   max: {
-    validate: (value, length) => {
+    validate: (value: string, length: number) => {
       return value.length <= length ? true : false;
     },
     message: "Max characters length must be ",
   },
   alpha: {
-    validate: (value) => {
+    validate: (value: string): boolean => {
       return isAlpha(value, "es-ES");
     },
     message: "Characters must be a-zA-Z",
   },
   alphaSimbol: {
-    validate: (value) => {
+    validate: (value: string): boolean => {
       return isAlphaSimbols(value, "es-ES");
     },
     message: "Characters must be a-zA-Z -.&,_#!*/",
   },
   alphaNumeric: {
-    validate: (value) => {
+    validate: (value: string): boolean => {
       return isAlphanumeric(value);
     },
     message: "Characters must be a-zA-Z1-9",
   },
   alphaNumericSimbols: {
-    validate: (value) => {
+    validate: (value: string): boolean => {
       return isAlphaNumericSimbols(value);
     },
     message: "Characters must be a-zA-Z1-9  -.&,_#*/",
   },
   email: {
-    validate: (value) => {
+    validate: (value: string): boolean => {
       return isEmail(value);
     },
     message: "Please enter a valid email address example: foo@gmail.com",
   },
   boolean: {
-    validate: (value) => {
+    validate: (value: string): boolean => {
       return typeof value === "boolean" ? true : false;
     },
     message: "Please enter a boolean",
   },
   required: {
-    validate: (value) => {
+    validate: (value: string): boolean => {
       return !value ? false : true;
     },
     message: `The <field> must be required`,
   },
 };
 
+type errors = keyof typeof errorsTypes;
+
 export const compareValue = (
   data: Record<string, string>,
   optionsToValidate: Record<string, string>,
-  message: Record<string, string> = {},
+  message?: Record<string, string>,
 ): true | Record<string, string> => {
   if (typeof data !== "object" || data === null)
     throw new Error("parameter data must be a object");
   if (typeof optionsToValidate !== "object" || optionsToValidate === null)
     throw new Error("parameter optionsToValidate must be a object");
 
+  const sd = Object.keys(data);
+  const so = Object.keys(optionsToValidate);
+  if (sd.filter((x) => !so.includes(x))) {
+    console.log(
+      JSON.parse(
+        '{"' +
+          sd.filter((x) => !so.includes(x))[0] +
+          '": "' +
+          "campo no valido" +
+          '"}',
+      ),
+    );
+    return JSON.parse(
+      `{"${sd.filter((x) => !so.includes(x))[0]}": "${message["invalidField"] ?? "Field not valid"}"}`,
+    );
+  }
   const optionsEntries = Object.entries(optionsToValidate);
-  const sd = new Set(Object.keys(data));
-  const so = new Set(Object.keys(optionsToValidate));
   const errors: any = optionsEntries
     .map(([key]: any) => {
-      let errorsValidate: string[] | string = [];
+      let errorsValidate: (string | false)[] | string = [];
 
       if (optionsToValidate[key])
         errorsValidate = optionsToValidate[key]

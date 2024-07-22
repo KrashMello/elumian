@@ -40,7 +40,7 @@ export class RequestValidator {
       next();
     };
   }
-  private validateValues = {
+  private validations = {
     alpha: (value: string, message?: string): string => {
       if (
         typeof value === "string" &&
@@ -137,13 +137,13 @@ export class RequestValidator {
         if (option.includes("max") || option.includes("min")) {
           const auxOption = option.split(":");
           MinMaxLength = Number(auxOption[1]);
-          result = this.validateValues[option](
+          result = this.validations[option](
             data[key],
             MinMaxLength,
             message[option],
           );
         }
-        result = this.validateValues[option](data[key], message[option]);
+        result = this.validations[option](data[key], message[option]);
         if (result != null) optionsResult.push(result);
       });
       if (optionsResult.length > 0)
