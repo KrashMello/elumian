@@ -131,101 +131,19 @@ export class RequestValidator {
 
       const optionsResult: string[] = [];
 
-      options.forEach((option) => {
+      options.forEach((option: any) => {
         let result: string | null = null;
         let MinMaxLength: number = 0;
         if (option.includes("max") || option.includes("min")) {
           const auxOption = option.split(":");
           MinMaxLength = Number(auxOption[1]);
+          result = this.validateValues[option](
+            data[key],
+            MinMaxLength,
+            message[option],
+          );
         }
-        switch (option) {
-          case "alpha":
-            if (
-              typeof data[key] === "string" &&
-              isAlpha(data[key], this.lang) === false &&
-              data[key] != null
-            ) {
-              result = message.alpha ?? "el campo solo debe tener letras!";
-            }
-            break;
-          case "alphaSimbols":
-            if (
-              typeof data[key] === "string" &&
-              isAlphaSimbols(data[key], this.lang) === false
-            ) {
-              result =
-                message.alphaSimbols ??
-                "el campo solo debe contener letras y /_";
-            }
-            break;
-          case "alphaNumeric":
-            if (
-              typeof data[key] === "string" &&
-              !validator.isAlphanumeric(data[key])
-            ) {
-              result =
-                message.alphaNumeric ??
-                "el campo solo debe tener letras y numeros";
-            }
-            break;
-          case "alphaNumericSimbols":
-            if (
-              typeof data[key] !== "string" &&
-              !isAlphaNumericSimbols(data[key]) &&
-              data[key] != null
-            ) {
-              result =
-                message.alphaNumericSimbols ??
-                "el campo debe contener solo letras, numeros y -._#,/";
-            }
-            break;
-          case "required":
-            // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-            if (!data[key]) {
-              result = message.required ?? "el campo es requerido";
-            }
-            break;
-          case "max":
-            if (
-              typeof data[key] === "string" &&
-              (data[key]?.length as number) > MinMaxLength
-            ) {
-              result =
-                message.max ??
-                `el campo no debe tener mas de ${MinMaxLength} caracteres`;
-            }
-            break;
-          case "min":
-            if (
-              typeof data[key] === "string" &&
-              (data[key]?.length as number) < MinMaxLength
-            ) {
-              result =
-                message.min ??
-                `el campo no debe tener menos de ${MinMaxLength} caracteres`;
-            }
-            break;
-          case "email":
-            if (
-              typeof data[key] === "string" &&
-              !validator.isEmail(data[key] as string)
-            ) {
-              result =
-                message.email ??
-                "el campo debe ser un correo electronico ejemplo: example@myweb.com";
-            }
-            break;
-          case "boolean":
-            if (typeof data[key] !== "boolean") {
-              result = message.boolean ?? "el campo debe ser booleano";
-            }
-            break;
-          case "array":
-            if (!Array.isArray(data[key])) {
-              result = message.array ?? "el campo debe ser un arreglo";
-            }
-            break;
-        }
+        result = this.validateValues[option](data[key], message[option]);
         if (result != null) optionsResult.push(result);
       });
       if (optionsResult.length > 0)
