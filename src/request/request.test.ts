@@ -86,8 +86,9 @@ describe("request", () => {
     ).toBe(true);
   });
   it("should return errors field password if not exists field in optionsToValidate", () => {
-    expect(compareData({ password: "-." }, { name: "min:5" })).toStrictEqual({
+    expect(compareData({ password: "asdf" }, { name: "min:5" })).toStrictEqual({
       password: "Field not valid",
+      name: "Min characters length must be 5",
     });
   });
   it("should return errors field email if not exists field in optionsTypes", () => {
