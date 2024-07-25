@@ -60,9 +60,35 @@ const errorsTypes = {
   },
 };
 
-type errors = keyof typeof errorsTypes;
+const validateField = (
+  field: string,
+  key: string,
+  data: Record<string, string>,
+  message: Record<string, string>,
+) => {
+  return field
+    .split("|")
+    .map((v: string) => {
+      if (v.includes("min") || v.includes("max")) {
+        const [type, limit] = v.split(":");
+        return errorsTypes[type].validate(data[key], limit)
+          ? null
+          : errorsTypes[type].message + limit;
+      }
+      if (!errorsTypes[v])
+        return message?.["invalidField"] ?? "Field not valid";
 
-export const compareValue = (
+      if (v === "required")
+        return message?.[v] ?? errorsTypes[v].message.replace("<field>", key);
+
+      return errorsTypes[v].validate(data[key])
+        ? null
+        : (message?.[v] ?? errorsTypes[v].message);
+    })
+    .filter((z: null | string) => z);
+};
+
+const compareData = (
   data: Record<string, string>,
   optionsToValidate: Record<string, string>,
   message?: Record<string, string>,
@@ -74,47 +100,35 @@ export const compareValue = (
 
   const sd = Object.keys(data);
   const so = Object.keys(optionsToValidate);
-  if (sd.filter((x) => !so.includes(x))) {
-    console.log(
-      JSON.parse(
-        '{"' +
-          sd.filter((x) => !so.includes(x))[0] +
-          '": "' +
-          "campo no valido" +
-          '"}',
-      ),
-    );
-    return JSON.parse(
-      `{"${sd.filter((x) => !so.includes(x))[0]}": "${message["invalidField"] ?? "Field not valid"}"}`,
+
+  if (sd.filter((x) => !so.includes(x)).length > 0) {
+    const m = message?.["invalidField"] ?? "Field not valid";
+    return Object.fromEntries(
+      sd
+        .filter((x) => !so.includes(x))
+        .map((key) => {
+          return [key, m];
+        }),
     );
   }
+
   const optionsEntries = Object.entries(optionsToValidate);
   const errors: any = optionsEntries
     .map(([key]: any) => {
       let errorsValidate: (string | false)[] | string = [];
-
       if (optionsToValidate[key])
-        errorsValidate = optionsToValidate[key]
-          ?.split("|")
-          .map((v: any) => {
-            const [type, limit] = v.split(":");
-            if (!Object.keys(errorsTypes).find((z) => z !== type))
-              return message["invalidField"] ?? "Field not valid";
-            if (type === "min" || type === "max") {
-              return errorsTypes[type].validate(data[key], limit)
-                ? true
-                : errorsTypes[type].message + limit;
-            }
-            return errorsTypes[v].validate(data[key])
-              ? true
-              : v === "required"
-                ? message[v] ?? errorsTypes[v].message.replace("<field>", key)
-                : message[v] ?? errorsTypes[v].message;
-          })
-          .filter((z: boolean | string) => z !== true);
-      else errorsValidate = [message["invalidField"] ?? "Field not valid"];
-      return errorsValidate.length > 0 ? [key, errorsValidate[0]] : true;
+        errorsValidate = validateField(
+          optionsToValidate[key],
+          key,
+          data,
+          message,
+        );
+      return errorsValidate.length > 0 ? [key, errorsValidate[0]] : null;
     })
-    .filter((k) => k !== true);
+    .filter((k) => k);
   return errors.length > 0 ? Object.fromEntries(errors) : true;
+};
+
+module.exports = {
+  compareData,
 };

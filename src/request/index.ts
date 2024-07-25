@@ -21,13 +21,13 @@ export class RequestValidator {
     return (req: Request, res: Response, next: NextFunction) => {
       let validate: returnCompareValue;
       if (get)
-        validate = this.compareValue(
+        validate = this.compareData(
           req.query,
           this.optionsToValidate,
           this.message,
         );
       else {
-        validate = this.compareValue(
+        validate = this.compareData(
           req.body,
           this.optionsToValidate,
           this.message,
@@ -102,7 +102,7 @@ export class RequestValidator {
         return message ?? "el campo debe ser un arreglo";
     },
   };
-  private compareValue(
+  private compareData(
     data: dataCompareValueRequest,
     optionsToValidate: Record<string, string>,
     message: Message = {},
