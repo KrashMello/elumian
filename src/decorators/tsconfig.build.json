@@ -3,8 +3,15 @@
   "compilerOptions": {
     "outDir": "../../lib/decorators/",
     "rootDir": ".",
-    "paths": {}
+    "paths": {
+      "@elumian/request": ["../request"],
+      "@elumian/request/*": ["../request/*"]
+    }
   },
   "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts"],
-  "references": []
+  "references": [
+    {
+      "path": "../request/tsconfig.build.json"
+    }
+  ]
 }

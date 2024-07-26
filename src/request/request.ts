@@ -2,6 +2,7 @@ import { isAlpha, isAlphaSimbols, isAlphaNumericSimbols } from "./service";
 import { isAlphanumeric } from "validator";
 import { Record } from "@prisma/client/runtime/library";
 import isEmail from "validator/lib/isEmail";
+import { type Response, type Request, type NextFunction } from "express";
 
 const errorsTypes = {
   min: {
@@ -61,19 +62,19 @@ const errorsTypes = {
 };
 
 const validateField = (
-  field: string,
+  optionsToValidate: string,
   key: string,
   data: Record<string, string>,
   message: Record<string, string>,
-) => {
-  return field
+): string[] => {
+  return optionsToValidate
     .split("|")
     .map((v: string) => {
       if (v.includes("min") || v.includes("max")) {
         const [type, limit] = v.split(":");
         return errorsTypes[type].validate(data[key], limit)
           ? null
-          : message?.[v] ?? errorsTypes[type].message + limit;
+          : (message?.[v] ?? errorsTypes[type].message + limit);
       }
       if (!errorsTypes[v])
         return message?.["invalidField"] ?? "Field not valid";
@@ -83,7 +84,7 @@ const validateField = (
 
       return errorsTypes[v].validate(data[key])
         ? null
-        : message?.[v] ?? errorsTypes[v].message;
+        : (message?.[v] ?? errorsTypes[v].message);
     })
     .filter((z: null | string) => z);
 };

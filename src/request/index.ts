@@ -7,148 +7,140 @@ import {
 } from "../type";
 
 import { isAlpha, isAlphaSimbols, isAlphaNumericSimbols } from "./service";
-import { type Response, type Request, type NextFunction } from "express";
-export class RequestValidator {
-  public readonly lang: Locale = "es-ES";
-  public readonly optionsToValidate: Record<string, string>;
-  public readonly message: Message;
+import { isAlphanumeric } from "validator";
+import { Record } from "@prisma/client/runtime/library";
+import isEmail from "validator/lib/isEmail";
 
-  constructor(options: Record<string, string>, message?: Message) {
-    this.optionsToValidate = options;
-    this.message = message;
-  }
-  public validate(get: boolean = false): any {
-    return (req: Request, res: Response, next: NextFunction) => {
-      let validate: returnCompareValue;
-      if (get)
-        validate = this.compareData(
-          req.query,
-          this.optionsToValidate,
-          this.message,
-        );
-      else {
-        validate = this.compareData(
-          req.body,
-          this.optionsToValidate,
-          this.message,
-        );
+const errorsTypes = {
+  min: {
+    validate: (value: string, length: number) => {
+      return value && value.length >= length ? true : false;
+    },
+    message: "Min characters length must be ",
+  },
+  max: {
+    validate: (value: string, length: number) => {
+      return value && value.length <= length ? true : false;
+    },
+    message: "Max characters length must be ",
+  },
+  alpha: {
+    validate: (value: string): boolean => {
+      return isAlpha(value, "es-ES");
+    },
+    message: "Characters must be a-zA-Z",
+  },
+  alphaSimbol: {
+    validate: (value: string): boolean => {
+      return isAlphaSimbols(value, "es-ES");
+    },
+    message: "Characters must be a-zA-Z -.&,_#!*/",
+  },
+  alphaNumeric: {
+    validate: (value: string): boolean => {
+      return isAlphanumeric(value);
+    },
+    message: "Characters must be a-zA-Z1-9",
+  },
+  alphaNumericSimbols: {
+    validate: (value: string): boolean => {
+      return isAlphaNumericSimbols(value);
+    },
+    message: "Characters must be a-zA-Z1-9  -.&,_#*/",
+  },
+  email: {
+    validate: (value: string): boolean => {
+      return isEmail(value);
+    },
+    message: "Please enter a valid email address example: foo@gmail.com",
+  },
+  boolean: {
+    validate: (value: string): boolean => {
+      return typeof value === "boolean" ? true : false;
+    },
+    message: "Please enter a boolean",
+  },
+  required: {
+    validate: (value: string): boolean => {
+      return !!value;
+    },
+    message: `The <field> must be required`,
+  },
+};
+
+const validateField = (
+  optionsToValidate: string,
+  key: string,
+  data: Record<string, string>,
+  message: Record<string, string>,
+): string[] => {
+  return optionsToValidate
+    .split("|")
+    .map((v: string) => {
+      if (v.includes("min") || v.includes("max")) {
+        const [type, limit] = v.split(":");
+        return errorsTypes[type].validate(data[key], limit)
+          ? null
+          : (message?.[v] ?? errorsTypes[type].message + limit);
       }
-      if (validate !== true) {
-        res.status(401).json({ type: "danger", message: validate });
-        return;
-      }
-      next();
+      if (!errorsTypes[v])
+        return message?.["invalidField"] ?? "Field not valid";
+
+      if (v === "required")
+        errorsTypes[v].message = errorsTypes[v].message.replace("<field>", key);
+
+      return errorsTypes[v].validate(data[key])
+        ? null
+        : (message?.[v] ?? errorsTypes[v].message);
+    })
+    .filter((z: null | string) => z);
+};
+
+export const compareData = (
+  data: Record<string, string>,
+  optionsToValidate: Record<string, string>,
+  message?: Record<string, string>,
+): true | Record<string, string> => {
+  if (typeof data !== "object" || data === null)
+    throw new Error("parameter data must be a object");
+  if (typeof optionsToValidate !== "object" || optionsToValidate === null)
+    throw new Error("parameter optionsToValidate must be a object");
+
+  const sd = Object.keys(data);
+  const so = Object.keys(optionsToValidate);
+  let errors: Record<string, string>;
+  if (sd.filter((x) => !so.includes(x)).length > 0) {
+    const m = message?.["invalidField"] ?? "Field not valid";
+    errors = {
+      ...errors,
+      ...Object.fromEntries(
+        sd
+          .filter((x) => !so.includes(x))
+          .map((key) => {
+            return [key, m];
+          }),
+      ),
     };
   }
-  private validations = {
-    alpha: (value: string, message?: string): string => {
-      if (
-        typeof value === "string" &&
-        isAlpha(value, this.lang) === false &&
-        value != null
-      )
-        return message ?? "el campo solo debe tener letras!";
-    },
-    alphaSimbols: (value: string, message?: string): string => {
-      if (
-        typeof value === "string" &&
-        isAlphaSimbols(value, this.lang) === false
-      )
-        return message ?? "el campo solo debe contener letras y /_";
-    },
-    alphaNumeric: (value: string, message?: string): string => {
-      if (typeof value === "string" && !validator.isAlphanumeric(value))
-        return message ?? "el campo solo debe tener letras y numeros";
-    },
-    alphaNumericSimbols: (value: string, message?: string): string => {
-      if (
-        typeof value !== "string" &&
-        !isAlphaNumericSimbols(value) &&
-        value != null
-      )
-        return (
-          message ?? "el campo debe contener solo letras, numeros y -._#,/"
-        );
-    },
-    required: (value: any, message?: string): string => {
-      if (!value) return message ?? "el campo es requerido";
-    },
-    max: (value: string, MinMaxLength: number, message?: string): string => {
-      if (typeof value === "string" && (value?.length as number) > MinMaxLength)
-        return (
-          message ?? `el campo no debe tener mas de ${MinMaxLength} caracteres`
-        );
-    },
-    min: (value: string, MinMaxLength: number, message?: string): string => {
-      if (typeof value === "string" && (value?.length as number) < MinMaxLength)
-        return (
-          message ??
-          `el campo no debe tener menos de ${MinMaxLength} caracteres`
-        );
-    },
-    email: (value: string, message?: string): string => {
-      if (typeof value === "string" && !validator.isEmail(value as string))
-        return (
-          message ??
-          "el campo debe ser un correo electronico ejemplo: example@myweb.com"
-        );
-    },
-    boolean: (value: any, message?: string): string => {
-      if (typeof value !== "boolean")
-        return message ?? "el campo debe ser booleano";
-    },
-    array: (value: any, message?: string): string => {
-      if (!Array.isArray(value))
-        return message ?? "el campo debe ser un arreglo";
-    },
+
+  const optionsEntries = Object.entries(optionsToValidate);
+  errors = {
+    ...errors,
+    ...Object.fromEntries(
+      optionsEntries
+        .map(([key]: any) => {
+          let errorsValidate: (string | false)[] | string = [];
+          if (optionsToValidate[key])
+            errorsValidate = validateField(
+              optionsToValidate[key],
+              key,
+              data,
+              message,
+            );
+          return errorsValidate.length > 0 ? [key, errorsValidate[0]] : null;
+        })
+        .filter((k) => k),
+    ),
   };
-  private compareData(
-    data: dataCompareValueRequest,
-    optionsToValidate: Record<string, string>,
-    message: Message = {},
-  ): returnCompareValue {
-    const dataKey = Object.keys(data);
-    const requestKey = Object.keys(optionsToValidate);
-    let uncoinsident = false;
-    dataKey.forEach((key) => {
-      if (!requestKey.includes(key)) {
-        uncoinsident = true;
-        return false;
-      }
-      return true;
-    });
-
-    if (uncoinsident)
-      return `campos unicamente necesarios: ${requestKey.toString()}`;
-
-    let errors: Record<string, string[]> = {};
-
-    requestKey.forEach((key): any => {
-      const optionsByKey = optionsToValidate[key];
-      if (optionsByKey == null) return;
-
-      const options = optionsByKey.split("|");
-
-      const optionsResult: string[] = [];
-
-      options.forEach((option: any) => {
-        let result: string | null = null;
-        let MinMaxLength: number = 0;
-        if (option.includes("max") || option.includes("min")) {
-          const auxOption = option.split(":");
-          MinMaxLength = Number(auxOption[1]);
-          result = this.validations[option](
-            data[key],
-            MinMaxLength,
-            message[option],
-          );
-        }
-        result = this.validations[option](data[key], message[option]);
-        if (result != null) optionsResult.push(result);
-      });
-      if (optionsResult.length > 0)
-        errors = { ...errors, [key]: optionsResult };
-    });
-    return Object.values(errors).length === 0 ? true : errors;
-  }
-}
+  return Object.keys(errors).length > 0 ? errors : true;
+};

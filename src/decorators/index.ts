@@ -1,4 +1,6 @@
-import { type SRouter, type IRouter } from "../type";
+import { type SRouter, type IRouter, guard } from "../type";
+import { type Response, type Request, type NextFunction } from "express";
+import { compareData } from "@elumian/request";
 import "reflect-metadata";
 
 export const Controller = (prefix: string): ClassDecorator => {
@@ -14,10 +16,10 @@ export const socketOn = (pathName: string): MethodDecorator => {
     }
     const routes: SRouter[] = Reflect.getMetadata(
       "routesSocket",
-      target.constructor
+      target.constructor,
     );
     const index = routes.findIndex(
-      (i) => i.handlerName === (propertyKey as string)
+      (i) => i.handlerName === (propertyKey as string),
     );
 
     if (
@@ -45,10 +47,10 @@ export const socketEmit = (pathName: string): MethodDecorator => {
     }
     const routes: SRouter[] = Reflect.getMetadata(
       "routesSocket",
-      target.constructor
+      target.constructor,
     );
     const index = routes.findIndex(
-      (i) => i.handlerName === (propertyKey as string)
+      (i) => i.handlerName === (propertyKey as string),
     );
 
     if (
@@ -71,7 +73,7 @@ export const socketEmit = (pathName: string): MethodDecorator => {
 
 export const Get = (
   path: string,
-  withMiddelware: boolean = true
+  withMiddelware: boolean = true,
 ): MethodDecorator => {
   // `target` equals our class, `propertyKey` equals our decorated method name
   return (target, propertyKey) => {
@@ -83,7 +85,7 @@ export const Get = (
     // Get the routes stored so far, extend it by the new route and re-set the metadata.
     const routes: IRouter[] = Reflect.getMetadata("routes", target.constructor);
     const index = routes.findIndex(
-      (i) => i.handlerName === (propertyKey as string)
+      (i) => i.handlerName === (propertyKey as string),
     );
 
     if (
@@ -110,7 +112,7 @@ export const Get = (
 };
 export const Post = (
   path: string,
-  withMiddelware: boolean = true
+  withMiddelware: boolean = true,
 ): MethodDecorator => {
   // `target` equals our class, `propertyKey` equals our decorated method name
   return (target, propertyKey) => {
@@ -123,7 +125,7 @@ export const Post = (
     // Get the routes stored so far, extend it by the new route and re-set the metadata.
     const routes: IRouter[] = Reflect.getMetadata("routes", target.constructor);
     const index = routes.findIndex(
-      (i) => i.handlerName === (propertyKey as string)
+      (i) => i.handlerName === (propertyKey as string),
     );
 
     if (
@@ -150,7 +152,7 @@ export const Post = (
 };
 export const Put = (
   path: string,
-  withMiddelware: boolean = true
+  withMiddelware: boolean = true,
 ): MethodDecorator => {
   // `target` equals our class, `propertyKey` equals our decorated method name
   return (target, propertyKey) => {
@@ -163,7 +165,7 @@ export const Put = (
     // Get the routes stored so far, extend it by the new route and re-set the metadata.
     const routes: IRouter[] = Reflect.getMetadata("routes", target.constructor);
     const index = routes.findIndex(
-      (i) => i.handlerName === (propertyKey as string)
+      (i) => i.handlerName === (propertyKey as string),
     );
 
     if (
@@ -192,7 +194,7 @@ export const Put = (
 
 export const Path = (
   path: string,
-  withMiddelware: boolean = true
+  withMiddelware: boolean = true,
 ): MethodDecorator => {
   // `target` equals our class, `propertyKey` equals our decorated method name
   return (target, propertyKey) => {
@@ -205,7 +207,7 @@ export const Path = (
     // Get the routes stored so far, extend it by the new route and re-set the metadata.
     const routes: IRouter[] = Reflect.getMetadata("routes", target.constructor);
     const index = routes.findIndex(
-      (i) => i.handlerName === (propertyKey as string)
+      (i) => i.handlerName === (propertyKey as string),
     );
 
     if (
@@ -234,7 +236,7 @@ export const Path = (
 
 export const Delete = (
   path: string,
-  withMiddelware: boolean = true
+  withMiddelware: boolean = true,
 ): MethodDecorator => {
   // `target` equals our class, `propertyKey` equals our decorated method name
   return (target, propertyKey) => {
@@ -247,9 +249,8 @@ export const Delete = (
     // Get the routes stored so far, extend it by the new route and re-set the metadata.
     const routes: IRouter[] = Reflect.getMetadata("routes", target.constructor);
     const index = routes.findIndex(
-      (i) => i.handlerName === (propertyKey as string)
+      (i) => i.handlerName === (propertyKey as string),
     );
-
     if (
       routes.filter((r) => r.handlerName === (propertyKey as string)).length ===
       0
@@ -269,12 +270,10 @@ export const Delete = (
         handlerName: propertyKey as string,
       };
     }
-
     Reflect.defineMetadata("routes", routes, target.constructor);
   };
 };
-
-export const RequestValidator = (requestValidator: any): MethodDecorator => {
+export const Guard = (guard: guard): MethodDecorator => {
   // `target` equals our class, `propertyKey` equals our decorated method name
   return (target, propertyKey) => {
     // In case this is the first route to be registered the `routes` metadata is likely to be undefined at this point.
@@ -286,32 +285,75 @@ export const RequestValidator = (requestValidator: any): MethodDecorator => {
     // Get the routes stored so far, extend it by the new route and re-set the metadata.
     const routes: IRouter[] = Reflect.getMetadata("routes", target.constructor);
     const index = routes.findIndex(
-      (i) => i.handlerName === (propertyKey as string)
+      (i) => i.handlerName === (propertyKey as string),
     );
     if (
       routes.filter((r) => r.handlerName === (propertyKey as string)).length ===
       0
-    ) {
+    )
       routes.push({
         method: "get",
         path: "",
         withMiddelware: true,
         handlerName: propertyKey as string,
-        requestValidator,
+        guard,
       });
-    } else {
+    else
       routes[index] = {
-        method: "get",
-        path: "",
-        withMiddelware: true,
-        handlerName: propertyKey as string,
+        ...routes[index],
+        guard,
       };
-    }
 
     Reflect.defineMetadata("routes", routes, target.constructor);
   };
 };
 
+export const dataEntryGuard = (data: {
+  options: Record<string, string>;
+  message?: Record<string, string>;
+}): MethodDecorator => {
+  // `target` equals our class, `propertyKey` equals our decorated method name
+  return (target, propertyKey) => {
+    // In case this is the first route to be registered the `routes` metadata is likely to be undefined at this point.
+    // To prevent any further validation simply set it to an empty array here.
+    if (!Reflect.hasMetadata("routes", target.constructor)) {
+      Reflect.defineMetadata("routes", [], target.constructor);
+    }
+    const guard = (req: Request, res: Response, next: NextFunction) => {
+      let validate: Record<string, string> | true;
+      let dataEntry: any;
+      if (req.method === "GET") dataEntry = req.query;
+      else dataEntry = req.body;
+      validate = compareData(dataEntry, data.options, data.message);
+      if (validate !== true)
+        return res.status(401).json({ type: "danger", message: validate });
+      next();
+    };
+    // Get the routes stored so far, extend it by the new route and re-set the metadata.
+    const routes: IRouter[] = Reflect.getMetadata("routes", target.constructor);
+    const index = routes.findIndex(
+      (i) => i.handlerName === (propertyKey as string),
+    );
+    if (
+      routes.filter((r) => r.handlerName === (propertyKey as string)).length ===
+      0
+    )
+      routes.push({
+        method: "get",
+        path: "",
+        withMiddelware: true,
+        handlerName: propertyKey as string,
+        guard,
+      });
+    else
+      routes[index] = {
+        ...routes[index],
+        guard,
+      };
+
+    Reflect.defineMetadata("routes", routes, target.constructor);
+  };
+};
 export const Services = (prefix: string): ClassDecorator => {
   return (target) => {
     Reflect.defineMetadata("prefix", prefix, target);
