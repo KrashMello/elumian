@@ -14,6 +14,9 @@
   "references": [
     {
       "path": "../router/tsconfig.build.json"
+    },
+    {
+      "path": "../tsconfig.build.json"
     }
   ]
 }

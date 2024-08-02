@@ -1,25 +1,184 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["multiSchema"]
+  previewFeatures = ["multiSchema", "views"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["ecommerce", "public"]
 }
 
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User?   @relation(fields: [authorId], references: [id])
-  authorId  Int?
+model products {
+  id                      Int                       @id @default(autoincrement())
+  name                    String                    @db.VarChar
+  image_src               String                    @db.VarChar
+  description             String                    @unique
+  short_description       String
+  regular_price           Float                     @db.Real
+  tax_price               Float                     @db.Real
+  mount_available         Int                       @db.SmallInt
+  stock_management        Boolean
+  quantity                Int                       @db.SmallInt
+  umbral                  Int                       @db.SmallInt
+  visible                 Boolean
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  categories_per_products categories_per_products[]
+  orders_items            orders_items[]
+  products_attributes     products_attributes[]
+  products_gallery        products_gallery[]
+  products_tags           products_tags[]
+
+  @@schema("ecommerce")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
+model products_attributes {
+  id          Int      @id @default(autoincrement())
+  products_id Int
+  key         String   @db.VarChar(15)
+  values      String
+  created_at  DateTime @default(now())
+  update_at   DateTime @updatedAt
+  products    products @relation(fields: [products_id], references: [id])
+
+  @@schema("ecommerce")
+}
+
+model products_gallery {
+  id          Int      @id @default(autoincrement())
+  products_id Int
+  src         String   @db.VarChar(15)
+  description String
+  created_at  DateTime @default(now())
+  update_at   DateTime @updatedAt
+  products    products @relation(fields: [products_id], references: [id])
+
+  @@schema("ecommerce")
+}
+
+model products_categories {
+  id                      Int                       @id @default(autoincrement())
+  name                    String                    @db.VarChar
+  created_at              DateTime                  @default(now())
+  update_at               DateTime                  @updatedAt
+  categories_per_products categories_per_products[]
+
+  @@schema("ecommerce")
+}
+
+model categories_per_products {
+  id            Int                 @id @default(autoincrement())
+  products_id   Int
+  categories_id Int
+  categories    products_categories @relation(fields: [categories_id], references: [id])
+  products      products            @relation(fields: [products_id], references: [id])
+
+  @@schema("ecommerce")
+}
+
+model products_tags {
+  id          Int      @id @default(autoincrement())
+  products_id Int
+  name        String   @db.VarChar(15)
+  created_at  DateTime @default(now())
+  update_at   DateTime @updatedAt
+  products    products @relation(fields: [products_id], references: [id])
+
+  @@schema("ecommerce")
+}
+
+model orders {
+  id           Int            @id @default(autoincrement())
+  code         String         @db.VarChar(99)
+  user_id      Int
+  status       String         @db.VarChar
+  created_at   DateTime       @default(now())
+  update_at    DateTime       @updatedAt
+  users        users          @relation(fields: [user_id], references: [id])
+  orders_items orders_items[]
+
+  @@schema("ecommerce")
+}
+
+model orders_items {
+  id          Int      @id @default(autoincrement())
+  orders_id   Int
+  products_id Int
+  quantity    Int      @db.SmallInt
+  orders      orders   @relation(fields: [orders_id], references: [id])
+  products    products @relation(fields: [products_id], references: [id])
+
+  @@schema("ecommerce")
+}
+
+model roles {
+  id               Int                @id @default(autoincrement())
+  name             String             @db.VarChar(50)
+  description      String?
+  created_at       DateTime           @default(now())
+  updated_at       DateTime           @updatedAt
+  role_permissions role_permissions[]
+  users            users[]
+
+  @@schema("public")
+}
+
+model role_permissions {
+  id         Int      @id @default(autoincrement())
+  roles_id   Int      @db.SmallInt
+  name       String   @db.VarChar(50)
+  status     Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  roles      roles    @relation(fields: [roles_id], references: [id])
+
+  @@schema("public")
+}
+
+model user_status {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(50)
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        users[]
+
+  @@schema("public")
+}
+
+model users {
+  id                    Int                @id @default(autoincrement())
+  roles_id              Int                @db.SmallInt
+  status_id             Int                @db.SmallInt
+  user_personal_data_id Int
+  username              String             @unique @db.VarChar(50)
+  password              String             @db.VarChar(255)
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  orders                orders[]
+  roles                 roles              @relation(fields: [roles_id], references: [id])
+  status                user_status        @relation(fields: [status_id], references: [id])
+  user_personal_data    user_personal_data @relation(fields: [user_personal_data_id], references: [id])
+
+  @@schema("public")
+}
+
+model user_personal_data {
+  id           Int     @id @default(autoincrement())
+  first_name   String  @db.VarChar
+  last_name    String  @db.VarChar
+  address      String
+  phone_number String  @db.VarChar
+  users        users[]
+
+  @@schema("public")
+}
+
+view UserInfo {
+  username    String  @unique @db.VarChar(50)
+  status_name String? @db.VarChar(50)
+  password    String  @db.VarChar(255)
+
+  @@schema("public")
 }

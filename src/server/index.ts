@@ -3,17 +3,17 @@ import os from "os";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
-import { Elumian } from "../index";
+import { Modules } from "..";
 import { router } from "../router/index";
-import twig from "twig";
 
-const server = (config: {
+const server = async (config: {
   controllers: any[];
   services: any[];
   whiteList?: string[];
   port?: number;
   viewsDir?: string;
-}): void => {
+}) => {
+  Modules(config.services);
   const app = express();
   app.use(express.json());
   config.port = config.port ?? 5000;
@@ -40,12 +40,6 @@ const server = (config: {
         },
       }),
     );
-  app.set("views", config.viewsDir);
-  app.set("view engine", "twig");
-  app.set("twig options", {
-    allowAsync: true, // Allow asynchronous compiling
-    strict_variables: false,
-  });
   const { networkInterfaces } = os;
   const nets = networkInterfaces();
   const results = Object.create(null); // Or just '{}', an empty object
@@ -76,10 +70,7 @@ const server = (config: {
 
   const io = new Server(httpServer);
 
-  Elumian.services = config.services;
-
-  router(config.controllers, app, io);
-
+  await router(config.controllers, app, io);
   httpServer.listen(config.port, () => {
     console.log(
       `Network: http://${IPV4}:${config.port} \nlocal: http://localhost:${config.port}`,

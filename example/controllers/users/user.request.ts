@@ -1,35 +1,24 @@
-import { RequestValidator } from "@elumian/request";
+import { RequestValidator } from "elumian/request";
 
 const findDataOptions = {
-  code: "max:15|alphaNumericSimbols",
-  username: "max:20|alpha",
-  email: "email",
-  firstName: "alpha|max:50",
-  lastName: "alpha|max:50",
+  searchFilter: "alpha",
 };
 
 const createUserOptions = {
-  username: "required|max:20|alpha",
-  password: "required|max:150|alphaNumericSimbols|min:8",
+  name: "required|max:20|alpha",
   email: "required|email",
-  firstName: "required|alpha|max:50",
-  lastName: "required|alpha|max:50",
-  statusCode: "required|alphaNumericSimbols|max:15",
-  roleCode: "required|alphaNumericSimbols|max:15",
 };
 
 const updateUserOptions = {
-  code: "max:15|alphaNumericSimbols",
-  firstName: "required|alpha|max:50",
-  lastName: "required|alpha|max:50",
+  name: "required|max:20|alpha",
 };
 
 export const findDataRequest = new RequestValidator(findDataOptions).validate(
-  true
+  true,
 );
 export const createUserRequest = new RequestValidator(
-  createUserOptions
+  createUserOptions,
 ).validate();
 export const updateUserRequest = new RequestValidator(
-  updateUserOptions
+  updateUserOptions,
 ).validate();

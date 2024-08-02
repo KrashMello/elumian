@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres
+    container_name: elumian-test
+    environment:
+      - POSTGRES_USER=elumian
+      - POSTGRES_PASSWORD=elumian
+      - POSTGRES_DB=elumian
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

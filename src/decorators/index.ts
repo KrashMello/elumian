@@ -1,6 +1,12 @@
-import { type SRouter, type IRouter, guard } from "../type";
+import {
+  type SRouter,
+  type IRouter,
+  guard,
+  validationsOptions,
+  validationsMessage,
+} from "../type";
 import { type Response, type Request, type NextFunction } from "express";
-import { compareData } from "@elumian/request";
+import { compareData } from "../request";
 import "reflect-metadata";
 
 export const Controller = (prefix: string): ClassDecorator => {
@@ -308,9 +314,9 @@ export const Guard = (guard: guard): MethodDecorator => {
   };
 };
 
-export const dataEntryGuard = (data: {
-  options: Record<string, string>;
-  message?: Record<string, string>;
+export const DataEntryGuard = (data: {
+  options: validationsOptions;
+  message?: validationsMessage;
 }): MethodDecorator => {
   // `target` equals our class, `propertyKey` equals our decorated method name
   return (target, propertyKey) => {
@@ -319,7 +325,7 @@ export const dataEntryGuard = (data: {
     if (!Reflect.hasMetadata("routes", target.constructor)) {
       Reflect.defineMetadata("routes", [], target.constructor);
     }
-    const guard = (req: Request, res: Response, next: NextFunction) => {
+    const guard = (req: Request, res: Response, next: NextFunction): any => {
       let validate: Record<string, string> | true;
       let dataEntry: any;
       if (req.method === "GET") dataEntry = req.query;
@@ -354,8 +360,18 @@ export const dataEntryGuard = (data: {
     Reflect.defineMetadata("routes", routes, target.constructor);
   };
 };
-export const Services = (prefix: string): ClassDecorator => {
-  return (target) => {
-    Reflect.defineMetadata("prefix", prefix, target);
+
+export function Service<T extends { new (...args: any[]): {} }>(
+  constructor: T,
+) {
+  return class extends constructor {
+    constructor(...args: any[]) {
+      super(...args);
+      if (!Reflect.getMetadata("service", constructor)) {
+        Reflect.defineMetadata("prefix", constructor.name, constructor);
+        Reflect.defineMetadata("service", this, constructor);
+      }
+      return Reflect.getMetadata("service", constructor);
+    }
   };
-};
+}

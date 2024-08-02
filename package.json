@@ -32,6 +32,7 @@
     "test": "vitest",
     "lint": "ts-standard",
     "lint:fix": "ts-standard --fix",
+    "db:generate": "prisma generate --schema=./example/prisma/scheme.prisma",
     "db:push": "prisma db push --schema=./example/prisma/scheme.prisma",
     "db:seed": "ts-node ./example/prisma/seed.ts"
   },
@@ -58,8 +59,9 @@
     "express": "4.19.2",
     "lodash": "^4.17.21",
     "prisma": "^5.11.0",
-    "reflect-metadata": "0.2.2",
+    "reflect-metadata": "^0.2.2",
     "socket.io": "^4.7.2",
+    "tslib": "^2.6.3",
     "twig": "^1.17.1",
     "typescript": "*",
     "validator": "13.11.0"

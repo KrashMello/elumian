@@ -1,6 +1,8 @@
 import type { Request, Response } from "express";
 import type { JwtPayload } from "jsonwebtoken";
 
+export * from "./request/type";
+
 interface Message {
   alpha?: string;
   alphaSimbols?: string;
@@ -306,3 +308,9 @@ export interface schemas {
 //   count: () => number
 //   get createSchema(): { up: schemaUp; down: schemaDown }
 // }
+
+interface Elumian {
+  prisma: object;
+  Auth: object;
+}
+

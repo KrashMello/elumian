@@ -1,4 +1,4 @@
-import { Encoder } from "@elumian/encoder";
+import { Encoder } from "../coder";
 import crypto from "crypto";
 import { type cacheData, type cacheLists } from "./type";
 
@@ -48,7 +48,7 @@ export function singCacheData(key: string, data: object): cacheData {
 export function getCacheDataById(key: string, id: string): cacheData | string {
   const filterById = cacheList[key]?.filter((v: cacheData) => v.id === id)[0]
     ?.data;
-  if (filterById != null) return filterById;
+  if (!!filterById) return filterById;
   else return "dont exists data in cache";
 }
 

@@ -1,7 +1,7 @@
-import { UserService } from "example/services/users.model";
-import { UserController } from "../controllers/users/user.controller";
+import { AuthController } from "../controllers/auth/auth.controller";
+import { Auth } from "../services/auth.service";
 
 export default {
-  controllers: [UserController],
-  services: [UserService],
+  controllers: [AuthController],
+  services: [Auth],
 };

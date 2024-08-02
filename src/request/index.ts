@@ -2,8 +2,13 @@ import { isAlpha, isAlphaSimbols, isAlphaNumericSimbols } from "./service";
 import { isAlphanumeric } from "validator";
 import { Record } from "@prisma/client/runtime/library";
 import isEmail from "validator/lib/isEmail";
+import {
+  validationsMessage,
+  validationsOptions,
+  validationsOptionsFields,
+} from "./type";
 
-const errorsTypes = {
+export const errorsTypes = {
   min: {
     validate: (value: string, length: number) => {
       return value && value.length >= length ? true : false;
@@ -61,19 +66,18 @@ const errorsTypes = {
 };
 
 const validateField = (
-  optionsToValidate: string,
+  optionsToValidate: validationsOptionsFields[],
   key: string,
   data: Record<string, string>,
   message: Record<string, string>,
 ): string[] => {
   return optionsToValidate
-    .split("|")
     .map((v: string) => {
       if (v.includes("min") || v.includes("max")) {
         const [type, limit] = v.split(":");
-        return errorsTypes[type].validate(data[key], limit)
+        return errorsTypes[type]?.validate(data[key], limit)
           ? null
-          : message?.[v] ?? errorsTypes[type].message + limit;
+          : (message?.[v] ?? errorsTypes[type].message + limit);
       }
       if (!errorsTypes[v])
         return message?.["invalidField"] ?? "Field not valid";
@@ -83,15 +87,15 @@ const validateField = (
 
       return errorsTypes[v].validate(data[key])
         ? null
-        : message?.[v] ?? errorsTypes[v].message;
+        : (message?.[v] ?? errorsTypes[v].message);
     })
     .filter((z: null | string) => z);
 };
 
 export const compareData = (
   data: Record<string, string>,
-  optionsToValidate: Record<string, string>,
-  message?: Record<string, string>,
+  optionsToValidate: validationsOptions,
+  message?: validationsMessage,
 ): true | Record<string, string> => {
   if (typeof data !== "object" || data === null)
     throw new Error("parameter data must be a object");

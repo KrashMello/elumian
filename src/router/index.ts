@@ -1,5 +1,5 @@
 import type { SRouter, IRouter } from "../type";
-import verifyToken from "@elumian/middelware";
+import verifyToken from "../middelware";
 import type { NextFunction, Request, Response } from "express";
 import os from "os";
 import "reflect-metadata";
@@ -58,51 +58,30 @@ export function router(
       Controller,
     );
 
-    routes.forEach(
-      ({ method, path, withMiddelware, handlerName, requestValidator }) => {
-        if (typeof requestValidator === "undefined" && !withMiddelware) {
-          app[method](
-            prefix.concat("", path),
-            (req: Request, res: Response) => {
-              instance[handlerName](req, res);
-            },
-          );
-        }
-        if (typeof requestValidator !== "undefined" && withMiddelware) {
-          app[method](
-            prefix.concat("", path),
-            Middelware,
-            requestValidator,
-            (req: Request, res: Response) => {
-              instance[handlerName](req, res);
-            },
-          );
-        } else if (typeof requestValidator !== "undefined") {
-          app[method](
-            prefix.concat("", path),
-            requestValidator,
-            (req: Request, res: Response) => {
-              instance[handlerName](req, res);
-            },
-          );
-        } else {
-          app[method](
-            prefix.concat("", path),
-            Middelware,
-            (req: Request, res: Response) => {
-              instance[handlerName](req, res);
-            },
-          );
-        }
-        info.push({
-          api: `${method.toLocaleUpperCase()} http://${IPV4}:${
-            process.env.SERVER_PORT ?? 5000
-          }${prefix.concat("", path) as string}`,
-          handler: `${Controller.name as string}.${String(handlerName)}`,
-          protected: withMiddelware,
-        });
-      },
-    );
+    routes.forEach(({ method, path, withMiddelware, handlerName, guard }) => {
+      if (!guard && !withMiddelware) {
+        app[method](prefix.concat("", path), instance[handlerName]);
+      }
+      if (guard && withMiddelware) {
+        app[method](
+          prefix.concat("", path),
+          Middelware,
+          guard,
+          instance[handlerName],
+        );
+      } else if (guard) {
+        app[method](prefix.concat("", path), guard, instance[handlerName]);
+      } else {
+        app[method](prefix.concat("", path), Middelware, instance[handlerName]);
+      }
+      info.push({
+        api: `${method.toLocaleUpperCase()} http://${IPV4}:${
+          process.env.SERVER_PORT ?? 5000
+        }${prefix.concat("", path) as string}`,
+        handler: `${Controller.name as string}.${String(handlerName)}`,
+        protected: withMiddelware,
+      });
+    });
 
     if (routesSocket != null)
       routesSocket.forEach(({ method, pathName, handlerName }) => {
@@ -123,6 +102,7 @@ export function router(
   app.use((_req: Request, res: Response) => {
     res.status(404).json({ message: "ruta no encontrada!" });
   });
+
   io.on("connection", (socket: any) => {
     console.log(`id is connect: ${socket.id as string}`);
     socketRouter.forEach(({ method, path, functionSocket }) => {
