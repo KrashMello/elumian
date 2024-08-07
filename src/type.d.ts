@@ -308,9 +308,3 @@ export interface schemas {
 //   count: () => number
 //   get createSchema(): { up: schemaUp; down: schemaDown }
 // }
-
-interface Elumian {
-  prisma: object;
-  Auth: object;
-}
-
