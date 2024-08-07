@@ -1,115 +1,120 @@
 import type { SRouter, IRouter } from "../type";
 import verifyToken from "../middelware";
 import type { NextFunction, Request, Response } from "express";
-import os from "os";
 import "reflect-metadata";
+import { getIPV4 } from "@elumian/server";
 
-const { networkInterfaces } = os;
-const nets = networkInterfaces();
-const results = Object.create(null); // Or just '{}', an empty object
-let IPV4 = "";
+const IPV4 = getIPV4();
+const DEFAULT_PORT = process.env.PORT ?? 5000;
 
-for (const name of Object.keys(nets)) {
-  const auxNets = nets[name];
-  if (auxNets != null)
-    for (const net of auxNets) {
-      // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
-      // 'IPv4' is in Node <= 17, from 18 it's a number 4 or 6
-      const familyV4Value = typeof net.family === "string" ? "IPv4" : 4;
-      if (net.family === familyV4Value && !net.internal) {
-        const auxResult = results[name];
-        if (auxResult == null) {
-          results[name] = [];
-        }
-        IPV4 = net.address;
-        results[name].push(net.address);
-      }
-    }
+interface RouteInfo {
+  api: string;
+  handler: string;
+  protected: boolean;
 }
 
-const info: Array<{ api: string; handler: string; protected: boolean }> = [];
-const infoSocket: Array<{ method: string; path: string; handlerName: string }> =
-  [];
-
-const socketRouter: Array<{
+interface SocketRoute {
   method: string;
   path: string;
-  functionSocket: any;
-}> = [];
+  functionSocket: (io: any, socket: any) => void;
+}
+
+type SocketInfo = { method: string; path: string; handlerName: string };
+
+const routeInfo: RouteInfo[] = [];
+const socketInfo: SocketInfo[] = [];
+const socketRoutes: SocketRoute[] = [];
 
 export function router(
-  controllers: any,
+  controllers: any[],
   app: any,
   io: any,
-  Middelware: (
+  Middleware: (
     req: Request,
     res: Response,
     next: NextFunction,
   ) => Response = verifyToken,
-): any {
+): void {
   controllers.forEach((Controller: any) => {
     const instance = new Controller();
-
     const prefix = Reflect.getMetadata("prefix", Controller);
+    const routes: IRouter[] = Reflect.getMetadata("routes", Controller) || [];
+    const routesSocket: SRouter[] =
+      Reflect.getMetadata("routesSocket", Controller) || [];
 
-    const routes: IRouter[] = Reflect.getMetadata("routes", Controller);
-    const routesSocket: SRouter[] = Reflect.getMetadata(
-      "routesSocket",
-      Controller,
+    registerHttpRoutes(
+      routes,
+      prefix,
+      instance,
+      app,
+      Middleware,
+      Controller.name,
     );
-
-    routes.forEach(({ method, path, withMiddelware, handlerName, guard }) => {
-      if (!guard && !withMiddelware) {
-        app[method](prefix.concat("", path), instance[handlerName]);
-      }
-      if (guard && withMiddelware) {
-        app[method](
-          prefix.concat("", path),
-          Middelware,
-          guard,
-          instance[handlerName],
-        );
-      } else if (guard) {
-        app[method](prefix.concat("", path), guard, instance[handlerName]);
-      } else {
-        app[method](prefix.concat("", path), Middelware, instance[handlerName]);
-      }
-      info.push({
-        api: `${method.toLocaleUpperCase()} http://${IPV4}:${
-          process.env.SERVER_PORT ?? 5000
-        }${prefix.concat("", path) as string}`,
-        handler: `${Controller.name as string}.${String(handlerName)}`,
-        protected: withMiddelware,
-      });
-    });
-
-    if (routesSocket != null)
-      routesSocket.forEach(({ method, pathName, handlerName }) => {
-        socketRouter.push({
-          method,
-          path: prefix.concat(":", pathName),
-          functionSocket: (io: any, socket: any) => {
-            instance[handlerName](io, socket);
-          },
-        });
-        infoSocket.push({
-          method,
-          path: prefix.concat(":", pathName),
-          handlerName: `${Controller.name as string}.${String(handlerName)}`,
-        });
-      });
+    registerSocketRoutes(routesSocket, prefix, instance, Controller.name);
   });
+
   app.use((_req: Request, res: Response) => {
-    res.status(404).json({ message: "ruta no encontrada!" });
+    res.status(404).json({ message: "Ruta no encontrada!" });
   });
 
   io.on("connection", (socket: any) => {
-    console.log(`id is connect: ${socket.id as string}`);
-    socketRouter.forEach(({ method, path, functionSocket }) => {
+    console.log(`ID conectado: ${socket.id}`);
+    socketRoutes.forEach(({ method, path, functionSocket }) => {
       console.log(method, path);
       functionSocket(io, socket);
     });
   });
-  console.table(info);
-  if (infoSocket.length > 0) console.table(infoSocket);
+
+  console.table(routeInfo);
+  if (socketInfo.length > 0) console.table(socketInfo);
+}
+
+function registerHttpRoutes(
+  routes: IRouter[],
+  prefix: string,
+  instance: any,
+  app: any,
+  Middleware: (req: Request, res: Response, next: NextFunction) => Response,
+  controllerName: string,
+) {
+  routes.forEach(({ method, path, withMiddelware, handlerName, guard }) => {
+    const routePath = `${prefix}${path}`;
+    const middlewares = [Middleware];
+
+    if (guard) {
+      withMiddelware = true;
+      middlewares.push(guard);
+    }
+
+    app[method](routePath, ...middlewares, instance[handlerName]);
+
+    routeInfo.push({
+      api: `${method.toUpperCase()} http://${IPV4}:${process.env.SERVER_PORT ?? DEFAULT_PORT}${routePath}`,
+      handler: `${controllerName}.${handlerName}`,
+      protected: withMiddelware,
+    });
+  });
+}
+
+function registerSocketRoutes(
+  routesSocket: SRouter[],
+  prefix: string,
+  instance: any,
+  controllerName: string,
+) {
+  routesSocket.forEach(({ method, pathName, handlerName }) => {
+    const socketPath = `${prefix}:${pathName}`;
+    socketRoutes.push({
+      method,
+      path: socketPath,
+      functionSocket: (io: any, socket: any) => {
+        instance[handlerName](io, socket);
+      },
+    });
+    socketInfo.push({
+      method,
+      path: socketPath,
+      handlerName: `${controllerName}.${handlerName}`,
+    });
+  });
 }

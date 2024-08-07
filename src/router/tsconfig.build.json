@@ -4,8 +4,8 @@
     "outDir": "../../lib/router/",
     "rootDir": ".",
     "paths": {
-      "@elumian/controller": ["../controller"],
-      "@elumian/controller/*": ["../controller/*"],
+      "@elumian/server": ["../server"],
+      "@elumian/server/*": ["../server/"],
       "@elumian/middelware": ["../middelware"],
       "@elumian/middelware/*": ["../middelware/*"]
     }
@@ -13,7 +13,7 @@
   "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts"],
   "references": [
     {
-      "path": "../controller/tsconfig.build.json"
+      "path": "../server/tsconfig.build.json"
     },
     {
       "path": "../middelware/tsconfig.build.json"
