@@ -13,8 +13,9 @@ export interface Message {
   array?: string;
   email?: string;
 }
-
-type validationsOptionsFields = keyof typeof errorsTypes;
+type BaseValidations = keyof typeof errorsTypes;
+type MinMaxValidations = `min:${number}` | `max:${number}`;
+type validationsOptionsFields = BaseValidations | MinMaxValidations;
 
 export type validationsOptions = Record<
   string,
