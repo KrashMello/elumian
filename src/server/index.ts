@@ -1,81 +1,68 @@
-import express from "express";
+import express, { Express } from "express";
 import os from "os";
-import { createServer } from "http";
-import { Server } from "socket.io";
-import cors from "cors";
-import { Modules } from "..";
+import http from "http";
+import { Server, Socket } from "socket.io";
+import cors, { CorsOptions } from "cors";
+import { loadServices } from "..";
 import { router } from "../router/index";
+import { ServerConfig } from "./type";
 
-const server = async (config: {
-  controllers: any[];
-  services: any[];
-  whiteList?: string[];
-  port?: number;
-  viewsDir?: string;
-}) => {
-  Modules(config.services);
-  const app = express();
+const server = (config: ServerConfig): void => {
+  loadServices(config.services);
+  const app: Express = express();
   app.use(express.json());
   config.port = config.port ?? 5000;
-  config.viewsDir = config.viewsDir ?? "src/views";
-  // Utilice el CORS para permitir que el CORS sea habilitado
-  if (
-    config.whiteList &&
-    config.whiteList.length > 0 &&
-    Array.isArray(config.whiteList)
-  )
-    app.use(
-      cors({
-        origin: function (origin: string | undefined, callback) {
-          console.log(origin);
-          if (
-            typeof origin === "string" &&
-            config.whiteList.includes(origin) &&
-            origin !== undefined
-          ) {
-            callback(null, true);
-          } else {
-            callback(new Error("Not allowed by CORS"));
-          }
-        },
-      }),
-    );
-  const { networkInterfaces } = os;
-  const nets = networkInterfaces();
-  const results = Object.create(null); // Or just '{}', an empty object
-  let IPV4 = "";
 
-  for (const name of Object.keys(nets)) {
-    const auxNets = nets[name];
-    // Esta función añadirá todas las direcciones de las auxNets a los resultados.
-    if (auxNets != null)
-      for (const net of auxNets) {
-        // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
-        // 'IPv4' is in Node <= 17, from 18 it's a number 4 or 6
-        const familyV4Value = typeof net.family === "string" ? "IPv4" : 4;
-        // Añadir la dirección IPV4 a los resultados
-        if (net.family === familyV4Value && !net.internal) {
-          const auxResult = results[name];
-          // Elimine todos los resultados del mapa de resultados.
-          if (auxResult == null) {
-            results[name] = [];
-          }
-          IPV4 = net.address;
-          results[name].push(net.address);
-        }
+  const corsOptions: CorsOptions = {
+    origin: (origin, callback) => {
+      if (!origin || (config.whiteList && config.whiteList.includes(origin))) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
       }
+    },
+  };
+
+  if (config.whiteList && config.whiteList.length > 0) {
+    app.use(cors(corsOptions));
   }
 
-  const httpServer = createServer(app);
+  const httpServer: http.Server = http.createServer(app);
+  const io: Server = new Server(httpServer);
+  router(config.controllers, app, io);
 
-  const io = new Server(httpServer);
-
-  await router(config.controllers, app, io);
   httpServer.listen(config.port, () => {
+    const IPV4: string = getIPV4();
     console.log(
       `Network: http://${IPV4}:${config.port} \nlocal: http://localhost:${config.port}`,
     );
   });
 };
+
+export function getIPV4(): string {
+  const { networkInterfaces } = os;
+  const nets = networkInterfaces();
+  let IPV4: string = "127.0.0.1";
+
+  for (const name of Object.keys(nets)) {
+    const auxNets: (os.NetworkInterfaceInfo | null)[] | undefined = nets[name];
+    if (auxNets) {
+      for (const net of auxNets) {
+        const familyV4Value: string | number =
+          typeof net.family === "string" ? "IPv4" : 4;
+        if (
+          net.family === familyV4Value &&
+          !net.internal &&
+          typeof net.address === "string"
+        ) {
+          IPV4 = net.address;
+          break;
+        }
+      }
+    }
+  }
+
+  return IPV4;
+}
 
 export default server;
