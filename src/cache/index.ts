@@ -1,6 +1,6 @@
-import { Encoder } from "../coder";
 import crypto from "crypto";
 import { type cacheData, type cacheLists } from "./type";
+import { Elumian } from "..";
 
 const secondsToMidnight = (n: Date): number => {
   return (
@@ -10,50 +10,57 @@ const secondsToMidnight = (n: Date): number => {
   );
 };
 
-export const cacheList: cacheLists = { Auth: [] };
-const encoder = new Encoder();
+const list: cacheLists = { Auth: [] };
+
 let expireTime: number = 1 * 1000 * 60 * 60;
 
-export function setConfig(expireT: number): void {
+function setConfig(expireT: number): void {
   expireTime = expireT * 1000 * 60 * 60;
 }
 
-export function singCacheData(key: string, data: object): cacheData {
-  const time = Math.floor(Math.random() * 10) + 1;
-  const encryptedData: cacheData = {
+function singCacheData(data: {
+  key: string;
+  data: any;
+  encrypted?: boolean;
+  expire?: boolean;
+}): cacheData {
+  const MAX_RANDOM_TIME = 4;
+  const MIN_RANDOM_TIME = 1;
+  const time = Math.floor(Math.random() * MAX_RANDOM_TIME) + MIN_RANDOM_TIME;
+  const returnData: cacheData = {
     id: crypto.randomUUID(),
-    data: encoder.hardEncryptor(data, time),
-    expireTime: new Date(
-      new Date().getTime() + secondsToMidnight(new Date()) * expireTime,
-    ),
+    data: data.data,
   };
+  if (data.encrypted) {
+    returnData.data = Elumian.crypto.hardEncrypt(data.data, time);
+  }
+  if (data.expire) {
+    const expirationDuration = secondsToMidnight(new Date()) * expireTime;
+    returnData.expireTime = new Date(Date.now() + expirationDuration);
+  }
 
-  if (cacheList[key] == null) cacheList[key] = [];
+  if (!Elumian.cache.list[data.key]) Elumian.cachelist[data.key] = [];
 
-  cacheList[key]?.push(encryptedData);
+  Elumian.cache.list[data.key]?.push(returnData);
 
-  setTimeout(() => {
-    cacheList[key]?.forEach((v: cacheData, i: number) => {
-      if (v.id === encryptedData.id) {
-        cacheList[key] = cacheList[key]?.filter(
-          (_, k: number) => k !== i,
-        ) as cacheData[];
-      }
-    });
-  }, expireTime);
-
-  return encryptedData;
+  return returnData;
 }
 
-export function getCacheDataById(key: string, id: string): cacheData | string {
-  const filterById = cacheList[key]?.filter((v: cacheData) => v.id === id)[0]
-    ?.data;
-  if (!!filterById) return filterById;
-  else return "dont exists data in cache";
+function getCacheDataById(key: string, id: string): cacheData | string {
+  const cacheList = Elumian.cache.list[key];
+  const foundItem = cacheList?.find((item: cacheData) => item.id === id);
+  return foundItem ? foundItem.data : null;
 }
 
-export function verifyId(key: string, id: string): boolean {
-  if (cacheList[key]?.filter((v: cacheData) => v.id === id)[0] != null)
-    return true;
-  else return false;
+function verifyId(key: string, id: string): boolean {
+  const cacheList = Elumian.cache.list[key];
+  return cacheList?.some((item: cacheData) => item.id === id) ?? false;
 }
+
+export default {
+  verifyId,
+  list,
+  getCacheDataById,
+  setConfig,
+  singCacheData,
+};

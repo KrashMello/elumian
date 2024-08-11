@@ -4,14 +4,14 @@
     "outDir": "../../lib/cache/",
     "rootDir": ".",
     "paths": {
-      "@elumian/encoder": ["../coder"],
-      "@elumian/encoder/*": ["../coder/*"]
+      "@elumian/crypto": ["../crypto"],
+      "@elumian/crypto/*": ["../crypto/*"]
     }
   },
   "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts"],
   "references": [
     {
-      "path": "../coder/tsconfig.build.json"
+      "path": "../crypto/tsconfig.build.json"
     }
   ]
 }
