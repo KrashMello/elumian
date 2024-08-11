@@ -1,5 +1,4 @@
-import type { SRouter, IRouter } from "../type";
-import verifyToken from "../middelware";
+import type { SRouter, IRouter, tGuard } from "../type";
 import type { NextFunction, Request, Response } from "express";
 import "reflect-metadata";
 import { getIPV4 } from "@elumian/server";
@@ -25,16 +24,7 @@ const routeInfo: RouteInfo[] = [];
 const socketInfo: SocketInfo[] = [];
 const socketRoutes: SocketRoute[] = [];
 
-export function router(
-  controllers: any[],
-  app: any,
-  io: any,
-  Middleware: (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => Response = verifyToken,
-): void {
+export function router(controllers: any[], app: any, io: any): void {
   controllers.forEach((Controller: any) => {
     const instance = new Controller();
     const prefix = Reflect.getMetadata("prefix", Controller);
@@ -42,14 +32,7 @@ export function router(
     const routesSocket: SRouter[] =
       Reflect.getMetadata("routesSocket", Controller) || [];
 
-    registerHttpRoutes(
-      routes,
-      prefix,
-      instance,
-      app,
-      Middleware,
-      Controller.name,
-    );
+    registerHttpRoutes(routes, prefix, instance, app, Controller.name);
     registerSocketRoutes(routesSocket, prefix, instance, Controller.name);
   });
 
@@ -74,24 +57,22 @@ function registerHttpRoutes(
   prefix: string,
   instance: any,
   app: any,
-  Middleware: (req: Request, res: Response, next: NextFunction) => Response,
   controllerName: string,
 ) {
-  routes.forEach(({ method, path, withMiddelware, handlerName, guard }) => {
+  routes.forEach(({ method, path, isProtected, handlerName, guard }) => {
     const routePath = `${prefix}${path}`;
-    const middlewares = [Middleware];
+    let middlewares = [];
 
     if (guard) {
-      withMiddelware = true;
-      middlewares.push(guard);
+      middlewares = [...guard];
     }
 
     app[method](routePath, ...middlewares, instance[handlerName]);
 
     routeInfo.push({
       api: `${method.toUpperCase()} http://${IPV4}:${process.env.SERVER_PORT ?? DEFAULT_PORT}${routePath}`,
-      handler: `${controllerName}.${handlerName}`,
-      protected: withMiddelware,
+      handler: `${controllerName}@${handlerName}`,
+      protected: isProtected,
     });
   });
 }

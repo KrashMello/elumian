@@ -5,18 +5,13 @@
     "rootDir": ".",
     "paths": {
       "@elumian/server": ["../server"],
-      "@elumian/server/*": ["../server/"],
-      "@elumian/middelware": ["../middelware"],
-      "@elumian/middelware/*": ["../middelware/*"]
+      "@elumian/server/*": ["../server/"]
     }
   },
   "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts"],
   "references": [
     {
       "path": "../server/tsconfig.build.json"
-    },
-    {
-      "path": "../middelware/tsconfig.build.json"
     }
   ]
 }
