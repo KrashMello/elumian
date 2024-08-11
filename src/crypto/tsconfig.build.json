@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.build.json",
+  "compilerOptions": {
+    "outDir": "../../lib/encoder/",
+    "rootDir": ".",
+    "paths": {
+      "@elumian/decorators": ["../decorators"],
+      "@elumian/decorators/*": ["../decorators/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts"],
+  "references": [
+    {
+      "path": "../decorators/tsconfig.build.json"
+    }
+  ]
+}
