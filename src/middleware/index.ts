@@ -1,5 +1,5 @@
 import { type NextFunction, type Response, type Request } from "express";
-import { verifyId } from "../cache";
+import { Elumian } from "..";
 
 function verifyToken(req: Request, res: Response, next: NextFunction): any {
   const id = req.header("x-access-id");
@@ -10,7 +10,7 @@ function verifyToken(req: Request, res: Response, next: NextFunction): any {
       message: "No token provided!",
     });
   }
-  if (verifyId("Auth", id) === false)
+  if (Elumian.cache.verifyId("Auth", id) === false)
     return res.status(401).json({
       error: "warning",
       message: "Unauthorized!",
