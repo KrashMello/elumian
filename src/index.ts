@@ -1,8 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import "reflect-metadata";
+import Cache from "./cache";
+import { Crypto } from "./crypto";
 
 export const Elumian: Record<string, any> = {
   prisma: new PrismaClient(),
+  cache: Cache,
+  crypto: new Crypto(),
 };
 
 export function loadServices(services: any[]) {
