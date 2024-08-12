@@ -1,41 +1,37 @@
 {
   "compilerOptions": {
-    "target": "ES2021" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
-    "module": "Node16" /* Specify what module code is generated. */,
-    "moduleResolution": "NodeNext" /* Specify how TypeScript looks up a file from a given module specifier. */,
-    "baseUrl": "./",
+    "module": "commonjs",
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "removeComments": true,
+    "noLib": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "useUnknownInCatchVariables": false,
+    "target": "ES2021",
+    "sourceMap": true,
+    "allowJs": false,
+    "outDir": "lib",
+    "baseUrl": ".",
     "paths": {
       "@elumian": ["src"],
       "@elumian/*": ["src/*"],
-      "@elumian/services": ["src/services"],
-      "@elumian/services/*": ["src/services/*"],
       "@elumian/decorators": ["src/decorators"],
       "@elumian/decorators/*": ["src/decorators/*"],
-      "@elumian/controller": ["src/controller"],
-      "@elumian/controller/*": ["src/controller/*"],
-      "@elumian/encoder": ["src/coder"],
-      "@elumian/encoder/*": ["src/coder/*"],
+      "@elumian/crypto": ["src/crypto"],
+      "@elumian/crypto/*": ["src/crypto/*"],
       "@elumian/cache": ["src/cache"],
       "@elumian/cache/*": ["src/cache/*"],
       "@elumian/middelware": ["src/middelware"],
       "@elumian/middelware/*": ["src/middelware/*"],
-      "@elumian/request": ["src/request"],
-      "@elumian/request/*": ["src/request/*"],
       "@elumian/server": ["src/server"],
-      "@elumian/server/*": ["src/server/*"],
-      "@elumian/router": ["src/router"],
-      "@elumian/router/*": ["src/router/*"]
+      "@elumian/server/*": ["src/server/*"]
     },
-    "types": ["./src/type.d.ts", "node"],
-    "allowJs": false /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */,
-    "declaration": true /* Generate .d.ts files from TypeScript and JavaScript files in your project. */,
-    "experimentalDecorators": true /* Enable experimental support for TC39 stage 2 draft decorators. */,
-    "emitDecoratorMetadata": true,
-    "outDir": "./lib" /* Specify an output folder for all emitted files. */
+    "types": ["./src/type.d.ts", "node"]
   },
-  "include": ["./src/**/*", "./example/**/*"],
-  // "exclude": ["node_modules", "lib", "example"], //production
-  "exclude": ["node_modules", "lib"], // development
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules", "lib", "example", "**/**.test.ts"], //production
+  // "exclude": ["node_modules", "lib"], // development
   "ts-node": {
     "require": ["tsconfig-paths/register"]
   }

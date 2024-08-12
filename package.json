@@ -4,6 +4,7 @@
   "description": "Elumian is a framework for back end developers to deploy an api quickly and securely.",
   "main": "lib/*",
   "homepage": "https://github.com/KrashMello/elumian",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/KrashMello/elumian"
