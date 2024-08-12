@@ -1,8 +1,4 @@
-import {
-  type IsAlphanumericSimbolsOptions,
-  type IsAlphaOptions,
-  type Locale,
-} from "../type";
+import { type IsAlphaOptions, type Locale } from "../type";
 
 const alpha = {
   "es-ES": /^[a-zA-Z-.\s&,_#!*/]+$/i,
@@ -43,7 +39,7 @@ export function isAlphaSimbols(
 export function isAlphaNumericSimbols(
   _str: string,
   locale: Locale = "es-ES",
-  options: IsAlphanumericSimbolsOptions = {},
+  options: any = {},
 ): any {
   let str = _str;
   const ignore = options.ignore;

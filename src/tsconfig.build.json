@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "composite": true,
-    "module": "NodeNext",
+    "module": "CommonJS",
     "declaration": true,
     "noImplicitAny": false,
     "skipLibCheck": true,

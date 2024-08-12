@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 
-type Methods = "get" | "post" | "delete" | "path" | "options" | "put";
-type MethodsSocket = "on" | "emit";
+export type Methods = "get" | "post" | "delete" | "path" | "options" | "put";
+export type MethodsSocket = "on" | "emit";
 
-type tGuard = (req: Request, res: Response, next: NextFunction) => any;
+export type tGuard = (req: Request, res: Response, next: NextFunction) => any;
 
-interface IRouter {
+export interface IRouter {
   method: Methods;
   path: string;
   isProtected: boolean;
@@ -13,25 +13,11 @@ interface IRouter {
   guard?: tGuard[];
 }
 
-interface SRouter {
+export interface SRouter {
   method: MethodsSocket;
   pathName: string;
   handlerName: string;
 }
-interface ControllerType {
+export interface ControllerType {
   functionController;
 }
-
-type functionController = Record<
-  function,
-  (req: Request, resp: Response) => any
->;
-
-module.exports = {
-  Methods,
-  MethodsSocket,
-  Guard,
-  IRouter,
-  SRouter,
-  ControllerType,
-};

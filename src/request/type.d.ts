@@ -1,3 +1,4 @@
+import { AlphaLocale } from "validator";
 import { errorsTypes } from ".";
 
 export interface Message {
@@ -33,8 +34,6 @@ export type returnCompareValue = true | string | Record<string, string[]>;
 export interface IsAlphaSimbolsOptions {
   ignore?: string;
 }
-
-export type IsAlphanumericSimbolsOptions = pick<IsAlphaSimbols>;
 
 export type Locale =
   | "en-US"
@@ -189,8 +188,4 @@ export interface isBooleansOptions {
 export interface ResponseValidate {
   status: number;
   message?: string;
-}
-
-export interface RequestJWT extends Request {
-  userId: string | JwtPayload;
 }

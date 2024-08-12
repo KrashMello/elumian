@@ -1,7 +1,7 @@
-import type { SRouter, IRouter, tGuard } from "../type";
+import type { SRouter, IRouter, tGuard } from "../../type";
 import type { NextFunction, Request, Response } from "express";
 import "reflect-metadata";
-import { getIPV4 } from "@elumian/server";
+import { getIPV4 } from "..";
 
 const IPV4 = getIPV4();
 const DEFAULT_PORT = process.env.PORT ?? 5000;

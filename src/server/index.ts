@@ -1,10 +1,11 @@
-import express, { Express } from "express";
-import os from "os";
-import http from "http";
+import * as express from "express";
+import type { Express } from "express";
+import * as os from "os";
+import * as http from "http";
 import { Server, Socket } from "socket.io";
 import cors, { CorsOptions } from "cors";
 import { loadServices } from "..";
-import { router } from "../router/index";
+import { router } from "./router/index";
 import { ServerConfig } from "./type";
 
 const server = (config: ServerConfig): void => {

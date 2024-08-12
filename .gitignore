@@ -8,6 +8,10 @@ dist
 
 .vscode
 
+lib/
+
+example/
+
 yarn-error.log
 
 yarn.lock

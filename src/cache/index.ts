@@ -1,4 +1,4 @@
-import crypto from "crypto";
+import * as crypto from "crypto";
 import { type cacheData, type cacheLists } from "./type";
 import { Elumian } from "..";
 

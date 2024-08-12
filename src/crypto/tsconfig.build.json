@@ -1,7 +1,7 @@
 {
   "extends": "../tsconfig.build.json",
   "compilerOptions": {
-    "outDir": "../../lib/encoder/",
+    "outDir": "../../lib/crypto/",
     "rootDir": ".",
     "paths": {
       "@elumian/decorators": ["../decorators"],

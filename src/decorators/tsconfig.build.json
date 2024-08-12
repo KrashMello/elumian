@@ -4,10 +4,6 @@
     "outDir": "../../lib/decorators/",
     "rootDir": ".",
     "paths": {
-      "@elumian": ["../"],
-      "@elumian/*": ["../*"],
-      "@elumian/request": ["../request"],
-      "@elumian/request/*": ["../request/*"],
       "@elumian/middleware": ["../middleware"],
       "@elumian/middleware/*": ["../middleware/*"]
     }
@@ -15,13 +11,7 @@
   "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts"],
   "references": [
     {
-      "path": "../request/tsconfig.build.json"
-    },
-    {
       "path": "../middleware/tsconfig.build.json"
-    },
-    {
-      "path": "../tsconfig.build.json"
     }
   ]
 }
