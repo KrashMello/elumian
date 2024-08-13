@@ -1,9 +1,20 @@
-import type { SRouter, IRouter } from "@elumian/core/decorators/type";
+import type { SRouter, IRouter } from "@elumian/core/decorators";
 import type { NextFunction, Request, Response } from "express";
 import "reflect-metadata";
-import { getIPV4 } from "..";
-import { RouteInfo, SocketInfo, SocketRoute } from "./type";
+import { getIPV4 } from "../server";
+export interface RouteInfo {
+  api: string;
+  handler: string;
+  protected: boolean;
+}
 
+export interface SocketRoute {
+  method: string;
+  path: string;
+  functionSocket: (io: any, socket: any) => void;
+}
+
+export type SocketInfo = { method: string; path: string; handlerName: string };
 const IPV4 = getIPV4();
 const DEFAULT_PORT = process.env.PORT ?? 5000;
 

@@ -1,9 +1,30 @@
-import { type SRouter, type IRouter, type tGuard } from "./type";
-import { validationsOptions, validationsMessage } from "../request/type";
-import { type Response, type Request, type NextFunction } from "express";
+import type { validationsOptions, validationsMessage } from "../request";
+import type { Response, Request, NextFunction } from "express";
 import { compareData } from "../request";
 import "reflect-metadata";
 import { Elumian } from "..";
+
+export type Methods = "get" | "post" | "delete" | "path" | "options" | "put";
+export type MethodsSocket = "on" | "emit";
+
+export type tGuard = (req: Request, res: Response, next: NextFunction) => any;
+
+export interface IRouter {
+  method: Methods;
+  path: string;
+  isProtected: boolean;
+  handlerName: string;
+  guard?: tGuard[];
+}
+
+export interface SRouter {
+  method: MethodsSocket;
+  pathName: string;
+  handlerName: string;
+}
+export interface ControllerType {
+  functionController;
+}
 
 export const Controller = (prefix: string): ClassDecorator => {
   return (target) => {
