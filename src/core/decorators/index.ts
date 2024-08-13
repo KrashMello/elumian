@@ -1,14 +1,12 @@
+import { type SRouter, type IRouter, type tGuard } from "./type";
 import {
-  type SRouter,
-  type IRouter,
   validationsOptions,
   validationsMessage,
-  type tGuard,
-} from "../type";
+} from "@elumian/server/request/type";
 import { type Response, type Request, type NextFunction } from "express";
-import { compareData } from "../request";
+import { compareData } from "@elumian/server/request";
 import "reflect-metadata";
-import verifyToken from "@elumian/middleware";
+import { Elumian } from "..";
 
 export const Controller = (prefix: string): ClassDecorator => {
   return (target) => {
@@ -234,6 +232,22 @@ export const Guard = (Iguard: tGuard): MethodDecorator => {
   };
 };
 
+function verifyToken(req: Request, res: Response, next: NextFunction): any {
+  const id = req.header("x-access-id");
+
+  if (id == null) {
+    return res.status(403).send({
+      error: "warning",
+      message: "No token provided!",
+    });
+  }
+  if (Elumian.cache.verifyId("Auth", id) === false)
+    return res.status(401).json({
+      error: "warning",
+      message: "Unauthorized!",
+    });
+  next();
+}
 export const ProtecteGuard = (middleware?: tGuard): MethodDecorator => {
   return (target, propertyKey) => {
     if (!Reflect.hasMetadata("routes", target.constructor)) {
@@ -312,9 +326,9 @@ export const DataEntryGuard = (data: {
   };
 };
 
-export function Service<T extends { new (...args: any[]): {} }>(
+export const Service = <T extends { new (...args: any[]): {} }>(
   constructor: T,
-) {
+) => {
   return class extends constructor {
     constructor(...args: any[]) {
       super(...args);
@@ -325,13 +339,13 @@ export function Service<T extends { new (...args: any[]): {} }>(
       return Reflect.getMetadata("service", constructor);
     }
   };
-}
+};
 
-export function CatchErrors(
+export const CatchErrors = (
   target: any,
   propertyKey: string,
   descriptor: PropertyDescriptor,
-) {
+) => {
   const originalMethod = descriptor.value;
 
   descriptor.value = async function (...args: any[]) {
@@ -351,4 +365,4 @@ export function CatchErrors(
   };
 
   return descriptor;
-}
+};

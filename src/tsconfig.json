@@ -2,22 +2,10 @@
   "files": [],
   "references": [
     {
-      "path": "./decorators/tsconfig.build.json"
-    },
-    {
-      "path": "./request/tsconfig.build.json"
-    },
-    {
       "path": "./server/tsconfig.build.json"
     },
     {
-      "path": "./cache/tsconfig.build.json"
-    },
-    {
-      "path": "./crypto/tsconfig.build.json"
-    },
-    {
-      "path": "./middleware/tsconfig.build.json"
+      "path": "./core/tsconfig.build.json"
     }
   ]
 }

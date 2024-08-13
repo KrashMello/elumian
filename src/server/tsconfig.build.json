@@ -4,19 +4,14 @@
     "outDir": "../../lib/server/",
     "rootDir": ".",
     "paths": {
-      "@elumian": [".."],
-      "@elumian/*": ["../*"],
-      "@elumian/router": ["../router/"],
-      "@elumian/router/*": ["../router/*"]
+      "@elumian/core": ["../core"],
+      "@elumian/core/*": ["../core/*"]
     }
   },
   "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts"],
   "references": [
     {
-      "path": "../router/tsconfig.build.json"
-    },
-    {
-      "path": "../tsconfig.build.json"
+      "path": "../core"
     }
   ]
 }

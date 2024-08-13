@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.build.json",
+  "compilerOptions": {
+    "outDir": "../../lib/core/",
+    "rootDir": ".",
+    "paths": {
+      "@elumian/server": ["../server"],
+      "@elumian/server/*": ["../server/*"],
+      "@elumian/server/request": ["../server/request"],
+      "@elumian/server/request/*": ["../server/request/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts"],
+  "references": []
+}

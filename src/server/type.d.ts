@@ -4,3 +4,5 @@ export interface ServerConfig {
   whiteList?: string[];
   port?: number;
 }
+export * from "./request/type";
+export * from "./router/type";

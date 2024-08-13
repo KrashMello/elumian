@@ -1,4 +1,4 @@
-import { Service } from "@elumian/decorators";
+import { Service } from "../decorators";
 import * as crypto from "crypto";
 
 @Service
