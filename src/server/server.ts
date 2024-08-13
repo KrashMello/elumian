@@ -15,7 +15,7 @@ function loadServices(services: any[]) {
     if (!Elumian[prefix]) Elumian[prefix] = service;
   });
 }
-const server = (config: ServerConfig): void => {
+export const server = (config: ServerConfig): void => {
   loadServices(config.services);
   const app: Express = express();
   app.use(express.json());

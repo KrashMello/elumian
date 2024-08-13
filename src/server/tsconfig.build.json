@@ -11,7 +11,7 @@
   "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts"],
   "references": [
     {
-      "path": "../core"
+      "path": "../core/tsconfig.build.json"
     }
   ]
 }

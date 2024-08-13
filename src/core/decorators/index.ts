@@ -1,10 +1,7 @@
 import { type SRouter, type IRouter, type tGuard } from "./type";
-import {
-  validationsOptions,
-  validationsMessage,
-} from "@elumian/server/request/type";
+import { validationsOptions, validationsMessage } from "../request/type";
 import { type Response, type Request, type NextFunction } from "express";
-import { compareData } from "@elumian/server/request";
+import { compareData } from "../request";
 import "reflect-metadata";
 import { Elumian } from "..";
 

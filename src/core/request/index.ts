@@ -1,12 +1,20 @@
-import { isAlpha, isAlphaSimbols, isAlphaNumericSimbols } from "./service";
+import { isAlpha, isAlphaSimbols, isAlphaNumericSimbols } from "./validations";
 import { isAlphanumeric } from "validator";
 import { Record } from "@prisma/client/runtime/library";
 import isEmail from "validator/lib/isEmail";
-import {
-  validationsMessage,
-  validationsOptions,
-  validationsOptionsFields,
-} from "./type";
+
+type BaseValidations = keyof typeof errorsTypes;
+type MinMaxValidations = `min:${number}` | `max:${number}`;
+type validationsOptionsFields = BaseValidations | MinMaxValidations;
+
+export type validationsOptions = Record<
+  string,
+  Array<validationsOptionsFields>
+>;
+
+export type validationsMessage = Partial<
+  Record<validationsOptionsFields, string>
+>;
 
 export const errorsTypes = {
   min: {
@@ -64,7 +72,7 @@ const validateField = (
         ];
         return errorsTypes[type].validate(data[key], Number(limit))
           ? null
-          : (message?.[v] ?? errorsTypes[type].message + Number(limit));
+          : message?.[v] ?? errorsTypes[type].message + Number(limit);
       }
       if (!errorsTypes[v]) {
         return message?.["invalidField"] ?? "Field not valid";
@@ -75,7 +83,7 @@ const validateField = (
 
       return errorsTypes[v].validate(data[key])
         ? null
-        : (message?.[v] ?? errorsTypes[v].message);
+        : message?.[v] ?? errorsTypes[v].message;
     })
     .filter((z: null | string) => z);
 };
@@ -125,6 +133,5 @@ export const compareData = (
         .filter((k) => k),
     ),
   };
-  console.info(errors);
   return Object.keys(errors).length > 0 ? errors : true;
 };

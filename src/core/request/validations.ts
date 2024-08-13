@@ -1,4 +1,4 @@
-import { type IsAlphaOptions, type Locale } from "../type";
+import { type IsAlphaOptions, type Locale } from "./type";
 
 const alpha = {
   "es-ES": /^[a-zA-Z-.\s&,_#!*/]+$/i,
