@@ -4,7 +4,7 @@ import * as os from "os";
 import * as http from "http";
 import { Server, Socket } from "socket.io";
 import cors, { CorsOptions } from "cors";
-import { Elumian } from "@elumian/core";
+import { Elumian } from "elumian/core";
 import { router } from "./router/index";
 import { ServerConfig } from "./type";
 

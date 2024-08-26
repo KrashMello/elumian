@@ -1,7 +1,8 @@
 import { isAlpha, isAlphaSimbols, isAlphaNumericSimbols } from "./validations";
-import { isAlphanumeric } from "validator";
+import { isAlphanumeric, isDate, isNumeric } from "validator";
 import { Record } from "@prisma/client/runtime/library";
 import isEmail from "validator/lib/isEmail";
+import isBoolean from "validator/lib/isBoolean";
 
 type BaseValidations = keyof typeof errorsTypes;
 type MinMaxValidations = `min:${number}` | `max:${number}`;
@@ -36,11 +37,16 @@ export const errorsTypes = {
     message: "Characters must be a-zA-Z -.&,_#!*/",
   },
   alphaNumeric: {
-    validate: (value: string) => isAlphanumeric(value),
+    validate: (value: string) =>
+      isAlphanumeric(value, "es-ES", { ignore: " " }),
     message: "Characters must be a-zA-Z1-9",
   },
+  numeric: {
+    validate: (value: string) => isNumeric(value),
+    message: "Please enter a valid number (e.g., 1234)",
+  },
   alphaNumericSimbols: {
-    validate: (value: string) => isAlphaNumericSimbols(value),
+    validate: (value: string) => isAlphaNumericSimbols(value, "es-ES"),
     message: "Characters must be a-zA-Z1-9  -.&,_#*/",
   },
   email: {
@@ -48,8 +54,13 @@ export const errorsTypes = {
     message: "Please enter a valid email address (e.g., foo@gmail.com)",
   },
   boolean: {
-    validate: (value: any) => typeof value === "boolean",
+    validate: (value: any) => isBoolean(value),
     message: "Please enter a boolean",
+  },
+  date: {
+    validate: (value: string) =>
+      isDate(value, { format: "YYYY-MM-DD", strictMode: true }),
+    message: "Please enter a valid date (e.g., 2020-01-01)",
   },
   required: {
     validate: (value: string) => !!value,
@@ -72,7 +83,7 @@ const validateField = (
         ];
         return errorsTypes[type].validate(data[key], Number(limit))
           ? null
-          : message?.[v] ?? errorsTypes[type].message + Number(limit);
+          : (message?.[v] ?? errorsTypes[type].message + Number(limit));
       }
       if (!errorsTypes[v]) {
         return message?.["invalidField"] ?? "Field not valid";
@@ -83,7 +94,7 @@ const validateField = (
 
       return errorsTypes[v].validate(data[key])
         ? null
-        : message?.[v] ?? errorsTypes[v].message;
+        : (message?.[v] ?? errorsTypes[v].message);
     })
     .filter((z: null | string) => z);
 };

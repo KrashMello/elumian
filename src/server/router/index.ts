@@ -1,4 +1,4 @@
-import type { SRouter, IRouter } from "@elumian/core/decorators";
+import type { SRouter, IRouter } from "elumian/core/decorators";
 import type { NextFunction, Request, Response } from "express";
 import "reflect-metadata";
 import { getIPV4 } from "../server";

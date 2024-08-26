@@ -1,10 +1,10 @@
 {
   "name": "elumian",
-  "version": "1.1.9",
-  "description": "Elumian is a framework for back end developers to deploy an api quickly and securely.",
+  "version": "2.0.0",
+  "description": "Elumian is a library for back end developers to deploy an api rest quickly and securely.",
   "main": "lib/*",
   "homepage": "https://github.com/KrashMello/elumian",
-  "type": "module",
+  "type": "commonjs",
   "repository": {
     "type": "git",
     "url": "https://github.com/KrashMello/elumian"
@@ -13,18 +13,18 @@
     "elumian",
     "elumian-ts",
     "lib",
-    "framework"
+    "rest",
+    "api rest"
   ],
-  "types": "lib/type.d.ts",
   "files": [
-    "/lib"
+    "lib/"
   ],
-  "author": "krashMello <joelenrikesoteldo@gmail.com> (https://krashmello.netlify.app/)",
+  "author": "krashMello <joelenrikesoteldo@gmail.com> (https://krashmello.vercel.app/)",
   "license": "MIT",
   "scripts": {
     "tsc": "tsc",
     "build": "tsc -b -v src",
-    "build:alias": "rm -rf ./lib && rm -f tsconfig.tsbuildinfo && bunx tsc && tsc-alias -p tsconfig.json",
+    "prebuild:prod": "tsc -b --clean src",
     "build:watch": "tsc -b -v src --watch",
     "start": "node dist/src/index.js",
     "start:example": "ts-node-dev --rs --watch --clear -r tsconfig-paths/register example/index.ts",

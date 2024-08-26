@@ -9,6 +9,5 @@
     {
       "path": "./tsconfig.build.json"
     }
-  ],
-  "strictNullChecks": false /* When type checking, take into account 'null' and 'undefined'. */
+  ]
 }

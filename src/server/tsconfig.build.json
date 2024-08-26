@@ -4,8 +4,8 @@
     "outDir": "../../lib/server/",
     "rootDir": ".",
     "paths": {
-      "@elumian/core": ["../core"],
-      "@elumian/core/*": ["../core/*"]
+      "elumian/core": ["../core"],
+      "elumian/core/*": ["../core/*"]
     }
   },
   "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts"],
