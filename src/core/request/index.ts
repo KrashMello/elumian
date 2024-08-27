@@ -1,5 +1,10 @@
-import { isAlpha, isAlphaSimbols, isAlphaNumericSimbols } from "./validations";
-import { isAlphanumeric, isDate, isNumeric } from "validator";
+import {
+  isAlpha,
+  isAlphaSimbols,
+  isDate,
+  isAlphaNumericSimbols,
+} from "./validations";
+import { isAlphanumeric, isNumeric } from "validator";
 import { Record } from "@prisma/client/runtime/library";
 import isEmail from "validator/lib/isEmail";
 import isBoolean from "validator/lib/isBoolean";
@@ -58,8 +63,7 @@ export const errorsTypes = {
     message: "Please enter a boolean",
   },
   date: {
-    validate: (value: string) =>
-      isDate(value, { format: "YYYY-MM-DD", strictMode: true }),
+    validate: (value: string) => isDate(value, "YYYY-MM-DD"),
     message: "Please enter a valid date (e.g., 2020-01-01)",
   },
   required: {
