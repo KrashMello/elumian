@@ -3,7 +3,8 @@ import type { Express } from "express";
 import * as os from "os";
 import * as http from "http";
 import { Server, Socket } from "socket.io";
-import cors, { CorsOptions } from "cors";
+import * as cors from "cors";
+import { type CorsOptions } from "cors";
 import { Elumian } from "elumian/core";
 import { router } from "./router/index";
 import { ServerConfig } from "./type";
@@ -21,17 +22,19 @@ export const server = (config: ServerConfig): void => {
   app.use(express.json());
   config.port = config.port ?? 5000;
 
-  const corsOptions: CorsOptions = {
-    origin: (origin, callback) => {
-      if (!origin || (config.whiteList && config.whiteList.includes(origin))) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-  };
-
   if (config.whiteList && config.whiteList.length > 0) {
+    const corsOptions: CorsOptions = {
+      origin: (origin, callback) => {
+        if (
+          !origin ||
+          (config.whiteList && config.whiteList.includes(origin))
+        ) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
+    };
     app.use(cors(corsOptions));
   }
 
