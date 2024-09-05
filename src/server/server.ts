@@ -23,18 +23,23 @@ export const server = (config: ServerConfig): void => {
   config.port = config.port ?? 5000;
 
   if (config.whiteList && config.whiteList.length > 0) {
-    const corsOptions: CorsOptions = {
-      origin: (origin, callback) => {
-        if (
-          !origin ||
-          (config.whiteList && config.whiteList.includes(origin))
-        ) {
-          callback(null, true);
-        } else {
-          callback(new Error("Not allowed by CORS"));
-        }
-      },
-    };
+    const corsOptions: CorsOptions =
+      typeof config.whiteList === "object"
+        ? {
+            origin: (origin, callback) => {
+              if (
+                !origin ||
+                (config.whiteList && config.whiteList.includes(origin))
+              ) {
+                callback(null, true);
+              } else {
+                callback(new Error("Not allowed by CORS"));
+              }
+            },
+          }
+        : {
+            origin: config.whiteList,
+          };
     app.use(cors(corsOptions));
   }
 
