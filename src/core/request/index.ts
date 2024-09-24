@@ -34,36 +34,38 @@ export const errorsTypes = {
     message: "Max characters length must be ",
   },
   alpha: {
-    validate: (value: string) => isAlpha(value, "es-ES"),
+    validate: (value: string) => (value ? isAlpha(value, "es-ES") : true),
     message: "Characters must be a-zA-Z",
   },
   alphaSimbol: {
-    validate: (value: string) => isAlphaSimbols(value, "es-ES"),
+    validate: (value: string) =>
+      value ? isAlphaSimbols(value ?? "", "es-ES") : true,
     message: "Characters must be a-zA-Z -.&,_#!*/",
   },
   alphaNumeric: {
     validate: (value: string) =>
-      isAlphanumeric(value, "es-ES", { ignore: " " }),
+      value ? isAlphanumeric(value, "es-ES", { ignore: " " }) : true,
     message: "Characters must be a-zA-Z1-9",
   },
   numeric: {
-    validate: (value: string) => isNumeric(value),
+    validate: (value: string) => (value ? isNumeric(value) : true),
     message: "Please enter a valid number (e.g., 1234)",
   },
   alphaNumericSimbols: {
-    validate: (value: string) => isAlphaNumericSimbols(value, "es-ES"),
+    validate: (value: string) =>
+      value ? isAlphaNumericSimbols(value, "es-ES") : true,
     message: "Characters must be a-zA-Z1-9  -.&,_#*/",
   },
   email: {
-    validate: (value: string) => isEmail(value),
+    validate: (value: string) => (value ? isEmail(value) : true),
     message: "Please enter a valid email address (e.g., foo@gmail.com)",
   },
   boolean: {
-    validate: (value: any) => isBoolean(value),
+    validate: (value: any) => (value ? isBoolean(value) : true),
     message: "Please enter a boolean",
   },
   date: {
-    validate: (value: string) => isDate(value, "YYYY-MM-DD"),
+    validate: (value: string) => (value ? isDate(value, "YYYY-MM-DD") : true),
     message: "Please enter a valid date (e.g., 2020-01-01)",
   },
   required: {
