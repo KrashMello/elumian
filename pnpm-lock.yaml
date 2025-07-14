@@ -68,7 +68,7 @@ importers:
         version: 2.8.17
       '@types/twig':
         specifier: ^1.12.16
-        version: 1.12.16
+        version: 1.12.17
       module-alias:
         specifier: ^2.2.2
         version: 2.2.3
@@ -485,8 +485,8 @@ packages:
   '@types/strip-json-comments@0.0.30':
     resolution: {integrity: sha512-7NQmHra/JILCd1QqpSzl8+mJRc8ZHz3uDm8YV1Ks9IhK0epEiTw8aIErbvH9PI+6XbqhyIQy3462nEsn7UVzjQ==}
 
-  '@types/twig@1.12.16':
-    resolution: {integrity: sha512-6kXSQwqxWxdHVITY6lur6pVpKbTk5D8R/ZUn2/7Y2AACKFlRqO4jbtHgWPDLe7JUc91sZQhkmopboYDABtZqlA==}
+  '@types/twig@1.12.17':
+    resolution: {integrity: sha512-Lxcjgzt4mlDrv1xp1EdoBLPTxpjLAt9vtN3/qoblC5D6hMCYgZJOQHfaT/0gwCcAZENnKQ7Sga28DSsckPWa0g==}
 
   '@types/validator@13.12.1':
     resolution: {integrity: sha512-w0URwf7BQb0rD/EuiG12KP0bailHKHP5YVviJG9zw3ykAokL0TuxU2TUqMB7EwZ59bDHYdeTIvjI5m0S7qHfOA==}
@@ -2796,7 +2796,7 @@ snapshots:
 
   '@types/strip-json-comments@0.0.30': {}
 
-  '@types/twig@1.12.16': {}
+  '@types/twig@1.12.17': {}
 
   '@types/validator@13.12.1': {}
 
