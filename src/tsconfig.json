@@ -1,8 +1,15 @@
 {
   "files": [],
+  "include": [
+    "./index.ts",
+    "./type.d.ts"
+  ],
+  "compilerOptions": {
+    "outDir": "../lib",
+  },
   "references": [
     {
-      "path": "./server/tsconfig.build.json"
+      "path": "./common/tsconfig.build.json"
     },
     {
       "path": "./core/tsconfig.build.json"

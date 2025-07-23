@@ -1,2 +1,2 @@
 export * from "./core/type";
-export * from "./server/type";
+export * from "./common/type";

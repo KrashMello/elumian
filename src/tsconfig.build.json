@@ -17,6 +17,8 @@
     "allowJs": false,
     "strict": true,
     "strictNullChecks": false,
-    "types": ["node"]
+    "types": [
+      "node"
+    ]
   }
 }
