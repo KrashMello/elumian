@@ -12,6 +12,7 @@ import { RouteInfo, type SocketInfo, SocketRoute } from "./type";
 import type { NextFunction, Request, Response } from "express";
 import { setMessages, validations } from "@elumian/common";
 import { HttpExceptions } from "@elumian/common";
+import { PrismaClient } from "@prisma/client";
 const DEFAULT_PORT = process.env.PORT ?? 5000;
 
 const socketInfo: SocketInfo[] = [];
@@ -70,6 +71,7 @@ const app: Express = express();
 const loadModules = (modules) => {
   const metadataControllers = [];
   let routesInfo = []
+  Elumian["prisma"] = new PrismaClient();
   for (let modul of modules) {
     const controllers = Reflect.getMetadata("controllers", modul)
     const middlewares = Reflect.getMetadata("middlewares", modul)
