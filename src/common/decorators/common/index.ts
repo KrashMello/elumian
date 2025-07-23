@@ -1,3 +1,4 @@
+import { moduleMetadata } from "./type";
 export const Middleware = (target) => {
   const descriptors = Object.getOwnPropertyDescriptors(target.prototype);
   if (descriptors.init)
@@ -13,7 +14,7 @@ const reflectorCreate = (key: string, value: any): MethodDecorator =>
     Reflect.defineMetadata(key, value, target);
     return target
   }
-export const Module = (metadata: { controllers: Array<any>, services: Array<any>, middlewares?: Array<any> }) => {
+export const Module = (metadata: moduleMetadata) => {
   let { controllers, services, middlewares } = metadata;
   middlewares = middlewares || [];
   return (target) => {

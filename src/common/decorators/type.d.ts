@@ -18,3 +18,4 @@ export interface SRouter {
 export interface ControllerType {
   functionController;
 }
+export * from "./common/type";
