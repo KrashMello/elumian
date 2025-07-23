@@ -1,134 +1,148 @@
-# Elumian
+# Documentación detallada de Elumian
 
-==================
+## Descripción general
 
-Elumian is a library for back end developers to deploy an api rest quickly and securely.
+**Elumian** es un framework modular diseñado específicamente para desarrolladores backend que necesitan desplegar APIs REST de forma rápida, eficiente y segura. Proporciona una estructura clara y herramientas integradas para la creación de módulos, gestión de servicios, validación de datos y manejo de excepciones HTTP, facilitando el desarrollo escalable y mantenible.
 
-# Installation and Usage
+## Instalación
 
-==================
+Puedes instalar Elumian en tu proyecto utilizando cualquiera de los gestores de paquetes más populares de JavaScript:
 
-Install the `Elumian` package:
+- Con **npm**:
 
 ```sh
 npm i Elumian
+```
+
+- Con **yarn**:
+
+```sh
 yarn add Elumian
 ```
 
-# Typescript
+- Con **pnpm**:
 
-## index.ts
-
-```typescript
-import modules from "./modules/index";
-import { server } from "elumian/server";
-const whiteList = ["http://localhost:3000"];
-server({
-  controllers: modules.controllers,
-  services: modules.services,
-  port: 5000,
-});
+```sh
+pnpm add Elumian
 ```
 
-## modules/index.ts
+## Uso con TypeScript
+
+Elumian está pensado para integrarse fácilmente con TypeScript, ofreciendo tipados claros y anotaciones que permiten un desarrollo más seguro y robusto.
+
+### Definición de Módulos
+
+Elumian utiliza decoradores para definir módulos que agrupan controladores, servicios y middlewares.
 
 ```typescript
-import { AuthController } from "../controllers/auth/auth.controller";
-import { Auth } from "../services/auth.service";
+import { Module } from "@elumian/common"
 
-export default {
-  controllers: [AuthController],
-  services: [Auth],
-};
+@Module({
+  controllers: [TestController],
+  services: [TestService],
+  middlewares: [GlobalMiddleware]
+})
+class TestModule { }
 ```
 
-## services/auth.service.ts
+- `controllers`: Lista de controladores que gestionan las rutas y peticiones.
+- `services`: Servicios que manejan la lógica de negocio.
+- `middlewares`: Middlewares globales para manejo transversal de peticiones.
+
+### Definición de Servicios
+
+Los servicios encapsulan la lógica reutilizable. Se definen también mediante decoradores.
 
 ```typescript
-import { Service } from "elumian/core/decorators";
-import { Elumian } from "elumian/core";
-import bcrypt from "bcrypt";
+import { Service } from "@elumian/common"
 
 @Service
-export class Auth {
-  async login(data: { username: string; password: string }) {
-    const sessionActive = Elumian.cache.list.Auth.map((v) => {
-      return Elumian.crypto.hardDecrypt(v.data).username;
-    }).filter((v) => v === data.username)[0];
-    if (sessionActive) {
-      return { type: "warning", message: "Ya hay una sesion activa" };
-    }
-    const userData = await Elumian.prisma.users.findUnique({
-      select: {
-        id: true,
-        username: true,
-        password: true,
-      },
-      where: {
-        username: data.username,
-      },
-    });
-    if (userData) {
-      const comparePassword = bcrypt.compareSync(
-        data.password,
-        userData.password,
-      );
+class TestService {
+  data = {
+    nombre: "asdf"
+  }
 
-      if (comparePassword) {
-        delete userData.password;
-
-        return Elumian.cache.singCacheData({
-          key: "Auth",
-          data: userData,
-          encrypted: true,
-          expire: true,
-        });
-      } else {
-        return { type: "warning", message: "Contraseña invalida" };
-      }
-    } else {
-      return { type: "warning", message: "nombre de usuario invalido" };
+  getData() {
+    return {
+      status: HttpStatus.ok,
+      message: this.data,
+      type: 'SUCCESS'
     }
   }
 }
 ```
 
-## controllers/auth/auth.controller.ts
+- El método `getData()` retorna un objeto con un estado HTTP, datos y un tipo de respuesta.
+
+### Creación de Controladores y Rutas
+
+Los controladores usan decoradores para definir rutas HTTP y validaciones sobre diferentes partes de la solicitud.
 
 ```typescript
-import {
-  Controller,
-  Post,
-  DataEntryGuard,
-  CatchErrors,
-} from "elumian/core/decorators";
-import { type Request, type Response } from "express";
-import { loginDataRequest } from "./auth.request";
-import { Elumian } from "elumian/core";
+import { ValidateQuery, ValidateParams, ValidateBody, Post, Get, Controller } from "@elumian/common"
+import { HttpExceptions, HttpStatus } from "@elumian/common"
+import { bodyDataValidate } from "./dataValidateSchemas/bodyData.schema"
 
-@Controller("/auth")
-export class AuthController {
-  @Post("/login")
-  @DataEntryGuard(loginDataRequest)
-  @CatchErrors
-  async login(req: Request, res: Response): Promise<any> {
-    const data = req.body;
-    res.json(await Elumian.Auth.login(data));
+@Controller("test")
+class TestController {
+  @Get("/")
+  getData(req, res) {
+    HttpExceptions(Elumian.TestService.getData())
+  }
+
+  @Post("/test/1")
+  @ValidateBody(bodyDataValidate)
+  @ValidateQuery(bodyDataValidate)
+  test1(req, res) {
+    HttpExceptions({
+      status: HttpStatus.ok,
+      message: { test: "test" },
+      type: 'SUCCESS'
+    })
+  }
+
+  @Post("/:id")
+  @ValidateParams(bodyDataValidate)
+  @ValidateBody(bodyDataValidate)
+  test2(req, res) {
+    HttpExceptions({
+      status: HttpStatus.ok,
+      message: { test: "test" },
+      type: 'SUCCESS'
+    })
   }
 }
 ```
 
-## controller/auth/auth.request.ts
+- `@Controller("test")`: Prefijo global para las rutas del controlador.
+- `@Get()`, `@Post()`: Definición de métodos HTTP.
+- `@ValidateBody`, `@ValidateQuery`, `@ValidateParams`: Validaciones aplicadas a diferentes partes de la solicitud basadas en esquemas.
+- `HttpExceptions`: Maneja respuestas estandarizadas y excepciones HTTP.
+
+### Definición de Esquemas de Validación
+
+Los esquemas de validación definen reglas para los datos recibidos en las peticiones, utilizando las opciones de validación propias de Elumian.
 
 ```typescript
-import { validationsOptions } from "elumian/core/request";
+import { validationsOptions } from "@elumian/type"
 
-const loginDataOptions: validationsOptions = {
-  username: ["alphaNumeric", "required"],
-  password: ["alphaNumericSimbols", "required"],
-};
-
-export const loginDataRequest = {
-  options: loginDataOptions,
-};
+export const bodyDataValidate: validationsOptions = {
+  fecha: ['required', 'date'],
+}
 ```
+
+- En este ejemplo, el campo `fecha` es obligatorio y debe cumplir con el formato fecha.
+
+## Inicialización y Arranque del Servidor
+
+Para iniciar tu servidor Elumian, configura los módulos que quieres cargar y define el puerto de escucha. Posteriormente, inicia el servidor.
+
+```typescript
+import { Server } from "elumian/core";
+
+Server.setConfig({ modules: [modulo1, modulo2], port: 5000 })
+Server.start()
+```
+
+- `modules`: Array con los módulos que contiene la aplicación.
+- `port`: Puerto en el que el servidor escuchará las peticiones entrantes.
