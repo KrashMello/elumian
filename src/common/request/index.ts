@@ -5,7 +5,6 @@ import {
   isAlphaNumericSimbols,
 } from "./validations";
 import { isAlphanumeric, isNumeric } from "validator";
-import { Record } from "@prisma/client/runtime/library";
 import isEmail from "validator/lib/isEmail";
 import isBoolean from "validator/lib/isBoolean";
 import { validationsMessage, validationsOptions, validationsOptionsFields } from "./type";
