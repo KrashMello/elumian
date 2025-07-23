@@ -14,25 +14,43 @@
     "outDir": "lib",
     "baseUrl": ".",
     "paths": {
-      "@elumian": ["src"],
-      "@elumian/*": ["src/*"],
-      "@elumian/decorators": ["src/decorators"],
-      "@elumian/decorators/*": ["src/decorators/*"],
-      "@elumian/crypto": ["src/crypto"],
-      "@elumian/crypto/*": ["src/crypto/*"],
-      "@elumian/cache": ["src/cache"],
-      "@elumian/cache/*": ["src/cache/*"],
-      "@elumian/middelware": ["src/middelware"],
-      "@elumian/middelware/*": ["src/middelware/*"],
-      "@elumian/server": ["src/server"],
-      "@elumian/server/*": ["src/server/*"]
+      "@elumian": [
+        "src"
+      ],
+      "@elumian/*": [
+        "src/*"
+      ],
+      "@elumian/core": [
+        "src/core"
+      ],
+      "@elumian/core/*": [
+        "src/core/*"
+      ],
+      "@elumian/common": [
+        "src/common"
+      ],
+      "@elumian/common/*": [
+        "src/common/*"
+      ],
     },
-    "types": ["./src/type.d.ts", "node"]
+    "types": [
+      "./src/type.d.ts",
+      "node"
+    ]
   },
-  "include": ["./src/**/*"],
-  "exclude": ["node_modules", "lib", "example", "**/**.test.ts"], //production
+  "include": [
+    "./src/**/*",
+  ],
+  "exclude": [
+    "node_modules",
+    "lib",
+    "example",
+    "**/**.test.ts"
+  ], //production
   // "exclude": ["node_modules", "lib"], // development
   "ts-node": {
-    "require": ["tsconfig-paths/register"]
+    "require": [
+      "tsconfig-paths/register"
+    ]
   }
 }
