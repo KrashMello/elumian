@@ -2,7 +2,7 @@
 import { Service, ValidateQuery, ValidateParams, ValidateBody, Middleware, Module, Post, Get, Public, Controller } from "@elumian/common"
 import { validationsOptions } from "@elumian/type"
 import { HttpExceptions, HttpStatus } from "@elumian/common"
-import { Elumian, server } from "@elumian/core"
+import { Elumian, Server } from "@elumian/core"
 
 const bodyDataValidate: validationsOptions = {
   fecha: ['required', 'date'],
@@ -71,5 +71,36 @@ class GlobalGuard {
   }
 )
 class asdf { }
-
-server({ modules: [asdf], port: 5000 })
+@Controller("test2")
+class test2 {
+  @Post("/")
+  test(req, res) {
+    HttpExceptions(Elumian.persona.message())
+  }
+  @Post("/us/1")
+  @ValidateBody(bodyDataValidate)
+  @ValidateQuery(bodyDataValidate)
+  test1(req, res) {
+    HttpExceptions({
+      status: HttpStatus.ok,
+      message: { test: "test" },
+      type: 'SUCCESS'
+    })
+  }
+  @Post("/:id")
+  @ValidateParams(bodyDataValidate)
+  @ValidateBody(bodyDataValidate)
+  test2(req, res) {
+    HttpExceptions({
+      status: HttpStatus.ok,
+      message: { test: "test" },
+      type: 'SUCCESS'
+    })
+  }
+}
+@Module({
+  controllers: [test2],
+})
+class asdf2 { }
+Server.setConfig({ modules: [asdf, asdf2], port: 5000 })
+Server.start()
