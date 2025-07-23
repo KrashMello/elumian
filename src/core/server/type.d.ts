@@ -1,3 +1,8 @@
+export interface ServerConfig {
+  whiteList?: string[];
+  port?: number;
+  modules: any[]
+}
 export interface RouteInfo {
   api: string;
   handler: string;
