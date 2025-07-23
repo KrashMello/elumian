@@ -4,12 +4,29 @@
     "outDir": "../../lib/core/",
     "rootDir": ".",
     "paths": {
-      "elumian/server": ["../server"],
-      "elumian/server/*": ["../server/*"],
-      "elumian/server/request": ["../server/request"],
-      "elumian/server/request/*": ["../server/request/*"]
+      "@elumian/core": [
+        "../"
+      ],
+      "@elumian/core/*": [
+        "../*"
+      ],
+      "@elumian/common": [
+        "../common"
+      ],
+      "@elumian/common/*": [
+        "../common/*"
+      ]
     }
   },
-  "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts"],
-  "references": []
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test/**/*",
+    "*.spec.ts"
+  ],
+  "references": [
+    {
+      "path": "../common/tsconfig.build.json"
+    }
+  ]
 }

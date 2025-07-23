@@ -12,10 +12,14 @@ const secondsToMidnight = (n: Date): number => {
 
 const list: cacheLists = { Auth: [] };
 
-let expireTime: number = 1 * 1000 * 60 * 60;
+let expireTime: number = 10 * 1000 * 60;
 
+/**
+ * Sets the expiration time for cached data in minutes.
+ * @param expireT - The expiration time in minutes.
+ */
 function setConfig(expireT: number): void {
-  expireTime = expireT * 1000 * 60 * 60;
+  expireTime = expireT * 1000 * 60;
 }
 
 function singCacheData(data: {
