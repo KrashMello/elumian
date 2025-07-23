@@ -14,7 +14,7 @@ const iv: Buffer = crypto.randomBytes(16);
 
 export const encrypted = (data: object): string => {
   const plainText: string = JSON.stringify(data);
-  const cipher: crypto.Cipher = crypto.createCipheriv(
+  const cipher: crypto.Cipheriv = crypto.createCipheriv(
     algorithm,
     secretKeyBuffer,
     iv,
@@ -23,7 +23,7 @@ export const encrypted = (data: object): string => {
 };
 
 export const encryptedBase64 = (text: string): string => {
-  const cipher: crypto.Cipher = crypto.createCipheriv(
+  const cipher: crypto.Cipheriv = crypto.createCipheriv(
     algorithm,
     secretKeyBuffer,
     iv,
@@ -36,7 +36,7 @@ export const encryptedBase64 = (text: string): string => {
 };
 
 export const decrypt = (data: string): Record<string, any> => {
-  const decipher: crypto.Decipher = crypto.createDecipheriv(
+  const decipher: crypto.Decipheriv = crypto.createDecipheriv(
     algorithm,
     secretKeyBuffer,
     iv,
@@ -48,7 +48,7 @@ export const decrypt = (data: string): Record<string, any> => {
 
 export const decryptBase64 = (text: string): string => {
   const encryptedText = Buffer.from(text, "base64");
-  const decipher: crypto.Decipher = crypto.createDecipheriv(
+  const decipher: crypto.Decipheriv = crypto.createDecipheriv(
     algorithm,
     secretKeyBuffer,
     iv,
@@ -86,10 +86,3 @@ export default {
   hardEncrypt,
   hardDecrypt,
 };
-
-// let eln = new Eluncoder()
-// let time = Math.floor(Math.random() * 10) + 1
-// console.log(time)
-// let encrypted = eln.hardEncryptor({ id: 1, name: 'asd' }, time)
-// console.log(encrypted)
-// console.log(eln.hardDecrypt(encrypted))
