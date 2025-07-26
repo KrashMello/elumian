@@ -1,18 +1,16 @@
 export interface ServerConfig {
-  whiteList?: string[];
-  port?: number;
-  modules: any[]
+	port?: number;
 }
 export interface RouteInfo {
-  api: string;
-  handler: string;
-  protected: boolean;
+	controller: string;
+	method: string;
+	path: string;
 }
 
 export interface SocketRoute {
-  method: string;
-  path: string;
-  functionSocket: (io: any, socket: any) => void;
+	method: string;
+	path: string;
+	functionSocket: (io: any, socket: any) => void;
 }
 
 export type SocketInfo = { method: string; path: string; handlerName: string };
