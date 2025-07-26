@@ -1,7 +1,7 @@
 {
   "name": "elumian",
-  "version": "2.0.0",
-  "description": "Elumian is a library for back end developers to deploy an api rest quickly and securely.",
+  "version": "1.0.0",
+  "description": "Elumian es un framework modular diseñado específicamente para desarrolladores backend que necesitan desplegar APIs REST de forma rápida, eficiente y segura. Proporciona una estructura clara y herramientas integradas para la creación de módulos, gestión de servicios, validación de datos y manejo de excepciones HTTP, facilitando el desarrollo escalable y mantenible.",
   "main": "lib/*",
   "homepage": "https://github.com/KrashMello/elumian",
   "type": "commonjs",
@@ -38,6 +38,7 @@
     "db:seed": "ts-node ./example/prisma/seed.ts"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.1.2",
     "@types/cors": "^2.8.19",
     "@types/twig": "^1.12.17",
     "module-alias": "^2.2.3",
