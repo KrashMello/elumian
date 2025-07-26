@@ -14,22 +14,22 @@
     "outDir": "lib",
     "baseUrl": ".",
     "paths": {
-      "@elumian": [
+      "elumian": [
         "src"
       ],
-      "@elumian/*": [
+      "elumian/*": [
         "src/*"
       ],
-      "@elumian/core": [
+      "elumian/core": [
         "src/core"
       ],
-      "@elumian/core/*": [
+      "elumian/core/*": [
         "src/core/*"
       ],
-      "@elumian/common": [
+      "elumian/common": [
         "src/common"
       ],
-      "@elumian/common/*": [
+      "elumian/common/*": [
         "src/common/*"
       ],
     },
