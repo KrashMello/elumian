@@ -4,10 +4,10 @@
     "outDir": "../../lib/common/",
     "rootDir": ".",
     "paths": {
-      "@elumian/core": [
+      "elumian/core": [
         "../core"
       ],
-      "@elumian/core/*": [
+      "elumian/core/*": [
         "../core/*"
       ],
     }
