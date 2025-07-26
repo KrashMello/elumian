@@ -35,7 +35,7 @@ Elumian está pensado para integrarse fácilmente con TypeScript, ofreciendo tip
 Elumian utiliza decoradores para definir módulos que agrupan controladores, servicios y middlewares.
 
 ```typescript
-import { Module } from "@elumian/common"
+import { Module } from "elumian/common"
 
 @Module({
   controllers: [TestController],
@@ -54,7 +54,7 @@ class TestModule { }
 Los servicios encapsulan la lógica reutilizable. Se definen también mediante decoradores.
 
 ```typescript
-import { Service } from "@elumian/common"
+import { Service } from "elumian/common"
 
 @Service
 class TestService {
@@ -79,8 +79,8 @@ class TestService {
 Los controladores usan decoradores para definir rutas HTTP y validaciones sobre diferentes partes de la solicitud.
 
 ```typescript
-import { ValidateQuery, ValidateParams, ValidateBody, Post, Get, Controller } from "@elumian/common"
-import { HttpExceptions, HttpStatus } from "@elumian/common"
+import { ValidateQuery, ValidateParams, ValidateBody, Post, Get, Controller } from "elumian/common"
+import { HttpExceptions, HttpStatus } from "elumian/common"
 import { bodyDataValidate } from "./dataValidateSchemas/bodyData.schema"
 
 @Controller("test")
@@ -124,7 +124,7 @@ class TestController {
 Los esquemas de validación definen reglas para los datos recibidos en las peticiones, utilizando las opciones de validación propias de Elumian.
 
 ```typescript
-import { validationsOptions } from "@elumian/type"
+import { validationsOptions } from "elumian/type"
 
 export const bodyDataValidate: validationsOptions = {
   fecha: ['required', 'date'],
