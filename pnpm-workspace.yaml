@@ -1,4 +1,6 @@
 onlyBuiltDependencies:
   - '@prisma/client'
   - '@prisma/engines'
+  - bcrypt
+  - esbuild
   - prisma
