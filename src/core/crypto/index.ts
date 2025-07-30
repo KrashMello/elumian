@@ -1,5 +1,5 @@
 import * as crypto from "crypto";
-const SECRET_KEY: string = process.env.eln_SECRET_KEY ?? "secretKey";
+const SECRET_KEY: string = process.env.eln_SECRET_KEY || "secretKey";
 
 const ALGORITHM: string = "aes-256-cbc";
 const SECRET_KEY_BUFFER: crypto.CipherKey = Buffer.alloc(
@@ -57,9 +57,10 @@ export const encryptedBase64 = (
 		SECRET_KEY_BUFFER,
 		iv,
 	);
-	let encrypted = Buffer.concat([cipher.update(text), cipher.final()]).toString(
-		"base64",
-	);
+	const encrypted = Buffer.concat([
+		cipher.update(text),
+		cipher.final(),
+	]).toString("base64");
 
 	return encrypted;
 };
@@ -72,7 +73,7 @@ export const decrypt = (
 	if (unsafe) iv = Buffer.alloc(16, SECRET_KEY, "utf8");
 	const decipher: crypto.Decipheriv = crypto.createDecipheriv(
 		ALGORITHM,
-		SECRET_KEY,
+		SECRET_KEY_BUFFER,
 		iv,
 	);
 	const decryptedText: string =
@@ -89,7 +90,7 @@ export const decryptBase64 = (
 	const encryptedText = Buffer.from(text, "base64");
 	const decipher: crypto.Decipheriv = crypto.createDecipheriv(
 		ALGORITHM,
-		SECRET_KEY,
+		SECRET_KEY_BUFFER,
 		iv,
 	);
 	return Buffer.concat([
