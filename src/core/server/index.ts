@@ -69,6 +69,9 @@ export class Server {
 	private static app: Express = express();
 	private static config: ServerConfig;
 	private static routesInfo: RouteInfo[] = [];
+	static setRedisProvider(args: { url: string }) {
+		Elumian.cache.setConfigProvider(args);
+	}
 	static setConfig = (config: ServerConfig) => {
 		this.app.use(express.json());
 		this.config = config;
