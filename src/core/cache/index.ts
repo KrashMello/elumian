@@ -28,7 +28,9 @@ export const singData = async (args: {
 	key: string;
 	data: any;
 	field?: string;
-	encrypted?: boolean;
+	encrypted?: {
+		unsafe: boolean;
+	};
 	ttl?: number;
 }): Promise<any> => {
 	let { key, data, field, encrypted, ttl } = args;
@@ -38,7 +40,7 @@ export const singData = async (args: {
 		id,
 	};
 	if (encrypted) {
-		data = Elumian.crypto.hardEncrypt(data);
+		data = Elumian.crypto.hardEncrypt(data, encrypted.unsafe);
 	}
 	if (ttl) {
 		const expirationDuration = secondsToMidnight(new Date()) * expireTime(ttl);
