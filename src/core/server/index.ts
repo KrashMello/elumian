@@ -145,7 +145,12 @@ export class Server {
 								init = Object.getOwnPropertyDescriptors(init).value.value;
 								guards.push((req, res, next) => {
 									try {
-										if (init(descriptor.value)) next();
+										const context = {
+											handler: descriptor.value,
+											request: req,
+											response: res,
+										};
+										if (init(context)) next();
 									} catch (e) {
 										if (e.data) res.status(e.status).json(e.data);
 										else {
