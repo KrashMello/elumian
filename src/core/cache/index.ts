@@ -1,70 +1,88 @@
-import * as crypto from "crypto";
 import { type cacheData, type cacheLists } from "./type";
 import { Elumian } from "..";
+import { createClient } from "redis";
 
 const secondsToMidnight = (n: Date): number => {
-  return (
-    (24 - n.getHours() - 1) * 60 * 60 +
-    (60 - n.getMinutes() - 1) * 60 +
-    (60 - n.getSeconds())
-  );
+	return (
+		(24 - n.getHours() - 1) * 60 * 60 +
+		(60 - n.getMinutes() - 1) * 60 +
+		(60 - n.getSeconds())
+	);
 };
 
-const list: cacheLists = { Auth: [] };
+export const list: Record<string, Record<string, any>> = {};
 
-let expireTime: number = 10 * 1000 * 60;
+let redisConfiguration: {
+	url: string;
+};
 
-/**
- * Sets the expiration time for cached data in minutes.
- * @param expireT - The expiration time in minutes.
- */
-function setConfig(expireT: number): void {
-  expireTime = expireT * 1000 * 60;
-}
+const expireTime = (seconds: number = 1) => {
+	return 1000 * seconds;
+};
 
-function singCacheData(data: {
-  key: string;
-  data: any;
-  encrypted?: boolean;
-  expire?: boolean;
-}): cacheData {
-  const MAX_RANDOM_TIME = 4;
-  const MIN_RANDOM_TIME = 1;
-  const time = Math.floor(Math.random() * MAX_RANDOM_TIME) + MIN_RANDOM_TIME;
-  const returnData: cacheData = {
-    id: crypto.randomUUID(),
-    data: data.data,
-  };
-  if (data.encrypted) {
-    returnData.data = Elumian.crypto.hardEncrypt(data.data, time);
-  }
-  if (data.expire) {
-    const expirationDuration = secondsToMidnight(new Date()) * expireTime;
-    returnData.expireTime = new Date(Date.now() + expirationDuration);
-  }
+export const setConfigProvider = (args: { url: string }) => {
+	redisConfiguration = args;
+};
 
-  if (!Elumian.cache.list[data.key]) Elumian.cachelist[data.key] = [];
+export const singData = async (args: {
+	key: string;
+	data: any;
+	field?: string;
+	encrypted?: boolean;
+	ttl?: number;
+}): Promise<any> => {
+	let { key, data, field, encrypted, ttl } = args;
 
-  Elumian.cache.list[data.key]?.push(returnData);
+	const id = field || Elumian.crypto.codeGen(72);
+	let result: { id: string; expireTime?: any } = {
+		id,
+	};
+	if (encrypted) {
+		data = Elumian.crypto.hardEncrypt(data);
+	}
+	if (ttl) {
+		const expirationDuration = secondsToMidnight(new Date()) * expireTime(ttl);
+		result.expireTime = new Date(Date.now() + expirationDuration);
+	}
+	if (redisConfiguration) {
+		const client = await createClient(redisConfiguration)
+			.on("error", (err) => console.log("Redis Client Error", err))
+			.connect();
+		await client.hSet(key, id, JSON.stringify(data));
+		if (ttl) await client.hExpire(key, id, ttl || 60);
+		client.destroy();
+	} else {
+		if (!list[key]) list[key] = {};
+		if (!list[key][id]) list[key][id] = data;
+		if (ttl) {
+			setTimeout(() => {
+				delete list[key][id];
+			}, expireTime(ttl));
+		}
+	}
+	return result;
+};
 
-  return returnData;
-}
+export const getData = async (
+	key: string,
+	field: string,
+): Promise<cacheData | string> => {
+	let value: string | Record<string, any>;
+	if (redisConfiguration) {
+		const client = await createClient(redisConfiguration)
+			.on("error", (err) => console.log("Redis Client Error", err))
+			.connect();
+		value = JSON.parse((await client.hGet(key, field)) as string);
+		client.destroy();
+	} else {
+		value = list[key][field] || undefined;
+	}
+	return value as string;
+};
 
-function getCacheDataById(key: string, id: string): cacheData | string {
-  const cacheList = Elumian.cache.list[key];
-  const foundItem = cacheList?.find((item: cacheData) => item.id === id);
-  return foundItem ? foundItem.data : null;
-}
-
-function verifyId(key: string, id: string): boolean {
-  const cacheList = Elumian.cache.list[key];
-  return cacheList?.some((item: cacheData) => item.id === id) ?? false;
-}
-
-export default {
-  verifyId,
-  list,
-  getCacheDataById,
-  setConfig,
-  singCacheData,
+export const verifyId = async (
+	key: string,
+	field: string,
+): Promise<boolean> => {
+	return (await getData(key, field)) ? true : false;
 };
