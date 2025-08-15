@@ -11,7 +11,6 @@ import type { SRouter, IRouter, moduleMetadata } from "elumian/common/type";
 import { RouteInfo, type SocketInfo, SocketRoute } from "./type";
 import type { NextFunction, Request, Response } from "express";
 import { setMessages, validations } from "elumian/common";
-import { HttpExceptions } from "elumian/common";
 
 const socketInfo: SocketInfo[] = [];
 const socketRoutes: SocketRoute[] = [];
@@ -79,13 +78,14 @@ export class Server {
 	static chargeModules = (modules: any[]) => {
 		for (let modul of modules) {
 			const controllers = Reflect.getMetadata("controllers", modul);
-			const middlewares = Reflect.getMetadata("middlewares", modul);
+			let middlewares = Reflect.getMetadata("middlewares", modul);
 			const services = Reflect.getMetadata("services", modul);
 			//NOTE: aqui empiezo a cargar los servicios de los modulos
 			if (services && services.length > 0)
 				for (let service of services) {
-					const initialService = new service();
+					const initialService = service.getInstance();
 					const prefix = Reflect.getMetadata("prefix", service);
+					console.log(prefix);
 					if (!Elumian[prefix]) Elumian[prefix] = initialService;
 				}
 			//NOTE: aqui empiezo a cargar los controladores de los modulos
@@ -95,11 +95,15 @@ export class Server {
 					"handlerName",
 					controller,
 				);
-				controller = controller.prototype;
-				const descriptors = Object.getOwnPropertyDescriptors(controller);
+				//NOTE: aqui se hace una auto inject dependencies
+				const dependencies =
+					Reflect.getMetadata("design:paramtypes", controller) || [];
+				const controllerPrototype = controller.prototype;
+				const instances = dependencies.map((dep) => dep.getInstance());
+				controller = new controller(...instances);
+				let descriptors = Object.getOwnPropertyDescriptors(controllerPrototype);
 				let routes = express.Router();
 				//NOTE: en esta fase empieza a leer todas las funciones incluido el constructor
-				//
 				for (const propertyKey in descriptors) {
 					let guards = [];
 					const descriptor = descriptors[propertyKey];
@@ -120,40 +124,20 @@ export class Server {
 						const method =
 							Reflect.getMetadata("method", descriptor.value) || "get";
 						const path = Reflect.getMetadata("path", descriptor.value) || "/";
-						const dataValidations = {
-							body: Reflect.getMetadata(
-								"dataValitationsBody",
-								descriptor.value,
-							),
-							query: Reflect.getMetadata(
-								"dataValitationsQuery",
-								descriptor.value,
-							),
-							params: Reflect.getMetadata(
-								"dataValitationsParams",
-								descriptor.value,
-							),
-						};
-						const dataValidate = (req, type) => {
-							return validations.compareData(req[type], dataValidations[type]);
-						};
-						const messages = Reflect.getMetadata(
-							"ValidationsMessage",
-							descriptor.value,
-						);
-						//NOTE: aqui lo que hago es almacenar los guards existentes
-						if (middlewares && middlewares.length > 0)
-							for (let middleware of middlewares) {
+						//NOTE:: aqui cargamos en el router las funciones de los controladores
+						routes[method](
+							path,
+							...middlewares.map((middleware) => {
 								let init = Reflect.getMetadata("middleware", middleware);
 								init = Object.getOwnPropertyDescriptors(init).value.value;
-								guards.push((req, res, next) => {
+								return async (req, res, next) => {
 									try {
 										const context = {
-											handler: descriptor.value,
+											handler: controller[propertyKey],
 											request: req,
 											response: res,
 										};
-										if (init(context)) next();
+										if (await init(context)) next();
 									} catch (e) {
 										if (e.data) res.status(e.status).json(e.data);
 										else {
@@ -164,55 +148,23 @@ export class Server {
 											});
 										}
 									}
-								});
-							}
-						//NOTE:: aqui cargamos en el router las funciones de los controladores
-						routes[method](path, ...guards, async (req, res, next) => {
-							try {
-								if (messages) setMessages(messages);
-								const validateResponse: {
-									params?: any;
-									query?: any;
-									body?: any;
-								} = {};
-								if (
-									dataValidations.params &&
-									dataValidate(req, "params") !== true
-								)
-									validateResponse["params"] = dataValidate(req, "params");
-								if (
-									dataValidations.query &&
-									dataValidate(req, "query") !== true
-								)
-									validateResponse["query"] = dataValidate(req, "query");
-								if (
-									dataValidations.body &&
-									method !== "get" &&
-									dataValidate(req, "body") !== true
-								)
-									validateResponse["body"] = dataValidate(req, "body");
-								if (
-									validateResponse.body ||
-									validateResponse.query ||
-									validateResponse.params
-								) {
-									HttpExceptions({
-										message: validateResponse,
-										type: "WARNING",
-										status: 401,
-									});
+								};
+							}),
+							async (req, res, next) => {
+								try {
+									await controller[propertyKey](req, res, next);
+								} catch (e) {
+									if (e.data) res.status(e.status).json(e.data);
+									else {
+										console.log(e);
+										res.status(500).json({
+											message: "Internal server error",
+											type: "DANGER",
+										});
+									}
 								}
-								await descriptor.value(req, res, next);
-							} catch (e) {
-								if (e.data) res.status(e.status).json(e.data);
-								else {
-									console.log(e);
-									res
-										.status(500)
-										.json({ message: "Internal server error", type: "DANGER" });
-								}
-							}
-						});
+							},
+						);
 					}
 				}
 				this.app.use(`/${prefix}`, routes);
