@@ -19,53 +19,34 @@ const bodyDataValidate: validationsOptions = {
 	algo: ["numeric"],
 };
 
-@Controller("test")
-class test {
-	@Get("/")
-	@Public
-	@ValidateQuery(bodyDataValidate)
-	async test(req, res) {
-		HttpExceptions(await Elumian.persona.message());
-	}
-	@Post("/us/1")
-	@Public
-	@ValidateBody(bodyDataValidate)
-	@ValidateQuery(bodyDataValidate)
-	test1(req, res) {
-		HttpExceptions({
-			status: HttpStatus.ok,
-			message: { test: "test" },
-			type: "SUCCESS",
-		});
-	}
-	@Post("/:id")
-	@ValidateParams(bodyDataValidate)
-	@ValidateBody(bodyDataValidate)
-	test2(req, res) {
-		HttpExceptions({
-			status: HttpStatus.ok,
-			message: { test: "test" },
-			type: "SUCCESS",
-		});
+@Service()
+class User {
+	getUser() {
+		return "user";
 	}
 }
-@Service
-class persona {
-	data = {
-		nombre: "asdf",
-	};
-	async message() {
+
+@Service()
+class Personas {
+	constructor(private user: User) {}
+	async message(): Promise<{
+		status: HttpStatus;
+		message: any;
+		type: "INFO" | "SUCCESS" | "DANGER" | "WARNING";
+	}> {
+		console.log(Elumian.User.getUser());
 		return {
 			status: HttpStatus.ok,
-			message: this.data,
-			type: "SUCCESS",
+			message: this.user.getUser(),
+			type: "INFO",
 		};
 	}
 }
 @Middleware
 class GlobalGuard {
 	init(context) {
-		const isPublic = Reflect.getMetadata("isPublic", context);
+		const { handler } = context;
+		const isPublic = Reflect.getMetadata("isPublic", handler);
 		if (isPublic) return true;
 		else
 			HttpExceptions({
@@ -76,18 +57,16 @@ class GlobalGuard {
 		return false;
 	}
 }
-@Module({
-	controllers: [test],
-	services: [persona],
-})
-class asdf {}
-@Controller("test2")
-class test2 {
-	@Post("/")
-	test(req, res) {
-		HttpExceptions(Elumian.persona.message());
+@Controller("test")
+class Test {
+	constructor(private personas: Personas) {}
+	@Get("/")
+	@Public
+	async test(req, res) {
+		HttpExceptions(await this.personas.message());
 	}
 	@Post("/us/1")
+	@Public
 	@ValidateBody(bodyDataValidate)
 	@ValidateQuery(bodyDataValidate)
 	test1(req, res) {
@@ -109,9 +88,11 @@ class test2 {
 	}
 }
 @Module({
-	controllers: [test2],
+	controllers: [Test],
+	services: [Personas],
+	middlewares: [GlobalGuard],
 })
-class asdf2 {}
+class asdf {}
 Server.setConfig({ port: 5000 });
-Server.chargeModules([asdf, asdf2]);
+Server.chargeModules([asdf]);
 Server.start();
