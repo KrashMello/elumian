@@ -85,7 +85,6 @@ export class Server {
 				for (let service of services) {
 					const initialService = service.getInstance();
 					const prefix = Reflect.getMetadata("prefix", service);
-					console.log(prefix);
 					if (!Elumian[prefix]) Elumian[prefix] = initialService;
 				}
 			//NOTE: aqui empiezo a cargar los controladores de los modulos
