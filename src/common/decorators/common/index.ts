@@ -18,6 +18,8 @@ const reflectorCreate =
 export const Module = (metadata: moduleMetadata) => {
 	let { controllers, services, middlewares } = metadata;
 	middlewares = middlewares || [];
+	controllers = controllers || [];
+	services = services || [];
 	return (target) => {
 		Reflect.defineMetadata("controllers", controllers, target);
 		Reflect.defineMetadata("middlewares", middlewares, target);
@@ -25,25 +27,30 @@ export const Module = (metadata: moduleMetadata) => {
 		return target;
 	};
 };
-export const Controller = (prefix: string): ClassDecorator => {
-	return (target) => {
-		Reflect.defineMetadata("prefix", prefix, target);
-		Reflect.defineMetadata("handlerName", target.name, target);
-		return target;
+export const Controller = (prefix: string) => {
+	return <T extends { new (...args: any[]): {} }>(constructor: T) => {
+		Reflect.defineMetadata("prefix", prefix, constructor);
+		Reflect.defineMetadata("handlerName", constructor.name, constructor);
 	};
 };
-export const Service = <T extends { new (...args: any[]): {} }>(
-	constructor: T,
-) => {
-	return class extends constructor {
-		constructor(...args: any[]) {
-			super(...args);
-			if (!Reflect.getMetadata("service", constructor)) {
-				Reflect.defineMetadata("prefix", constructor.name, constructor);
-				Reflect.defineMetadata("service", this, constructor);
+export const Service = () => {
+	return <T extends { new (...args: any[]): {} }>(constructor: T) => {
+		Reflect.defineMetadata("prefix", constructor.name, constructor);
+		return class extends constructor {
+			static instance;
+			constructor(...args) {
+				super(...args);
 			}
-			return Reflect.getMetadata("service", constructor);
-		}
+			static getInstance() {
+				if (!this.instance) {
+					const dependencies =
+						Reflect.getMetadata("design:paramtypes", constructor) || [];
+					const instances = dependencies.map((dep) => dep.getInstance());
+					this.instance = new constructor(...instances);
+				}
+				return this.instance;
+			}
+		};
 	};
 };
 export const Public = reflectorCreate("isPublic", true);
